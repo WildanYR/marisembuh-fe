@@ -26,24 +26,24 @@ const formDataError = reactive({
 const handleLogin = () => {
   const validator = new Validator();
   validator.addValidation("email", formData.email, [isRequired, isEmail]);
-  validator.addValidation("password", formData.password, [isRequired]);
+  validator.addValidation("password", formData.password, [isRequired, min(4)]);
   const isError = validator.validate();
-  console.log(isError);
   if (isError) {
-    formDataError.email = validator.getError("email");
-    formDataError.password = validator.getError("password");
+    formDataError.email = validator.getError("email") as any;
+    formDataError.password = validator.getError("password") as any;
     return;
   }
   loadingLogin.value = true;
   login({ email: formData.email, password: formData.password })
     .then((response) => {
+      if (!response) return;
       authStore.setUserData({
         id: response.id,
         email: response.email,
         name: response.name,
         role: response.role,
       });
-      router.push({ name: "HelloWorld" });
+      router.push({ name: "Home" });
     })
     .finally(() => {
       loadingLogin.value = false;
@@ -53,15 +53,15 @@ const handleLogin = () => {
 
 <template>
   <div
-    class="flex min-h-screen flex-col items-center justify-center bg-gray-100 px-4 md:px-0"
+    class="flex flex-col items-center justify-center min-h-screen px-4 bg-gray-100 md:px-0"
   >
     <img
       src="../assets/logo.svg"
       alt="logo marisembuh"
-      class="pointer-events-none mt-12 w-64 sm:w-80"
+      class="w-64 mt-12 pointer-events-none sm:w-80"
     />
-    <div class="mb-24 mt-14 w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
-      <h1 class="mb-6 text-center text-4xl font-medium">Login</h1>
+    <div class="w-full max-w-md p-6 mb-24 bg-white shadow-lg mt-14 rounded-xl">
+      <h1 class="mb-6 text-4xl font-medium text-center">Login</h1>
       <div class="space-y-4">
         <TextInput
           v-model="formData.email"
@@ -77,7 +77,7 @@ const handleLogin = () => {
         <LoadingButton
           :loading="loadingLogin"
           @click="handleLogin"
-          class="w-full px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 transition-colors disabled:bg-blue-200 disabled:text-blue-600 rounded-md"
+          class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
         >
           Login
         </LoadingButton>

@@ -19,6 +19,10 @@ const props = defineProps({
   errorMessage: {
     type: Array<String>,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -42,7 +46,7 @@ const toggleShowPassword = () => {
 };
 
 const mutateValue = (event: any) => {
-  emit("update:modelValue", event.target?.value);
+  emit("update:modelValue", event.target.value);
 };
 </script>
 
@@ -50,15 +54,16 @@ const mutateValue = (event: any) => {
   <div>
     <label
       :for="inputId"
-      class="relative block rounded-md border border-gray-200 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
+      class="relative block border border-gray-200 rounded-md shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
     >
       <input
         :type="inputType"
         :id="inputId"
         :placeholder="props.label"
         :value="props.modelValue"
+        :disabled="props.disabled"
         @input="mutateValue"
-        class="peer border-none bg-transparent placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0"
+        class="w-full placeholder-transparent bg-transparent border-none peer focus:border-transparent focus:outline-none focus:ring-0"
       />
 
       <span
@@ -73,11 +78,11 @@ const mutateValue = (event: any) => {
       >
         <component
           :is="showPassword ? EyeSlash : EyeOpen"
-          class="h-5 w-5"
+          class="w-5 h-5"
         ></component>
       </button>
     </label>
-    <div v-if="isError" class="ml-1 mt-1 space-y-1">
+    <div v-if="isError" class="mt-1 ml-1 space-y-1">
       <p
         v-for="(error, i) in props.errorMessage"
         :key="inputId + '-error' + i"
