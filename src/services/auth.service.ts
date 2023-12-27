@@ -8,6 +8,7 @@ interface ILogin {
 }
 
 interface ILoginResponse {
+  id: number;
   email: string;
   name: string;
   role: string;
