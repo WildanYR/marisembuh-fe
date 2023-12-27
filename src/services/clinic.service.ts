@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { IPagination, IPaginationResponse } from "../types/pagination.type";
 import { requestErrorHandler } from "../utils/request_error_handler.util";
 
-export interface IClinic {
+export interface IClinicResponse {
   id: number;
   name: string;
 }
@@ -17,7 +17,7 @@ export const getAllClinicWithPagination = async (pagination?: IPagination) => {
       uri += `?${query}`;
     }
     const response: AxiosResponse<
-      IPaginationResponse<IClinic>,
+      IPaginationResponse<IClinicResponse>,
       any
     > = await axios.get(uri);
     return response.data;

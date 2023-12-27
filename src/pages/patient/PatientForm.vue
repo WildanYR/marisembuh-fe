@@ -10,7 +10,7 @@ import {
 } from "../../services/patient.service";
 import { useAuthStore } from "../../stores/auth.store";
 import {
-  IClinic,
+  IClinicResponse,
   getAllClinicWithPagination,
 } from "../../services/clinic.service";
 import TextInput from "../../components/form/TextInput.vue";
@@ -34,7 +34,7 @@ const formDataError = reactive({
 });
 const registeringUser = ref("");
 const patientAge = ref(0);
-const clinics: Ref<IClinic[]> = ref([]);
+const clinics: Ref<IClinicResponse[]> = ref([]);
 const loadingGetPatient = ref(false);
 const loadingGetClinic = ref(false);
 const loadingSubmit = ref(false);
