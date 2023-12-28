@@ -7,6 +7,12 @@ export interface IClinicResponse {
   name: string;
 }
 
+interface IClinicCreate {
+  name: string;
+}
+
+interface IClinicUpdate extends Partial<IClinicCreate> {}
+
 export const getAllClinicWithPagination = async (pagination?: IPagination) => {
   try {
     let uri = "/clinic";
@@ -21,6 +27,55 @@ export const getAllClinicWithPagination = async (pagination?: IPagination) => {
       any
     > = await axios.get(uri);
     return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+  }
+};
+
+export const getClinicById = async (clinicId: number) => {
+  try {
+    const response: AxiosResponse<IClinicResponse, any> = await axios.get(
+      `/clinic/${clinicId}`
+    );
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+  }
+};
+
+export const getClinicByName = async (query: string) => {
+  try {
+    const response: AxiosResponse<IClinicResponse[], any> = await axios.get(
+      `/clinic?s=${query}`
+    );
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+  }
+};
+
+export const createClinic = async (clinicDTO: IClinicCreate) => {
+  try {
+    await axios.post("/clinic", clinicDTO);
+  } catch (error) {
+    requestErrorHandler(error);
+  }
+};
+
+export const updateClinic = async (
+  clinicId: number,
+  clinicDTO: IClinicUpdate
+) => {
+  try {
+    await axios.put(`/clinic/${clinicId}`, clinicDTO);
+  } catch (error) {
+    requestErrorHandler(error);
+  }
+};
+
+export const deleteClinic = async (clinicId: number) => {
+  try {
+    await axios.delete(`/clinic/${clinicId}`);
   } catch (error) {
     requestErrorHandler(error);
   }

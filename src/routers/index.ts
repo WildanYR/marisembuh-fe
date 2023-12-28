@@ -3,6 +3,7 @@ import Home from "../pages/Home.vue";
 import Login from "../pages/Login.vue";
 import PatientRoutes from "./patient.router";
 import GrayBgLayout from "../layouts/GrayBgLayout.vue";
+import ClinicRoutes from "./clinic.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,6 +15,12 @@ const router = createRouter({
       path: "/pasien",
       component: GrayBgLayout,
       children: PatientRoutes,
+    },
+    {
+      name: "ClinicLayout",
+      path: "/klinik",
+      component: GrayBgLayout,
+      children: ClinicRoutes,
     },
   ],
 });
