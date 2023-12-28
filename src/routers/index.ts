@@ -7,6 +7,7 @@ import ClinicRoutes from "./clinic.router";
 import MedicineRoutes from "./medicine.router";
 import DoctorDiagnosisRoutes from "./doctor_diagnosis.router";
 import SelfTherapyRoutes from "./self_therapy.router";
+import TreatmentPacketRoutes from "./treatment_packet.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -42,6 +43,12 @@ const router = createRouter({
       path: "/terapi-mandiri",
       component: GrayBgLayout,
       children: SelfTherapyRoutes,
+    },
+    {
+      name: "TreatmentPacketLayout",
+      path: "/paket-perawatan",
+      component: GrayBgLayout,
+      children: TreatmentPacketRoutes,
     },
   ],
 });

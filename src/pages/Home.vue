@@ -9,5 +9,8 @@
       Diagnosa Dokter
     </RouterLink>
     <RouterLink :to="{ name: 'SelfTherapyList' }"> Terapi Mandiri </RouterLink>
+    <RouterLink :to="{ name: 'TreatmentPacketList' }"
+      >Paket Perawatan
+    </RouterLink>
   </div>
 </template>
