@@ -15,5 +15,8 @@
     <RouterLink :to="{ name: 'StomachCheckupList' }"
       >Pemeriksaan Perut
     </RouterLink>
+    <RouterLink :to="{ name: 'TongueCheckupList' }"
+      >Pemeriksaan Lidah
+    </RouterLink>
   </div>
 </template>
