@@ -5,6 +5,7 @@ import PatientRoutes from "./patient.router";
 import GrayBgLayout from "../layouts/GrayBgLayout.vue";
 import ClinicRoutes from "./clinic.router";
 import MedicineRoutes from "./medicine.router";
+import DoctorDiagnosisRoutes from "./doctor_diagnosis.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,6 +29,12 @@ const router = createRouter({
       path: "/obat",
       component: GrayBgLayout,
       children: MedicineRoutes,
+    },
+    {
+      name: "DoctorDiagnosisLayout",
+      path: "/diagnosa-dokter",
+      component: GrayBgLayout,
+      children: DoctorDiagnosisRoutes,
     },
   ],
 });
