@@ -14,17 +14,7 @@ import TableRowBody from "../../components/tables/TableRowBody.vue";
 import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
-import {
-  Menu,
-  MenuButton,
-  MenuItems,
-  MenuItem,
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/vue";
+import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import ThreeDotIcon from "../../components/icon/ThreeDotIcon.vue";
 import { useRouter } from "vue-router";
 import LoadingButton from "../../components/LoadingButton.vue";
@@ -32,6 +22,7 @@ import DocumentIcon from "../../components/icon/DocumentIcon.vue";
 import EditIcon from "../../components/icon/EditIcon.vue";
 import TrashIcon from "../../components/icon/TrashIcon.vue";
 import TextSearch from "../../components/form/TextSearch.vue";
+import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 
 const router = useRouter();
 
@@ -141,11 +132,6 @@ const openDeleteModal = (patientId: number) => {
     (patient) => patient.id === patientId
   )!;
   modalDeleteOpen.value = true;
-};
-
-const closeDeleteModal = () => {
-  if (loadingDeletePatient.value) return;
-  modalDeleteOpen.value = false;
 };
 
 onMounted(() => {
@@ -288,68 +274,15 @@ onMounted(() => {
     </div>
     <EmptyData v-else></EmptyData>
   </div>
-  <TransitionRoot appear :show="modalDeleteOpen" as="template">
-    <Dialog as="div" @close="closeDeleteModal" class="relative z-30">
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black/25"></div>
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="flex items-center justify-center min-h-full p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl"
-            >
-              <DialogTitle
-                as="h3"
-                class="text-lg font-medium leading-6 text-gray-900"
-              >
-                Hapus Pasien
-              </DialogTitle>
-              <div class="mt-2">
-                <p class="text-sm text-gray-500">
-                  apakah anda yakin ingin menghapus data pasien?
-                </p>
-              </div>
-
-              <div class="flex gap-3 mt-4">
-                <button
-                  type="button"
-                  class="inline-flex justify-center px-4 py-2 text-sm font-medium text-red-900 bg-red-100 border border-transparent rounded-md hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                  @click="closeDeleteModal"
-                >
-                  Batal
-                </button>
-                <LoadingButton
-                  :loading="loadingDeletePatient"
-                  @click="handleOnPatientDelete"
-                  class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-                >
-                  Hapus Pasien
-                </LoadingButton>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </div>
-    </Dialog>
-  </TransitionRoot>
+  <ConfirmDialog
+    v-model="modalDeleteOpen"
+    title="Hapus Pasien"
+    button-text="Hapus"
+    :loading-confirm="loadingDeletePatient"
+    @confirm="handleOnPatientDelete"
+  >
+    konfirmasi untuk menghapus,
+    <span class="font-medium">{{ selectedPatient?.name }}</span
+    >?
+  </ConfirmDialog>
 </template>
