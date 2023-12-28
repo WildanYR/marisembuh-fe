@@ -6,6 +6,7 @@ import GrayBgLayout from "../layouts/GrayBgLayout.vue";
 import ClinicRoutes from "./clinic.router";
 import MedicineRoutes from "./medicine.router";
 import DoctorDiagnosisRoutes from "./doctor_diagnosis.router";
+import SelfTherapyRoutes from "./self_therapy.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -35,6 +36,12 @@ const router = createRouter({
       path: "/diagnosa-dokter",
       component: GrayBgLayout,
       children: DoctorDiagnosisRoutes,
+    },
+    {
+      name: "SelfTherapyLayout",
+      path: "/terapi-mandiri",
+      component: GrayBgLayout,
+      children: SelfTherapyRoutes,
     },
   ],
 });

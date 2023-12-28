@@ -5,8 +5,9 @@
     <RouterLink :to="{ name: 'PatientList' }">Pasien</RouterLink>
     <RouterLink :to="{ name: 'ClinicList' }">Klinik</RouterLink>
     <RouterLink :to="{ name: 'MedicineList' }">Obat</RouterLink>
-    <RouterLink :to="{ name: 'DoctorDiagnosisList' }"
-      >Diagnosa Dokter</RouterLink
-    >
+    <RouterLink :to="{ name: 'DoctorDiagnosisList' }">
+      Diagnosa Dokter
+    </RouterLink>
+    <RouterLink :to="{ name: 'SelfTherapyList' }"> Terapi Mandiri </RouterLink>
   </div>
 </template>
