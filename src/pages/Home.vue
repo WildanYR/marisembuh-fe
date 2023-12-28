@@ -12,5 +12,8 @@
     <RouterLink :to="{ name: 'TreatmentPacketList' }"
       >Paket Perawatan
     </RouterLink>
+    <RouterLink :to="{ name: 'StomachCheckupList' }"
+      >Pemeriksaan Perut
+    </RouterLink>
   </div>
 </template>

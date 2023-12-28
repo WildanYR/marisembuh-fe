@@ -8,6 +8,7 @@ import MedicineRoutes from "./medicine.router";
 import DoctorDiagnosisRoutes from "./doctor_diagnosis.router";
 import SelfTherapyRoutes from "./self_therapy.router";
 import TreatmentPacketRoutes from "./treatment_packet.router";
+import StomachCheckupRoutes from "./stomach_checkup.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -49,6 +50,12 @@ const router = createRouter({
       path: "/paket-perawatan",
       component: GrayBgLayout,
       children: TreatmentPacketRoutes,
+    },
+    {
+      name: "StomachCheckupLayout",
+      path: "/pemeriksaan-perut",
+      component: GrayBgLayout,
+      children: StomachCheckupRoutes,
     },
   ],
 });
