@@ -10,6 +10,7 @@ import SelfTherapyRoutes from "./self_therapy.router";
 import TreatmentPacketRoutes from "./treatment_packet.router";
 import StomachCheckupRoutes from "./stomach_checkup.router";
 import TongueCheckupRoutes from "./tongue_checkup.router";
+import TherapyRoutes from "./therapy.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -63,6 +64,12 @@ const router = createRouter({
       path: "/pemeriksaan-lidah",
       component: GrayBgLayout,
       children: TongueCheckupRoutes,
+    },
+    {
+      name: "TherapyLayout",
+      path: "/terapi",
+      component: GrayBgLayout,
+      children: TherapyRoutes,
     },
   ],
 });
