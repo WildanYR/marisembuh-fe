@@ -11,6 +11,7 @@ import TreatmentPacketRoutes from "./treatment_packet.router";
 import StomachCheckupRoutes from "./stomach_checkup.router";
 import TongueCheckupRoutes from "./tongue_checkup.router";
 import TherapyRoutes from "./therapy.router";
+import MeridianRoutes from "./meridian.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -70,6 +71,12 @@ const router = createRouter({
       path: "/terapi",
       component: GrayBgLayout,
       children: TherapyRoutes,
+    },
+    {
+      name: "MeridianLayout",
+      path: "/meridian",
+      component: GrayBgLayout,
+      children: MeridianRoutes,
     },
   ],
 });

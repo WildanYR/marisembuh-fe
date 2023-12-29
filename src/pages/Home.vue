@@ -19,5 +19,6 @@
       >Pemeriksaan Lidah
     </RouterLink>
     <RouterLink :to="{ name: 'TherapyList' }">Terapi (tindakan) </RouterLink>
+    <RouterLink :to="{ name: 'MeridianList' }">Meridian</RouterLink>
   </div>
 </template>
