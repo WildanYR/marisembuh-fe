@@ -25,7 +25,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "keyEnter"]);
 
 const showPassword = ref(false);
 
@@ -48,6 +48,10 @@ const toggleShowPassword = () => {
 const mutateValue = (event: any) => {
   emit("update:modelValue", event.target.value);
 };
+
+const onEnterPressed = () => {
+  emit("keyEnter");
+};
 </script>
 
 <template>
@@ -63,6 +67,7 @@ const mutateValue = (event: any) => {
         :value="props.modelValue"
         :disabled="props.disabled"
         @input="mutateValue"
+        @keyup.enter="onEnterPressed"
         class="w-full placeholder-transparent bg-transparent border-none peer focus:border-transparent focus:outline-none focus:ring-0"
       />
 

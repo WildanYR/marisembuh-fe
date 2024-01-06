@@ -73,6 +73,7 @@ const handleLogin = () => {
           label="Password"
           type="password"
           :error-message="formDataError.password"
+          @key-enter="handleLogin"
         ></TextInput>
         <LoadingButton
           :loading="loadingLogin"
