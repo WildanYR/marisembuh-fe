@@ -48,7 +48,7 @@ export const getMeridianById = async (meridianId: number) => {
 export const getMeridianByName = async (query: string) => {
   try {
     const response: AxiosResponse<IMeridianResponse[], any> = await axios.get(
-      `/meridian?s=${query}`
+      `/meridian?name=${query}`
     );
     return response.data;
   } catch (error) {

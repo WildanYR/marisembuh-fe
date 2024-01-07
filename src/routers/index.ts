@@ -12,6 +12,7 @@ import StomachCheckupRoutes from "./stomach_checkup.router";
 import TongueCheckupRoutes from "./tongue_checkup.router";
 import TherapyRoutes from "./therapy.router";
 import MeridianRoutes from "./meridian.router";
+import ComplaintRoutes from "./complaint.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -77,6 +78,12 @@ const router = createRouter({
       path: "/meridian",
       component: GrayBgLayout,
       children: MeridianRoutes,
+    },
+    {
+      name: "ComplaintLayout",
+      path: "/complaint",
+      component: GrayBgLayout,
+      children: ComplaintRoutes,
     },
   ],
 });

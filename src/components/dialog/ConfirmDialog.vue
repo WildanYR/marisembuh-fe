@@ -6,6 +6,7 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/vue";
+import LoadingButton from "../LoadingButton.vue";
 
 const props = defineProps({
   title: {
