@@ -21,5 +21,6 @@
     <RouterLink :to="{ name: 'TherapyList' }">Terapi (tindakan) </RouterLink>
     <RouterLink :to="{ name: 'MeridianList' }">Meridian</RouterLink>
     <RouterLink :to="{ name: 'ComplaintList' }">Keluhan</RouterLink>
+    <RouterLink :to="{ name: 'UserList' }">User</RouterLink>
   </div>
 </template>

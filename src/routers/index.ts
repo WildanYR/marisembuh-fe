@@ -13,6 +13,7 @@ import TongueCheckupRoutes from "./tongue_checkup.router";
 import TherapyRoutes from "./therapy.router";
 import MeridianRoutes from "./meridian.router";
 import ComplaintRoutes from "./complaint.router";
+import UserRoutes from "./user.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -84,6 +85,12 @@ const router = createRouter({
       path: "/complaint",
       component: GrayBgLayout,
       children: ComplaintRoutes,
+    },
+    {
+      name: "UserLayout",
+      path: "/user",
+      component: GrayBgLayout,
+      children: UserRoutes,
     },
   ],
 });
