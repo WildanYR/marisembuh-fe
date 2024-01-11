@@ -1,0 +1,343 @@
+<script setup lang="ts">
+import { Ref, computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import {
+  TransitionRoot,
+  TransitionChild,
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/vue";
+import TextSearch from "../TextSearch.vue";
+import { Debouncer } from "../../../utils/debounce";
+import LoadingSpinner from "../../icon/LoadingSpinner.vue";
+import EmptyData from "../../EmptyData.vue";
+import {
+  IMeridianResponse,
+  getAllMeridianWithPagination,
+  getMeridianByName,
+  createMeridian,
+} from "../../../services/meridian.service";
+import PlusIcon from "../../icon/PlusIcon.vue";
+import { IPaginationData } from "../../../types/pagination.type";
+import TextInput from "../TextInput.vue";
+import { Validator } from "../../../validator";
+import isRequired from "../../../validator/isRequired.validator";
+
+const debouncer = new Debouncer();
+
+const props = defineProps({
+  label: {
+    type: String,
+    required: true,
+  },
+  modelValue: {
+    required: true,
+  },
+  errorMessage: {
+    type: Array<String>,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const meridianList: Ref<IMeridianResponse[]> = ref([]);
+const paginationData: Ref<IPaginationData> = ref({
+  currentPage: 1,
+  limit: 20,
+  totalItems: 0,
+  totalPage: 1,
+});
+
+const addMeridianData = reactive({
+  name: "",
+});
+const addMeridianDataError = reactive({
+  name: [],
+});
+
+const loadingGetMeridian = ref(false);
+const loadingAddMeridian = ref(false);
+
+const modalShow = ref(false);
+const mode = ref("get");
+const searchText = ref("");
+
+const id = computed(() => props.label.replace(/\s+/g, "-").toLowerCase());
+
+const selectedItemIndex = computed(() => {
+  if (!props.modelValue || !meridianList.value.length) return -1;
+  return meridianList.value.findIndex(
+    (item) => item.id === (props.modelValue as any).id
+  );
+});
+
+const maxPage = computed(
+  () => paginationData.value.currentPage === paginationData.value.totalPage
+);
+
+const resetPaginationData = () => {
+  paginationData.value.currentPage = 1;
+  paginationData.value.limit = 20;
+  paginationData.value.totalItems = 0;
+  paginationData.value.totalPage = 1;
+};
+
+const getMeridian = (page = 1, limit = 20) => {
+  loadingGetMeridian.value = true;
+  getAllMeridianWithPagination({ page, limit })
+    .then((response) => {
+      if (!response) return [];
+      meridianList.value = response.items;
+      paginationData.value.currentPage = response.paginationData.currentPage;
+      paginationData.value.limit = response.paginationData.limit;
+      paginationData.value.totalItems = response.paginationData.totalItems;
+      paginationData.value.totalPage = response.paginationData.totalPage;
+    })
+    .finally(() => {
+      loadingGetMeridian.value = false;
+    });
+};
+
+const openModal = () => {
+  modalShow.value = true;
+};
+
+const closeModal = () => {
+  if (loadingAddMeridian.value) return;
+  modalShow.value = false;
+  debouncer.clearTimer();
+};
+
+const onSelectItem = (item: any) => {
+  emit("update:modelValue", item);
+  closeModal();
+};
+
+const onClearSelected = () => {
+  emit("update:modelValue", null);
+};
+
+const onSearch = debouncer.debounce((searchValue: string) => {
+  resetPaginationData();
+  if (!searchValue) {
+    getMeridian();
+  } else {
+    loadingGetMeridian.value = true;
+    getMeridianByName(searchValue)
+      .then((response) => {
+        if (!response) return [];
+        meridianList.value = response;
+      })
+      .finally(() => {
+        loadingGetMeridian.value = false;
+      });
+  }
+}, 1000);
+
+const onShowMore = () => {
+  getMeridian(paginationData.value.currentPage + 1);
+};
+
+const onAddMeridianMode = () => {
+  mode.value = "add";
+};
+const onGetMeridianMode = () => {
+  mode.value = "get";
+  resetPaginationData();
+  getMeridian();
+};
+
+const handleAddMeridian = () => {
+  const validator = new Validator();
+  validator.addValidation("name", addMeridianData.name, [isRequired]);
+  if (validator.validate()) {
+    addMeridianDataError.name = validator.getError("name") as any;
+    return;
+  }
+  loadingAddMeridian.value = true;
+  createMeridian({ ...addMeridianData })
+    .then((response) => {
+      if (!response) return;
+      emit("update:modelValue", response);
+      loadingAddMeridian.value = false;
+      mode.value = "get";
+      resetPaginationData();
+      getMeridian();
+      closeModal();
+    })
+    .finally(() => {
+      loadingAddMeridian.value = false;
+    });
+};
+
+onMounted(() => {
+  getMeridian();
+});
+
+onBeforeUnmount(() => {
+  debouncer.clearTimer();
+});
+</script>
+
+<template>
+  <div>
+    <p class="mb-1 font-medium">{{ props.label }}</p>
+    <div class="flex gap-2">
+      <button
+        :disabled="props.disabled"
+        @click="openModal"
+        :class="[
+          'flex-1 px-5 py-2 rounded-md',
+          props.modelValue
+            ? 'bg-emerald-100 hover:bg-emerald-300'
+            : 'text-sm hover:bg-gray-200 border border-gray-300 border-dashed',
+        ]"
+      >
+        {{
+          props.modelValue
+            ? (props.modelValue as any).name
+            : "Pilih " + props.label
+        }}
+      </button>
+      <button
+        v-show="props.modelValue"
+        :disabled="props.disabled"
+        @click="onClearSelected"
+        class="flex-none px-3 py-2 bg-red-100 rounded-md"
+      >
+        X
+      </button>
+    </div>
+    <div v-if="props.errorMessage?.length" class="mt-1 ml-1 space-y-1">
+      <p
+        v-for="(error, i) in props.errorMessage"
+        :key="id + '-error' + i"
+        class="text-sm text-red-500"
+      >
+        {{ `${props.label} ${error}` }}
+      </p>
+    </div>
+  </div>
+  <TransitionRoot appear :show="modalShow" as="template">
+    <Dialog as="div" @close="closeModal" class="relative z-30">
+      <TransitionChild
+        as="template"
+        enter="duration-300 ease-out"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="duration-200 ease-in"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
+      >
+        <div class="fixed inset-0 bg-black/25"></div>
+      </TransitionChild>
+
+      <div class="fixed inset-0 overflow-y-auto">
+        <div
+          class="flex items-center justify-center min-h-full p-4 text-center"
+        >
+          <TransitionChild
+            as="template"
+            enter="duration-300 ease-out"
+            enter-from="opacity-0 scale-95"
+            enter-to="opacity-100 scale-100"
+            leave="duration-200 ease-in"
+            leave-from="opacity-100 scale-100"
+            leave-to="opacity-0 scale-95"
+          >
+            <DialogPanel
+              class="w-full max-w-5xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <DialogTitle
+                  as="h3"
+                  class="text-lg font-medium leading-6 text-gray-900"
+                >
+                  Pilih {{ props.label }}
+                </DialogTitle>
+                <button
+                  type="button"
+                  @click="onAddMeridianMode"
+                  class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                >
+                  <PlusIcon class="w-4 h-4"></PlusIcon>
+                  <span>Tambah Meridian</span>
+                </button>
+              </div>
+              <div class="flex justify-end mb-3">
+                <TextSearch
+                  label="Cari"
+                  v-model="searchText"
+                  @update:model-value="onSearch"
+                ></TextSearch>
+              </div>
+              <div
+                v-if="loadingGetMeridian"
+                class="flex flex-col items-center justify-center gap-3"
+              >
+                <LoadingSpinner
+                  class="w-8 h-8 text-gray-500 animate-spin"
+                ></LoadingSpinner>
+                <p class="text-lg text-gray-500">Memuat Data</p>
+              </div>
+              <template v-else>
+                <template v-if="mode === 'add'">
+                  <div class="flex flex-col items-center justify-center gap-4">
+                    <TextInput
+                      v-model="addMeridianData.name"
+                      label="Nama Meridian"
+                      :error-message="addMeridianDataError.name"
+                    ></TextInput>
+                    <LoadingButton
+                      :loading="loadingAddMeridian"
+                      @click="handleAddMeridian"
+                      class="px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+                    >
+                      Tambah Meridian
+                    </LoadingButton>
+                    <button @click="onGetMeridianMode">batal</button>
+                  </div>
+                </template>
+                <template v-else>
+                  <template v-if="meridianList.length">
+                    <div class="grid grid-flow-col gap-3 auto-cols-auto">
+                      <button
+                        v-for="(item, i) in meridianList"
+                        :key="id + '-' + i"
+                        :disabled="selectedItemIndex === i"
+                        @click="onSelectItem(item)"
+                        :class="[
+                          'py-2 px-3 rounded-md',
+                          selectedItemIndex === i
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300',
+                        ]"
+                      >
+                        {{ item.name }}
+                      </button>
+                    </div>
+                    <div
+                      v-show="!maxPage"
+                      class="flex items-center justify-center mt-5"
+                    >
+                      <button
+                        @click="onShowMore"
+                        class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-200"
+                      >
+                        Tampilkan lebih banyak
+                      </button>
+                    </div>
+                  </template>
+                  <EmptyData v-else></EmptyData>
+                </template>
+              </template>
+            </DialogPanel>
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </TransitionRoot>
+</template>

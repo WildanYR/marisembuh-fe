@@ -58,7 +58,11 @@ export const getMeridianByName = async (query: string) => {
 
 export const createMeridian = async (meridianDTO: IMeridianCreate) => {
   try {
-    await axios.post("/meridian", meridianDTO);
+    const response: AxiosResponse<IMeridianResponse, any> = await axios.post(
+      "/meridian",
+      meridianDTO
+    );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

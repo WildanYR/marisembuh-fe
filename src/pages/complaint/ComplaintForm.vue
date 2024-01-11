@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Validator } from "../../validator";
 import isRequired from "../../validator/isRequired.validator";
@@ -10,13 +10,7 @@ import {
 } from "../../services/complaint.service";
 import TextInput from "../../components/form/TextInput.vue";
 import LoadingButton from "../../components/LoadingButton.vue";
-import SelectDialog from "../../components/form/SelectDialog.vue";
-import {
-  IMeridianResponse,
-  getAllMeridianWithPagination,
-  getMeridianByName,
-} from "../../services/meridian.service";
-import { IPaginationData } from "../../types/pagination.type";
+import SingleMeridianSelect from "../../components/form/custom_data/SingleMeridianSelect.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -28,16 +22,8 @@ const formData = reactive({
 const formDataError = reactive({
   name: [],
 });
-const meridianList: Ref<IMeridianResponse[]> = ref([]);
-const meridianPagination: Ref<IPaginationData> = ref({
-  currentPage: 1,
-  limit: 20,
-  totalItems: 0,
-  totalPage: 1,
-});
-const selectedMeridian: Ref<IMeridianResponse | null> = ref(null);
+const selectedMeridian = ref(null);
 const loadingGetComplaint = ref(false);
-const loadingGetMeridian = ref(false);
 const loadingSubmit = ref(false);
 
 const readOnly = computed(() => {
@@ -87,61 +73,8 @@ const handleSubmit = () => {
   }
 };
 
-const getMeridianData = () => {
-  loadingGetMeridian.value = true;
-  const firstGet =
-    meridianPagination.value.currentPage === 1 &&
-    meridianPagination.value.totalItems === 0;
-  const page = firstGet ? 1 : meridianPagination.value.currentPage + 1;
-  getAllMeridianWithPagination({
-    limit: meridianPagination.value.limit,
-    page,
-  })
-    .then((response) => {
-      if (!response) return;
-      if (firstGet) {
-        meridianList.value = response.items;
-      } else {
-        meridianList.value.push(...response.items);
-      }
-      meridianPagination.value.currentPage =
-        response.paginationData.currentPage;
-      meridianPagination.value.limit = response.paginationData.limit;
-      meridianPagination.value.totalItems = response.paginationData.totalItems;
-      meridianPagination.value.totalPage = response.paginationData.totalPage;
-    })
-    .finally(() => {
-      loadingGetMeridian.value = false;
-    });
-};
-
-const searchMeridian = (name: string) => {
-  meridianPagination.value.currentPage = 1;
-  meridianPagination.value.limit = 20;
-  meridianPagination.value.totalItems = 0;
-  meridianPagination.value.totalPage = 1;
-  if (!name) {
-    getMeridianData();
-    return;
-  }
-  loadingGetMeridian.value = true;
-  getMeridianByName(name)
-    .then((response) => {
-      if (!response) return;
-      meridianList.value = response;
-    })
-    .finally(() => {
-      loadingGetMeridian.value = false;
-    });
-};
-
-const onSelectMeridian = (meridian: IMeridianResponse) => {
-  formData.meridian_id = meridian.id as any;
-};
-
-const onClearSelectedMeridian = () => {
-  formData.meridian_id = null;
-  selectedMeridian.value = null;
+const onSelectMeridian = (meridian: any) => {
+  formData.meridian_id = meridian.id;
 };
 
 onMounted(() => {
@@ -152,7 +85,7 @@ onMounted(() => {
         if (!response) return;
         formData.name = response.name;
         if (response.meridian?.id) {
-          selectedMeridian.value = response.meridian;
+          selectedMeridian.value = response.meridian as any;
           formData.meridian_id = response.meridian.id as any;
         }
       })
@@ -160,7 +93,6 @@ onMounted(() => {
         loadingGetComplaint.value = false;
       });
   }
-  getMeridianData();
 });
 </script>
 
@@ -178,22 +110,12 @@ onMounted(() => {
         :disabled="readOnly"
         :error-message="formDataError.name"
       ></TextInput>
-      <SelectDialog
-        v-model="selectedMeridian"
+      <SingleMeridianSelect
         label="Meridian"
-        display-key="name"
-        select-key="id"
-        :items="meridianList"
-        :max-page="
-          meridianPagination.currentPage === meridianPagination.totalPage
-        "
-        :loading="loadingGetMeridian"
+        v-model="selectedMeridian"
         :disabled="readOnly"
         @update:model-value="onSelectMeridian"
-        @show-more="getMeridianData"
-        @search="searchMeridian"
-        @clear-selected="onClearSelectedMeridian"
-      ></SelectDialog>
+      />
       <LoadingButton
         v-if="!readOnly"
         :loading="loadingSubmit"
