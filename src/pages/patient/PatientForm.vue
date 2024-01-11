@@ -16,6 +16,7 @@ import {
 import TextInput from "../../components/form/TextInput.vue";
 import LoadingButton from "../../components/LoadingButton.vue";
 import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
+import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -38,6 +39,8 @@ const clinics: Ref<IClinicResponse[]> = ref([]);
 const loadingGetPatient = ref(false);
 const loadingGetClinic = ref(false);
 const loadingSubmit = ref(false);
+
+const selectedClinic = ref(null);
 
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
@@ -89,6 +92,10 @@ const handleSubmit = () => {
   }
 };
 
+const onSelectClinic = (clinic: any) => {
+  formData.clinic_id = clinic.id;
+};
+
 onMounted(() => {
   if (route.params.id) {
     loadingGetPatient.value = true;
@@ -101,6 +108,7 @@ onMounted(() => {
         formData.address = response.address;
         formData.telp = response.telp;
         formData.clinic_id = response.register_clinic.id;
+        selectedClinic.value = response.register_clinic as any;
         // Detail
         registeringUser.value = response.registered_by.name;
         const today = new Date();
@@ -215,34 +223,12 @@ onMounted(() => {
         label="No Telpon / WA"
         :disabled="readOnly"
       ></TextInput>
-      <RadioGroup v-model="formData.clinic_id" :disabled="readOnly">
-        <RadioGroupLabel class="text-gray-700">Klinik</RadioGroupLabel>
-        <div v-if="clinics.length" class="grid grid-cols-2 gap-3 mt-3">
-          <RadioGroupOption
-            v-for="(clinic, i) in clinics"
-            :key="'clinic-' + i"
-            as="template"
-            :value="clinic.id"
-            v-slot="{ active, checked }"
-          >
-            <div
-              :class="[
-                active
-                  ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-blue-300'
-                  : '',
-                checked
-                  ? 'bg-blue-700/75 text-white '
-                  : 'bg-white border border-gray-200',
-              ]"
-              class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
-            >
-              <RadioGroupLabel class="text-sm">{{
-                clinic.name
-              }}</RadioGroupLabel>
-            </div>
-          </RadioGroupOption>
-        </div>
-      </RadioGroup>
+      <SingleClinicSelect
+        label="Klinik"
+        v-model="selectedClinic"
+        :disabled="readOnly"
+        @update:model-value="onSelectClinic"
+      />
       <div v-if="readOnly">
         <p class="text-sm text-gray-700">Didaftarkan oleh</p>
         <p class="font-medium">{{ registeringUser }}</p>
