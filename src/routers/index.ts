@@ -14,6 +14,7 @@ import TherapyRoutes from "./therapy.router";
 import MeridianRoutes from "./meridian.router";
 import ComplaintRoutes from "./complaint.router";
 import UserRoutes from "./user.router";
+import DurationAdviceRoutes from "./duration_advice.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -91,6 +92,12 @@ const router = createRouter({
       path: "/user",
       component: GrayBgLayout,
       children: UserRoutes,
+    },
+    {
+      name: "DurationAdviceLayout",
+      path: "/saran-perawatan",
+      component: GrayBgLayout,
+      children: DurationAdviceRoutes,
     },
   ],
 });
