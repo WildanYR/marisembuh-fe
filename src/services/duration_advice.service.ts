@@ -70,7 +70,11 @@ export const updateDurationAdvice = async (
   durationadviceDTO: IDurationAdviceUpdate
 ) => {
   try {
-    await axios.put(`/duration-advice/${durationadviceId}`, durationadviceDTO);
+    const response = await axios.put(
+      `/duration-advice/${durationadviceId}`,
+      durationadviceDTO
+    );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

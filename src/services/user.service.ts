@@ -61,7 +61,8 @@ export const getUserByName = async (query: string) => {
 
 export const createUser = async (userDTO: IUserCreate) => {
   try {
-    await axios.post("/user", userDTO);
+    const response = await axios.post("/user", userDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,7 +70,8 @@ export const createUser = async (userDTO: IUserCreate) => {
 
 export const updateUser = async (userId: number, userDTO: IUserUpdate) => {
   try {
-    await axios.put(`/user/${userId}`, userDTO);
+    const response = await axios.put(`/user/${userId}`, userDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

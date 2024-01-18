@@ -58,7 +58,8 @@ export const createDoctorDiagnosis = async (
   doctordiagnosisDTO: IDoctorDiagnosisCreate
 ) => {
   try {
-    await axios.post("/doctor-diagnosis", doctordiagnosisDTO);
+    const response = await axios.post("/doctor-diagnosis", doctordiagnosisDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,10 +70,11 @@ export const updateDoctorDiagnosis = async (
   doctordiagnosisDTO: IDoctorDiagnosisUpdate
 ) => {
   try {
-    await axios.put(
+    const response = await axios.put(
       `/doctor-diagnosis/${doctordiagnosisId}`,
       doctordiagnosisDTO
     );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

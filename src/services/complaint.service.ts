@@ -61,7 +61,8 @@ export const getComplaintByName = async (query: string) => {
 
 export const createComplaint = async (complaintDTO: IComplaintCreate) => {
   try {
-    await axios.post("/complaint", complaintDTO);
+    const response = await axios.post("/complaint", complaintDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -72,7 +73,8 @@ export const updateComplaint = async (
   complaintDTO: IComplaintUpdate
 ) => {
   try {
-    await axios.put(`/complaint/${complaintId}`, complaintDTO);
+    const response = await axios.put(`/complaint/${complaintId}`, complaintDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

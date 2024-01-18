@@ -73,7 +73,8 @@ export const updateMeridian = async (
   meridianDTO: IMeridianUpdate
 ) => {
   try {
-    await axios.put(`/meridian/${meridianId}`, meridianDTO);
+    const response = await axios.put(`/meridian/${meridianId}`, meridianDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

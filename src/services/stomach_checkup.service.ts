@@ -58,7 +58,8 @@ export const createStomachCheckup = async (
   stomachcheckupDTO: IStomachCheckupCreate
 ) => {
   try {
-    await axios.post("/stomach-checkup", stomachcheckupDTO);
+    const response = await axios.post("/stomach-checkup", stomachcheckupDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,7 +70,11 @@ export const updateStomachCheckup = async (
   stomachcheckupDTO: IStomachCheckupUpdate
 ) => {
   try {
-    await axios.put(`/stomach-checkup/${stomachcheckupId}`, stomachcheckupDTO);
+    const response = await axios.put(
+      `/stomach-checkup/${stomachcheckupId}`,
+      stomachcheckupDTO
+    );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

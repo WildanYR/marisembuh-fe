@@ -77,7 +77,8 @@ export const getPatientByName = async (query: string) => {
 
 export const createPatient = async (patientDTO: IPatientCreate) => {
   try {
-    await axios.post("/patient", patientDTO);
+    const response = await axios.post("/patient", patientDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -88,7 +89,8 @@ export const updatePatient = async (
   patientDTO: IPatientUpdate
 ) => {
   try {
-    await axios.put(`/patient/${patientId}`, patientDTO);
+    const response = await axios.put(`/patient/${patientId}`, patientDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

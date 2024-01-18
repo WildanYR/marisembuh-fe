@@ -56,7 +56,8 @@ export const getTherapyByName = async (query: string) => {
 
 export const createTherapy = async (therapyDTO: ITherapyCreate) => {
   try {
-    await axios.post("/therapy", therapyDTO);
+    const response = await axios.post("/therapy", therapyDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -67,7 +68,8 @@ export const updateTherapy = async (
   therapyDTO: ITherapyUpdate
 ) => {
   try {
-    await axios.put(`/therapy/${therapyId}`, therapyDTO);
+    const response = await axios.put(`/therapy/${therapyId}`, therapyDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

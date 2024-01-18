@@ -58,7 +58,8 @@ export const getMedicineByName = async (query: string) => {
 
 export const createMedicine = async (medicineDTO: IMedicineCreate) => {
   try {
-    await axios.post("/medicine", medicineDTO);
+    const response = await axios.post("/medicine", medicineDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,7 +70,8 @@ export const updateMedicine = async (
   medicineDTO: IMedicineUpdate
 ) => {
   try {
-    await axios.put(`/medicine/${medicineId}`, medicineDTO);
+    const response = await axios.put(`/medicine/${medicineId}`, medicineDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

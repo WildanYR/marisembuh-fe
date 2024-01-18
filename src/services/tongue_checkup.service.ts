@@ -58,7 +58,8 @@ export const createTongueCheckup = async (
   tonguecheckupDTO: ITongueCheckupCreate
 ) => {
   try {
-    await axios.post("/tongue-checkup", tonguecheckupDTO);
+    const response = await axios.post("/tongue-checkup", tonguecheckupDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,7 +70,11 @@ export const updateTongueCheckup = async (
   tonguecheckupDTO: ITongueCheckupUpdate
 ) => {
   try {
-    await axios.put(`/tongue-checkup/${tonguecheckupId}`, tonguecheckupDTO);
+    const response = await axios.put(
+      `/tongue-checkup/${tonguecheckupId}`,
+      tonguecheckupDTO
+    );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

@@ -58,7 +58,8 @@ export const createTreatmentPacket = async (
   treatmentpacketDTO: ITreatmentPacketCreate
 ) => {
   try {
-    await axios.post("/treatment-packet", treatmentpacketDTO);
+    const response = await axios.post("/treatment-packet", treatmentpacketDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -69,10 +70,11 @@ export const updateTreatmentPacket = async (
   treatmentpacketDTO: ITreatmentPacketUpdate
 ) => {
   try {
-    await axios.put(
+    const response = await axios.put(
       `/treatment-packet/${treatmentpacketId}`,
       treatmentpacketDTO
     );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

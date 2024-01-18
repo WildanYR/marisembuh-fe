@@ -57,7 +57,8 @@ export const getSelfTherapyByName = async (query: string) => {
 
 export const createSelfTherapy = async (selftherapyDTO: ISelfTherapyCreate) => {
   try {
-    await axios.post("/self-therapy", selftherapyDTO);
+    const response = await axios.post("/self-therapy", selftherapyDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -68,7 +69,11 @@ export const updateSelfTherapy = async (
   selftherapyDTO: ISelfTherapyUpdate
 ) => {
   try {
-    await axios.put(`/self-therapy/${selftherapyId}`, selftherapyDTO);
+    const response = await axios.put(
+      `/self-therapy/${selftherapyId}`,
+      selftherapyDTO
+    );
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }

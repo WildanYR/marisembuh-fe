@@ -56,7 +56,8 @@ export const getClinicByName = async (query: string) => {
 
 export const createClinic = async (clinicDTO: IClinicCreate) => {
   try {
-    return await axios.post("/clinic", clinicDTO);
+    const response = await axios.post("/clinic", clinicDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
@@ -67,7 +68,8 @@ export const updateClinic = async (
   clinicDTO: IClinicUpdate
 ) => {
   try {
-    await axios.put(`/clinic/${clinicId}`, clinicDTO);
+    const response = await axios.put(`/clinic/${clinicId}`, clinicDTO);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
   }
