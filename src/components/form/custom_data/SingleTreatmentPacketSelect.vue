@@ -12,11 +12,11 @@ import { Debouncer } from "../../../utils/debounce";
 import LoadingSpinner from "../../icon/LoadingSpinner.vue";
 import EmptyData from "../../EmptyData.vue";
 import {
-  IMeridianResponse,
-  getAllMeridianWithPagination,
-  getMeridianByName,
-  createMeridian,
-} from "../../../services/meridian.service";
+  ITreatmentPacketResponse,
+  getAllTreatmentPacketWithPagination,
+  getTreatmentPacketByName,
+  createTreatmentPacket,
+} from "../../../services/treatment_packet.service";
 import PlusIcon from "../../icon/PlusIcon.vue";
 import { IPaginationData } from "../../../types/pagination.type";
 import TextInput from "../TextInput.vue";
@@ -45,7 +45,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 
-const meridianList: Ref<IMeridianResponse[]> = ref([]);
+const treatmentPacketList: Ref<ITreatmentPacketResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
   currentPage: 1,
   limit: 20,
@@ -53,15 +53,15 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 
-const addMeridianData = reactive({
+const addTreatmentPacketData = reactive({
   name: "",
 });
-const addMeridianDataError = reactive({
+const addTreatmentPacketDataError = reactive({
   name: [],
 });
 
-const loadingGetMeridian = ref(false);
-const loadingAddMeridian = ref(false);
+const loadingGetTreatmentPacket = ref(false);
+const loadingAddTreatmentPacket = ref(false);
 
 const modalShow = ref(false);
 const mode = ref("get");
@@ -70,8 +70,8 @@ const searchText = ref("");
 const id = computed(() => props.label.replace(/\s+/g, "-").toLowerCase());
 
 const selectedItemIndex = computed(() => {
-  if (!props.modelValue || !meridianList.value.length) return -1;
-  return meridianList.value.findIndex(
+  if (!props.modelValue || !treatmentPacketList.value.length) return -1;
+  return treatmentPacketList.value.findIndex(
     (item) => item.id === (props.modelValue as any).id
   );
 });
@@ -83,19 +83,19 @@ const resetPaginationData = () => {
   paginationData.value.totalPage = 1;
 };
 
-const getMeridian = (page = 1, limit = 20) => {
-  loadingGetMeridian.value = true;
-  getAllMeridianWithPagination({ page, limit })
+const getTreatmentPacket = (page = 1, limit = 20) => {
+  loadingGetTreatmentPacket.value = true;
+  getAllTreatmentPacketWithPagination({ page, limit })
     .then((response) => {
       if (!response) return [];
-      meridianList.value = response.items;
+      treatmentPacketList.value = response.items;
       paginationData.value.currentPage = response.paginationData.currentPage;
       paginationData.value.limit = response.paginationData.limit;
       paginationData.value.totalItems = response.paginationData.totalItems;
       paginationData.value.totalPage = response.paginationData.totalPage;
     })
     .finally(() => {
-      loadingGetMeridian.value = false;
+      loadingGetTreatmentPacket.value = false;
     });
 };
 
@@ -104,7 +104,7 @@ const openModal = () => {
 };
 
 const closeModal = () => {
-  if (loadingAddMeridian.value) return;
+  if (loadingAddTreatmentPacket.value) return;
   modalShow.value = false;
   debouncer.clearTimer();
 };
@@ -121,54 +121,54 @@ const onClearSelected = () => {
 const onSearch = debouncer.debounce((searchValue: string) => {
   resetPaginationData();
   if (!searchValue) {
-    getMeridian();
+    getTreatmentPacket();
   } else {
-    loadingGetMeridian.value = true;
-    getMeridianByName(searchValue)
+    loadingGetTreatmentPacket.value = true;
+    getTreatmentPacketByName(searchValue)
       .then((response) => {
         if (!response) return [];
-        meridianList.value = response;
+        treatmentPacketList.value = response;
       })
       .finally(() => {
-        loadingGetMeridian.value = false;
+        loadingGetTreatmentPacket.value = false;
       });
   }
 }, 1000);
 
-const onAddMeridianMode = () => {
+const onAddTreatmentPacketMode = () => {
   mode.value = "add";
 };
-const onGetMeridianMode = () => {
+const onGetTreatmentPacketMode = () => {
   mode.value = "get";
   resetPaginationData();
-  getMeridian();
+  getTreatmentPacket();
 };
 
-const handleAddMeridian = () => {
+const handleAddTreatmentPacket = () => {
   const validator = new Validator();
-  validator.addValidation("name", addMeridianData.name, [isRequired]);
+  validator.addValidation("name", addTreatmentPacketData.name, [isRequired]);
   if (validator.validate()) {
-    addMeridianDataError.name = validator.getError("name") as any;
+    addTreatmentPacketDataError.name = validator.getError("name") as any;
     return;
   }
-  loadingAddMeridian.value = true;
-  createMeridian({ ...addMeridianData })
+  loadingAddTreatmentPacket.value = true;
+  createTreatmentPacket({ ...addTreatmentPacketData })
     .then((response) => {
       if (!response) return;
       emit("update:modelValue", response);
-      loadingAddMeridian.value = false;
+      loadingAddTreatmentPacket.value = false;
       mode.value = "get";
       resetPaginationData();
-      getMeridian();
+      getTreatmentPacket();
       closeModal();
     })
     .finally(() => {
-      loadingAddMeridian.value = false;
+      loadingAddTreatmentPacket.value = false;
     });
 };
 
 onMounted(() => {
-  getMeridian();
+  getTreatmentPacket();
 });
 
 onBeforeUnmount(() => {
@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
         {{ (props.modelValue as any).name }}
       </button>
       <button
-        v-show="!props.disabled"
+        v-show="!props.disabled && props.modelValue"
         :disabled="props.disabled"
         @click="onClearSelected"
         class="flex-none px-3 py-2 bg-red-100 rounded-md"
@@ -255,11 +255,11 @@ onBeforeUnmount(() => {
                 </DialogTitle>
                 <button
                   type="button"
-                  @click="onAddMeridianMode"
+                  @click="onAddTreatmentPacketMode"
                   class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                 >
                   <PlusIcon class="w-4 h-4"></PlusIcon>
-                  <span>Tambah Meridian</span>
+                  <span>Tambah Paket Perawatan</span>
                 </button>
               </div>
               <div class="flex justify-end mb-3">
@@ -270,7 +270,7 @@ onBeforeUnmount(() => {
                 ></TextSearch>
               </div>
               <div
-                v-if="loadingGetMeridian"
+                v-if="loadingGetTreatmentPacket"
                 class="flex flex-col items-center justify-center gap-3"
               >
                 <LoadingSpinner
@@ -282,27 +282,27 @@ onBeforeUnmount(() => {
                 <template v-if="mode === 'add'">
                   <div class="flex flex-col items-center justify-center gap-4">
                     <TextInput
-                      v-model="addMeridianData.name"
-                      label="Nama Meridian"
-                      :error-message="addMeridianDataError.name"
+                      v-model="addTreatmentPacketData.name"
+                      label="Nama TreatmentPacket"
+                      :error-message="addTreatmentPacketDataError.name"
                     ></TextInput>
                     <LoadingButton
-                      :loading="loadingAddMeridian"
-                      @click="handleAddMeridian"
+                      :loading="loadingAddTreatmentPacket"
+                      @click="handleAddTreatmentPacket"
                       class="px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
                     >
-                      Tambah Meridian
+                      Tambah Paket Perawatan
                     </LoadingButton>
-                    <button @click="onGetMeridianMode">batal</button>
+                    <button @click="onGetTreatmentPacketMode">batal</button>
                   </div>
                 </template>
                 <template v-else>
-                  <template v-if="meridianList.length">
+                  <template v-if="treatmentPacketList.length">
                     <div
                       class="grid grid-cols-1 gap-3 lg:grid-cols-4 md:grid-cols-2"
                     >
                       <button
-                        v-for="(item, i) in meridianList"
+                        v-for="(item, i) in treatmentPacketList"
                         :key="id + '-' + i"
                         :disabled="selectedItemIndex === i"
                         @click="onSelectItem(item)"
@@ -322,7 +322,7 @@ onBeforeUnmount(() => {
                         :total-pages="paginationData.totalPage"
                         :total-items="paginationData.totalItems"
                         :limit="paginationData.limit"
-                        @page-change="getMeridian"
+                        @page-change="getTreatmentPacket"
                       ></Pagination>
                     </div>
                   </template>

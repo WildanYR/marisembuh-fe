@@ -12,11 +12,11 @@ import { Debouncer } from "../../../utils/debounce";
 import LoadingSpinner from "../../icon/LoadingSpinner.vue";
 import EmptyData from "../../EmptyData.vue";
 import {
-  IMeridianResponse,
-  getAllMeridianWithPagination,
-  getMeridianByName,
-  createMeridian,
-} from "../../../services/meridian.service";
+  IComplaintResponse,
+  getAllComplaintWithPagination,
+  getComplaintByName,
+  createComplaint,
+} from "../../../services/complaint.service";
 import PlusIcon from "../../icon/PlusIcon.vue";
 import { IPaginationData } from "../../../types/pagination.type";
 import TextInput from "../TextInput.vue";
@@ -45,7 +45,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 
-const meridianList: Ref<IMeridianResponse[]> = ref([]);
+const complaintList: Ref<IComplaintResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
   currentPage: 1,
   limit: 20,
@@ -53,28 +53,21 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 
-const addMeridianData = reactive({
+const addComplaintData = reactive({
   name: "",
 });
-const addMeridianDataError = reactive({
+const addComplaintDataError = reactive({
   name: [],
 });
 
-const loadingGetMeridian = ref(false);
-const loadingAddMeridian = ref(false);
+const loadingGetComplaint = ref(false);
+const loadingAddComplaint = ref(false);
 
 const modalShow = ref(false);
 const mode = ref("get");
 const searchText = ref("");
 
 const id = computed(() => props.label.replace(/\s+/g, "-").toLowerCase());
-
-const selectedItemIndex = computed(() => {
-  if (!props.modelValue || !meridianList.value.length) return -1;
-  return meridianList.value.findIndex(
-    (item) => item.id === (props.modelValue as any).id
-  );
-});
 
 const resetPaginationData = () => {
   paginationData.value.currentPage = 1;
@@ -83,20 +76,29 @@ const resetPaginationData = () => {
   paginationData.value.totalPage = 1;
 };
 
-const getMeridian = (page = 1, limit = 20) => {
-  loadingGetMeridian.value = true;
-  getAllMeridianWithPagination({ page, limit })
+const getComplaint = (page = 1, limit = 20) => {
+  loadingGetComplaint.value = true;
+  getAllComplaintWithPagination({ page, limit })
     .then((response) => {
       if (!response) return [];
-      meridianList.value = response.items;
+      complaintList.value = response.items;
       paginationData.value.currentPage = response.paginationData.currentPage;
       paginationData.value.limit = response.paginationData.limit;
       paginationData.value.totalItems = response.paginationData.totalItems;
       paginationData.value.totalPage = response.paginationData.totalPage;
     })
     .finally(() => {
-      loadingGetMeridian.value = false;
+      loadingGetComplaint.value = false;
     });
+};
+
+const isItemSelected = (id: number) => {
+  if (!(props.modelValue as any)?.length || !complaintList.value.length)
+    return false;
+  const selectedIndex = (props.modelValue as any[]).findIndex(
+    (item) => item.id === id
+  );
+  return selectedIndex !== -1;
 };
 
 const openModal = () => {
@@ -104,71 +106,85 @@ const openModal = () => {
 };
 
 const closeModal = () => {
-  if (loadingAddMeridian.value) return;
+  if (loadingAddComplaint.value) return;
   modalShow.value = false;
   debouncer.clearTimer();
 };
 
-const onSelectItem = (item: any) => {
-  emit("update:modelValue", item);
-  closeModal();
+const onSelectItem = (selectedItem: any) => {
+  if ((props.modelValue as any[])?.length) {
+    let newValue = (props.modelValue as any[]).map((item) => item);
+    const selectedIndex = newValue.findIndex(
+      (item) => item.id === selectedItem.id
+    );
+    if (selectedIndex === -1) {
+      newValue.push(selectedItem);
+    } else {
+      newValue = newValue.filter((_, i) => i !== selectedIndex);
+    }
+    emit("update:modelValue", newValue);
+  } else {
+    emit("update:modelValue", [selectedItem]);
+  }
 };
 
-const onClearSelected = () => {
-  emit("update:modelValue", null);
+const onClearSelected = (itemIndex: number) => {
+  const newValue = [...(props.modelValue as any[])];
+  newValue.splice(itemIndex, 1);
+  emit("update:modelValue", newValue);
 };
 
 const onSearch = debouncer.debounce((searchValue: string) => {
   resetPaginationData();
   if (!searchValue) {
-    getMeridian();
+    getComplaint();
   } else {
-    loadingGetMeridian.value = true;
-    getMeridianByName(searchValue)
+    loadingGetComplaint.value = true;
+    getComplaintByName(searchValue)
       .then((response) => {
         if (!response) return [];
-        meridianList.value = response;
+        complaintList.value = response;
       })
       .finally(() => {
-        loadingGetMeridian.value = false;
+        loadingGetComplaint.value = false;
       });
   }
 }, 1000);
 
-const onAddMeridianMode = () => {
+const onAddComplaintMode = () => {
   mode.value = "add";
 };
-const onGetMeridianMode = () => {
+const onGetComplaintMode = () => {
   mode.value = "get";
   resetPaginationData();
-  getMeridian();
+  getComplaint();
 };
 
-const handleAddMeridian = () => {
+const handleAddComplaint = () => {
   const validator = new Validator();
-  validator.addValidation("name", addMeridianData.name, [isRequired]);
+  validator.addValidation("name", addComplaintData.name, [isRequired]);
   if (validator.validate()) {
-    addMeridianDataError.name = validator.getError("name") as any;
+    addComplaintDataError.name = validator.getError("name") as any;
     return;
   }
-  loadingAddMeridian.value = true;
-  createMeridian({ ...addMeridianData })
+  loadingAddComplaint.value = true;
+  createComplaint({ ...addComplaintData })
     .then((response) => {
       if (!response) return;
-      emit("update:modelValue", response);
-      loadingAddMeridian.value = false;
+      onSelectItem(response);
+      addComplaintData.name = "";
+      loadingAddComplaint.value = false;
       mode.value = "get";
       resetPaginationData();
-      getMeridian();
-      closeModal();
+      getComplaint();
     })
     .finally(() => {
-      loadingAddMeridian.value = false;
+      loadingAddComplaint.value = false;
     });
 };
 
 onMounted(() => {
-  getMeridian();
+  getComplaint();
 });
 
 onBeforeUnmount(() => {
@@ -179,22 +195,37 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <p class="mb-1 font-medium">{{ props.label }}</p>
-    <div v-if="props.modelValue" class="flex gap-2">
-      <button
-        :disabled="props.disabled"
-        @click="openModal"
-        class="flex-1 px-5 py-2 rounded-md bg-emerald-100 enabled:hover:bg-emerald-300"
+    <div v-if="(props.modelValue as any)?.length" class="flex flex-col gap-3">
+      <div
+        v-for="(value, i) in props.modelValue"
+        :key="id + '-selected-' + i"
+        class="flex gap-2"
       >
-        {{ (props.modelValue as any).name }}
-      </button>
-      <button
-        v-show="!props.disabled"
-        :disabled="props.disabled"
-        @click="onClearSelected"
-        class="flex-none px-3 py-2 bg-red-100 rounded-md"
-      >
-        X
-      </button>
+        <button
+          :disabled="props.disabled"
+          @click="openModal"
+          class="flex-1 px-5 py-2 rounded-md bg-emerald-100 enabled:hover:bg-emerald-300"
+        >
+          <div class="text-center">
+            <p class="font-medium">{{ (value as any).name }}</p>
+            <p class="text-xs">
+              {{
+                (value as any).meridian
+                  ? (value as any).meridian.name
+                  : "Lain-lain"
+              }}
+            </p>
+          </div>
+        </button>
+        <button
+          v-show="!props.disabled"
+          :disabled="props.disabled"
+          @click="onClearSelected(i)"
+          class="flex-none px-3 py-2 bg-red-100 rounded-md"
+        >
+          X
+        </button>
+      </div>
     </div>
     <template v-else>
       <button
@@ -255,11 +286,11 @@ onBeforeUnmount(() => {
                 </DialogTitle>
                 <button
                   type="button"
-                  @click="onAddMeridianMode"
+                  @click="onAddComplaintMode"
                   class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                 >
                   <PlusIcon class="w-4 h-4"></PlusIcon>
-                  <span>Tambah Meridian</span>
+                  <span>Tambah Keluhan</span>
                 </button>
               </div>
               <div class="flex justify-end mb-3">
@@ -270,7 +301,7 @@ onBeforeUnmount(() => {
                 ></TextSearch>
               </div>
               <div
-                v-if="loadingGetMeridian"
+                v-if="loadingGetComplaint"
                 class="flex flex-col items-center justify-center gap-3"
               >
                 <LoadingSpinner
@@ -282,38 +313,44 @@ onBeforeUnmount(() => {
                 <template v-if="mode === 'add'">
                   <div class="flex flex-col items-center justify-center gap-4">
                     <TextInput
-                      v-model="addMeridianData.name"
-                      label="Nama Meridian"
-                      :error-message="addMeridianDataError.name"
+                      v-model="addComplaintData.name"
+                      label="Nama Keluhan"
+                      :error-message="addComplaintDataError.name"
                     ></TextInput>
                     <LoadingButton
-                      :loading="loadingAddMeridian"
-                      @click="handleAddMeridian"
+                      :loading="loadingAddComplaint"
+                      @click="handleAddComplaint"
                       class="px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
                     >
-                      Tambah Meridian
+                      Tambah Keluhan
                     </LoadingButton>
-                    <button @click="onGetMeridianMode">batal</button>
+                    <button @click="onGetComplaintMode">batal</button>
                   </div>
                 </template>
                 <template v-else>
-                  <template v-if="meridianList.length">
+                  <template v-if="complaintList.length">
                     <div
                       class="grid grid-cols-1 gap-3 lg:grid-cols-4 md:grid-cols-2"
                     >
                       <button
-                        v-for="(item, i) in meridianList"
+                        v-for="(item, i) in complaintList"
                         :key="id + '-' + i"
-                        :disabled="selectedItemIndex === i"
                         @click="onSelectItem(item)"
                         :class="[
                           'py-2 px-3 rounded-md',
-                          selectedItemIndex === i
+                          isItemSelected(item.id)
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-200 hover:bg-gray-300',
                         ]"
                       >
-                        {{ item.name }}
+                        <div class="text-center">
+                          <p class="font-medium">{{ item.name }}</p>
+                          <p class="text-xs">
+                            {{
+                              item.meridian ? item.meridian.name : "Lain-lain"
+                            }}
+                          </p>
+                        </div>
                       </button>
                     </div>
                     <div class="mt-5">
@@ -322,7 +359,7 @@ onBeforeUnmount(() => {
                         :total-pages="paginationData.totalPage"
                         :total-items="paginationData.totalItems"
                         :limit="paginationData.limit"
-                        @page-change="getMeridian"
+                        @page-change="getComplaint"
                       ></Pagination>
                     </div>
                   </template>

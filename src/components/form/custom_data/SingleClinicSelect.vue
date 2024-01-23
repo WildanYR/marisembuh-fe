@@ -22,6 +22,8 @@ import { IPaginationData } from "../../../types/pagination.type";
 import TextInput from "../TextInput.vue";
 import { Validator } from "../../../validator";
 import isRequired from "../../../validator/isRequired.validator";
+import LoadingButton from "../../LoadingButton.vue";
+import Pagination from "../../Pagination.vue";
 
 const debouncer = new Debouncer();
 
@@ -73,10 +75,6 @@ const selectedItemIndex = computed(() => {
     (item) => item.id === (props.modelValue as any).id
   );
 });
-
-const maxPage = computed(
-  () => paginationData.value.currentPage === paginationData.value.totalPage
-);
 
 const resetPaginationData = () => {
   paginationData.value.currentPage = 1;
@@ -137,10 +135,6 @@ const onSearch = debouncer.debounce((searchValue: string) => {
   }
 }, 1000);
 
-const onShowMore = () => {
-  getClinic(paginationData.value.currentPage + 1);
-};
-
 const onAddClinicMode = () => {
   mode.value = "add";
 };
@@ -185,25 +179,16 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <p class="mb-1 font-medium">{{ props.label }}</p>
-    <div class="flex gap-2">
+    <div v-if="props.modelValue" class="flex gap-2">
       <button
         :disabled="props.disabled"
         @click="openModal"
-        :class="[
-          'flex-1 px-5 py-2 rounded-md',
-          props.modelValue
-            ? 'bg-emerald-100 hover:bg-emerald-300'
-            : 'text-sm hover:bg-gray-200 border border-gray-300 border-dashed',
-        ]"
+        class="flex-1 px-5 py-2 rounded-md bg-emerald-100 enabled:hover:bg-emerald-300"
       >
-        {{
-          props.modelValue
-            ? (props.modelValue as any).name
-            : "Pilih " + props.label
-        }}
+        {{ (props.modelValue as any).name }}
       </button>
       <button
-        v-show="props.modelValue"
+        v-show="!props.disabled"
         :disabled="props.disabled"
         @click="onClearSelected"
         class="flex-none px-3 py-2 bg-red-100 rounded-md"
@@ -211,6 +196,16 @@ onBeforeUnmount(() => {
         X
       </button>
     </div>
+    <template v-else>
+      <button
+        v-if="!props.disabled"
+        @click="openModal"
+        class="w-full px-5 py-2 text-sm border border-gray-300 border-dashed rounded-md hover:bg-gray-200"
+      >
+        {{ "Pilih " + props.label }}
+      </button>
+      <p v-else class="text-sm text-gray-500">Tidak ada data</p>
+    </template>
     <div v-if="props.errorMessage?.length" class="mt-1 ml-1 space-y-1">
       <p
         v-for="(error, i) in props.errorMessage"
@@ -303,7 +298,9 @@ onBeforeUnmount(() => {
                 </template>
                 <template v-else>
                   <template v-if="clinicList.length">
-                    <div class="grid grid-flow-col gap-3 auto-cols-auto">
+                    <div
+                      class="grid grid-cols-1 gap-3 lg:grid-cols-4 md:grid-cols-2"
+                    >
                       <button
                         v-for="(item, i) in clinicList"
                         :key="id + '-' + i"
@@ -319,16 +316,14 @@ onBeforeUnmount(() => {
                         {{ item.name }}
                       </button>
                     </div>
-                    <div
-                      v-show="!maxPage"
-                      class="flex items-center justify-center mt-5"
-                    >
-                      <button
-                        @click="onShowMore"
-                        class="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-200"
-                      >
-                        Tampilkan lebih banyak
-                      </button>
+                    <div class="mt-5">
+                      <Pagination
+                        :current-page="paginationData.currentPage"
+                        :total-pages="paginationData.totalPage"
+                        :total-items="paginationData.totalItems"
+                        :limit="paginationData.limit"
+                        @page-change="getClinic"
+                      ></Pagination>
                     </div>
                   </template>
                   <EmptyData v-else></EmptyData>

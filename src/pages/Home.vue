@@ -7,6 +7,7 @@ const routes = ref([
     routes: [
       { to: "UserList", name: "User" },
       { to: "PatientList", name: "Pasien" },
+      { to: "TreatmentPatientList", name: "Perawatan" },
     ],
   },
   {

@@ -15,6 +15,7 @@ import MeridianRoutes from "./meridian.router";
 import ComplaintRoutes from "./complaint.router";
 import UserRoutes from "./user.router";
 import DurationAdviceRoutes from "./duration_advice.router";
+import TreatmentRoutes from "./treatment.router";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -98,6 +99,12 @@ const router = createRouter({
       path: "/saran-perawatan",
       component: GrayBgLayout,
       children: DurationAdviceRoutes,
+    },
+    {
+      name: "TreatmentLayout",
+      path: "/treatment",
+      component: GrayBgLayout,
+      children: TreatmentRoutes,
     },
   ],
 });
