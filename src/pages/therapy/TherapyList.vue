@@ -22,6 +22,8 @@ import EditIcon from "../../components/icon/EditIcon.vue";
 import TrashIcon from "../../components/icon/TrashIcon.vue";
 import TextSearch from "../../components/form/TextSearch.vue";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
+import GrayButton from "../../components/button/GrayButton.vue";
+import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 
 const router = useRouter();
 
@@ -116,6 +118,10 @@ const openDeleteModal = (TherapyId: number) => {
   modalDeleteOpen.value = true;
 };
 
+const toPreviousPage = () => {
+  router.push({ name: "Home" });
+};
+
 onMounted(() => {
   getTherapyData();
 });
@@ -123,7 +129,15 @@ onMounted(() => {
 
 <template>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-medium">Daftar Terapi (tindakan)</h1>
+    <div class="flex gap-3">
+      <GrayButton
+        @click="toPreviousPage"
+        class="flex items-center justify-center !px-3"
+      >
+        <ChevLeftIcon class="w-5 h-5" />
+      </GrayButton>
+      <h1 class="text-2xl font-medium">Daftar Terapi (tindakan)</h1>
+    </div>
     <button
       type="button"
       @click="handleOnTherapyAdd"

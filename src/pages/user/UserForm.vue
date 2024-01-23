@@ -11,6 +11,7 @@ import {
 import TextInput from "../../components/form/TextInput.vue";
 import LoadingButton from "../../components/LoadingButton.vue";
 import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
+import GrayButton from "../../components/button/GrayButton.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -82,6 +83,10 @@ const handleSubmit = () => {
   }
 };
 
+const toPreviousPage = () => {
+  router.push({ name: "UserList" });
+};
+
 onMounted(() => {
   if (route.params.id) {
     loadingGetUser.value = true;
@@ -103,9 +108,12 @@ onMounted(() => {
   <div
     class="w-full max-w-xl p-6 mx-auto mb-24 bg-white shadow-lg mt-14 rounded-xl"
   >
-    <h1 class="mb-6 text-4xl font-medium text-center">
+    <h1 class="mb-3 text-4xl font-medium text-center">
       {{ route.meta.title }}
     </h1>
+    <div class="flex items-center justify-center mb-3">
+      <GrayButton @click="toPreviousPage" class="text-sm">Kembali</GrayButton>
+    </div>
     <div class="space-y-4">
       <TextInput
         v-model="formData.email"
@@ -152,14 +160,17 @@ onMounted(() => {
           </RadioGroupOption>
         </div>
       </RadioGroup>
-      <LoadingButton
-        v-if="!readOnly"
-        :loading="loadingSubmit"
-        @click="handleSubmit"
-        class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-      >
-        {{ route.meta.title }}
-      </LoadingButton>
+      <div class="pt-3 space-y-4">
+        <LoadingButton
+          v-show="!readOnly"
+          :loading="loadingSubmit"
+          @click="handleSubmit"
+          class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+        >
+          {{ route.meta.title }}
+        </LoadingButton>
+        <GrayButton @click="toPreviousPage" class="w-full">Kembali</GrayButton>
+      </div>
     </div>
   </div>
 </template>
