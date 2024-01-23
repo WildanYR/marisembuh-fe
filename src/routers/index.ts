@@ -16,12 +16,18 @@ import ComplaintRoutes from "./complaint.router";
 import UserRoutes from "./user.router";
 import DurationAdviceRoutes from "./duration_advice.router";
 import TreatmentRoutes from "./treatment.router";
+import { tokenKey } from "../configs";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { name: "Home", path: "/", component: Home },
-    { name: "Login", path: "/login", component: Login },
+    {
+      name: "Login",
+      path: "/login",
+      component: Login,
+      meta: { publicRoute: true },
+    },
     {
       name: "PatientLayout",
       path: "/pasien",
@@ -107,6 +113,14 @@ const router = createRouter({
       children: TreatmentRoutes,
     },
   ],
+});
+
+router.beforeEach((to, from) => {
+  if (!to.meta.publicRoute) {
+    const token = localStorage.getItem(tokenKey);
+    if (!token) return { name: "Login" };
+  }
+  return true;
 });
 
 export default router;
