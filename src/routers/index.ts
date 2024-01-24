@@ -115,7 +115,7 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   if (!to.meta.publicRoute) {
     const token = localStorage.getItem(tokenKey);
     if (!token) return { name: "Login" };
