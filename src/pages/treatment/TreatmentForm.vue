@@ -235,7 +235,6 @@ onMounted(() => {
     getTreatmentById(parseInt(route.params.id as any))
       .then((response) => {
         if (!response) return;
-        console.log(response);
         formData.objective = response.objective;
         formData.blood_pressure = response.blood_pressure || "";
         formData.pulse_frequency = response.pulse_frequency || "";
@@ -369,7 +368,9 @@ onBeforeUnmount(() => {
           <RadioGroupLabel class="font-medium"
             >Tujuan Perawatan</RadioGroupLabel
           >
-          <div class="flex items-center justify-center gap-5 mt-3">
+          <div
+            class="flex flex-col items-center justify-center gap-5 mt-3 md:flex-row"
+          >
             <RadioGroupOption
               v-for="(obj, i) in treatmentObjective"
               :key="'treatment-objective-' + i"
@@ -431,7 +432,7 @@ onBeforeUnmount(() => {
           <RadioGroupLabel class="font-medium"
             >Status Kehamilan</RadioGroupLabel
           >
-          <div class="flex items-center gap-5 mt-3">
+          <div class="flex items-center gap-3 mt-3 md:gap-5">
             <RadioGroupOption
               as="template"
               :value="false"
@@ -526,7 +527,9 @@ onBeforeUnmount(() => {
             @update:model-value="onEditDataChange('pulse_checkup')"
           >
             <RadioGroupLabel class="font-medium">Kedalaman</RadioGroupLabel>
-            <div class="flex items-center gap-5 mt-3">
+            <div
+              class="flex flex-col items-center gap-3 mt-3 md:gap-5 md:flex-row"
+            >
               <RadioGroupOption
                 v-for="(depth, i) in pulseCheckupDepth"
                 :key="'pulse-checkup-depth-' + i"
@@ -557,7 +560,9 @@ onBeforeUnmount(() => {
             @update:model-value="onEditDataChange('pulse_checkup')"
           >
             <RadioGroupLabel class="font-medium">Kecepatan</RadioGroupLabel>
-            <div class="flex items-center gap-5 mt-3">
+            <div
+              class="flex flex-col items-center gap-3 mt-3 md:gap-5 md:flex-row"
+            >
               <RadioGroupOption
                 v-for="(speed, i) in pulseCheckupSpeed"
                 :key="'pulse-checkup-speed-' + i"
@@ -588,7 +593,9 @@ onBeforeUnmount(() => {
             @update:model-value="onEditDataChange('pulse_checkup')"
           >
             <RadioGroupLabel class="font-medium">Kekuatan</RadioGroupLabel>
-            <div class="flex items-center gap-5 mt-3">
+            <div
+              class="flex flex-col items-center gap-3 mt-3 md:gap-5 md:flex-row"
+            >
               <RadioGroupOption
                 v-for="(power, i) in pulseCheckupPower"
                 :key="'pulse-checkup-power-' + i"
@@ -621,7 +628,9 @@ onBeforeUnmount(() => {
             <RadioGroupLabel class="font-medium"
               >Jenis Nadi Abnormal</RadioGroupLabel
             >
-            <div class="grid grid-cols-3 gap-5 mt-3">
+            <div
+              class="grid grid-cols-1 gap-3 mt-3 md:grid-cols-2 lg:grid-cols-3 md:gap-5"
+            >
               <RadioGroupOption
                 v-for="(abnormal, i) in pulseCheckupAbnormalType"
                 :key="'pulse-checkup-abnormal-' + i"

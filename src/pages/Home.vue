@@ -34,7 +34,7 @@ const routes = ref([
     <div class="space-y-8">
       <div v-for="(group, i) in routes" :key="'route-' + i">
         <h2 class="mb-3 text-2xl font-medium">{{ group.name }}</h2>
-        <div class="grid grid-cols-4 gap-5 justify-stretch">
+        <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
           <RouterLink
             v-for="(route, i) in group.routes"
             :key="'route-' + i"

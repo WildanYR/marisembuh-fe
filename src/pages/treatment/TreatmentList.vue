@@ -141,7 +141,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-between">
+  <div
+    class="flex flex-col items-start justify-start gap-4 lg:items-center lg:flex-row lg:justify-between"
+  >
     <div class="flex gap-4">
       <GrayButton
         @click="toPreviousPage"
@@ -159,7 +161,7 @@ onMounted(() => {
     <button
       type="button"
       @click="handleOnTreatmentAdd"
-      class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+      class="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg lg:w-max hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
     >
       <PlusIcon class="w-4 h-4"></PlusIcon>
       <span>Tambah Perawatan</span>

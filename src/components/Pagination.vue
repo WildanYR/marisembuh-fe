@@ -54,7 +54,7 @@ const handlePaginate = (page: string | number) => {
 <template>
   <nav
     v-if="props.totalItems"
-    class="flex flex-col items-start justify-between p-4 space-y-3 md:flex-row md:items-center md:space-y-0"
+    class="flex flex-col items-center justify-center p-4 space-y-3 lg:justify-between lg:flex-row lg:space-y-0"
     aria-label="Table navigation"
   >
     <span class="text-sm font-normal text-gray-500 dark:text-gray-400">

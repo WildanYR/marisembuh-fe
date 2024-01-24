@@ -161,7 +161,7 @@ onMounted(() => {
       ></TextInput>
       <RadioGroup v-model="formData.gender" :disabled="readOnly">
         <RadioGroupLabel class="text-gray-700">Jenis Kelamin</RadioGroupLabel>
-        <div class="flex items-center gap-5 mt-3">
+        <div class="flex items-center gap-3 mt-3 lg:gap-5">
           <RadioGroupOption
             as="template"
             value="L"

@@ -24,6 +24,8 @@ import { Validator } from "../../../validator";
 import isRequired from "../../../validator/isRequired.validator";
 import LoadingButton from "../../LoadingButton.vue";
 import Pagination from "../../Pagination.vue";
+import GrayButton from "../../button/GrayButton.vue";
+import ChevLeftIcon from "../../icon/ChevLeftIcon.vue";
 
 const debouncer = new Debouncer();
 
@@ -277,27 +279,40 @@ onBeforeUnmount(() => {
             <DialogPanel
               class="w-full max-w-5xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl"
             >
-              <div class="flex items-center justify-between mb-3">
-                <DialogTitle
-                  as="h3"
-                  class="text-lg font-medium leading-6 text-gray-900"
-                >
-                  Pilih {{ props.label }}
-                </DialogTitle>
+              <div
+                class="flex flex-col items-start justify-start gap-4 mb-4 md:items-center md:justify-between md:flex-row"
+              >
+                <div class="flex items-center justify-start gap-3">
+                  <GrayButton
+                    @click="closeModal"
+                    class="flex items-center justify-center !px-3"
+                  >
+                    <ChevLeftIcon class="w-5 h-5" />
+                  </GrayButton>
+                  <DialogTitle
+                    as="h3"
+                    class="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Pilih {{ props.label }}
+                  </DialogTitle>
+                </div>
                 <button
                   type="button"
                   @click="onAddComplaintMode"
-                  class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                  v-show="mode !== 'add'"
+                  class="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg md:w-max hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                 >
                   <PlusIcon class="w-4 h-4"></PlusIcon>
                   <span>Tambah Keluhan</span>
                 </button>
               </div>
-              <div class="flex justify-end mb-3">
+              <div class="flex items-center justify-center mb-4 md:justify-end">
                 <TextSearch
                   label="Cari"
+                  v-show="mode !== 'add'"
                   v-model="searchText"
                   @update:model-value="onSearch"
+                  class="w-full md:w-max"
                 ></TextSearch>
               </div>
               <div
@@ -316,15 +331,18 @@ onBeforeUnmount(() => {
                       v-model="addComplaintData.name"
                       label="Nama Keluhan"
                       :error-message="addComplaintDataError.name"
+                      class="w-full"
                     ></TextInput>
                     <LoadingButton
                       :loading="loadingAddComplaint"
                       @click="handleAddComplaint"
-                      class="px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+                      class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
                     >
                       Tambah Keluhan
                     </LoadingButton>
-                    <button @click="onGetComplaintMode">batal</button>
+                    <GrayButton @click="onGetComplaintMode" class="w-full"
+                      >batal</GrayButton
+                    >
                   </div>
                 </template>
                 <template v-else>

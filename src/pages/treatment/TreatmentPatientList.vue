@@ -117,7 +117,11 @@ onMounted(() => {
   <div class="mt-5">
     <div class="flex justify-end gap-2 mb-3">
       <!-- search bar -->
-      <TextSearch label="Cari nama, No RM" v-model="searchQuery" />
+      <TextSearch
+        label="Cari nama"
+        v-model="searchQuery"
+        class="w-full lg:w-max"
+      />
       <LoadingButton
         :loading="loadingPatient"
         @click="getPatientDataByQuery"
