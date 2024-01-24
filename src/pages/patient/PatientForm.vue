@@ -18,6 +18,7 @@ import LoadingButton from "../../components/LoadingButton.vue";
 import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
+import { id as dateLocalId } from "date-fns/locale";
 
 const router = useRouter();
 const route = useRoute();
@@ -207,9 +208,13 @@ onMounted(() => {
           v-model="formData.birthdate"
           model-type="yyyy-MM-dd"
           placeholder="Pilih tanggal"
+          locale="id"
+          format="dd MMMM yyyy"
+          :format-locale="dateLocalId"
           :enable-time-picker="false"
           :flow="['year', 'month', 'calendar']"
           :readonly="readOnly"
+          auto-apply
         />
       </div>
       <div
