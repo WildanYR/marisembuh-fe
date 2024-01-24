@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { Ref, computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import {
+  Ref,
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import {
   TransitionRoot,
   TransitionChild,
@@ -188,8 +196,22 @@ const handleAddTherapy = () => {
     });
 };
 
+const syncMetavalue = () => {
+  if ((props.modelValue as any)?.length) {
+    metaValue.value = props.modelValue as any;
+  }
+};
+
+watch(
+  () => props.modelValue,
+  () => {
+    syncMetavalue();
+  }
+);
+
 onMounted(() => {
   getTherapy();
+  syncMetavalue();
 });
 
 onBeforeUnmount(() => {
