@@ -43,7 +43,7 @@ const modalDeleteOpen = ref(false);
 const tableData = computed(() => {
   if (!Complaints.value.length) return null;
   const row = Complaints.value.map((Complaint) => {
-    const meridian = Complaint.meridian ? Complaint.meridian.name : "";
+    const meridian = Complaint.meridian ? Complaint.meridian.name : "Lain-lain";
     return [Complaint.name, meridian];
   });
   return {
