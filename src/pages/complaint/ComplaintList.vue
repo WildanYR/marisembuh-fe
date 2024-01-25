@@ -20,6 +20,7 @@ import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
+import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -122,7 +123,7 @@ const toPreviousPage = () => {
 
 const onSearch = debouncer.debounce(() => {
   getComplaintDataByQuery();
-}, 1000);
+}, DEBOUNCE_TIMEOUT);
 
 onMounted(() => {
   getComplaintData();

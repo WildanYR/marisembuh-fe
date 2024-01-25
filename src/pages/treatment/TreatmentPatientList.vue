@@ -17,6 +17,7 @@ import TextSearch from "../../components/form/TextSearch.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
+import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -102,7 +103,7 @@ const toPreviousPage = () => {
 
 const onSearch = debouncer.debounce(() => {
   getPatientDataByQuery();
-}, 1000);
+}, DEBOUNCE_TIMEOUT);
 
 onMounted(() => {
   getPatientData();

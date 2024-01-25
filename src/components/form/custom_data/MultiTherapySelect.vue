@@ -34,6 +34,7 @@ import LoadingButton from "../../LoadingButton.vue";
 import Pagination from "../../Pagination.vue";
 import GrayButton from "../../button/GrayButton.vue";
 import ChevLeftIcon from "../../icon/ChevLeftIcon.vue";
+import { DEBOUNCE_TIMEOUT } from "../../../configs/debounce.config";
 
 const debouncer = new Debouncer();
 
@@ -164,7 +165,7 @@ const onSearch = debouncer.debounce((searchValue: string) => {
         loadingGetTherapy.value = false;
       });
   }
-}, 1000);
+}, DEBOUNCE_TIMEOUT);
 
 const onAddTherapyMode = () => {
   mode.value = "add";
