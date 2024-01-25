@@ -105,70 +105,72 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex gap-3">
-    <GrayButton
-      @click="toPreviousPage"
-      class="flex items-center justify-center !px-3"
-    >
-      <ChevLeftIcon class="w-5 h-5" />
-    </GrayButton>
-    <h1 class="text-2xl font-medium">Daftar Pasien</h1>
-  </div>
-  <div class="mt-5">
-    <div class="flex justify-end gap-2 mb-3">
-      <!-- search bar -->
-      <TextSearch
-        label="Cari nama"
-        v-model="searchQuery"
-        class="w-full lg:w-max"
-      />
-      <LoadingButton
-        :loading="loadingPatient"
-        @click="getPatientDataByQuery"
-        class="px-4 py-1 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+  <div class="p-8 bg-white rounded-lg">
+    <div class="flex gap-3">
+      <GrayButton
+        @click="toPreviousPage"
+        class="flex items-center justify-center !px-3"
       >
-        Cari
-      </LoadingButton>
+        <ChevLeftIcon class="w-5 h-5" />
+      </GrayButton>
+      <h1 class="text-2xl font-medium">Daftar Pasien</h1>
     </div>
-    <!-- table -->
-    <div v-if="patients.length">
-      <ResponsiveTable v-if="tableData">
-        <template v-slot:header>
-          <TableHead>Aksi</TableHead>
-          <TableHead
-            v-for="(header, i) in tableData.header"
-            :key="'patient-table-header' + i"
-          >
-            {{ header }}
-          </TableHead>
-        </template>
-        <template v-slot:body>
-          <TableRowBody
-            v-for="(row, i) in tableData.row"
-            :key="'patient-table-row-' + i"
-          >
-            <TableBody>
-              <button
-                @click="handleOnTreatmentDetail(patients[i].id)"
-                class="px-4 py-1 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-              >
-                Pilih
-              </button>
-            </TableBody>
-            <TableBody v-for="(col, j) in row" :key="'patient-table-col-' + j"
-              >{{ col }}
-            </TableBody>
-          </TableRowBody>
-        </template>
-      </ResponsiveTable>
-      <Pagination
-        :current-page="paginationData.currentPage"
-        :total-pages="paginationData.totalPage"
-        :total-items="paginationData.totalItems"
-        :limit="paginationData.limit"
-        @page-change="getPatientData"
-      ></Pagination>
+    <div class="mt-5">
+      <div class="flex justify-end gap-2 mb-3">
+        <!-- search bar -->
+        <TextSearch
+          label="Cari nama"
+          v-model="searchQuery"
+          class="w-full lg:w-max"
+        />
+        <LoadingButton
+          :loading="loadingPatient"
+          @click="getPatientDataByQuery"
+          class="px-4 py-1 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+        >
+          Cari
+        </LoadingButton>
+      </div>
+      <!-- table -->
+      <div v-if="patients.length">
+        <ResponsiveTable v-if="tableData">
+          <template v-slot:header>
+            <TableHead>Aksi</TableHead>
+            <TableHead
+              v-for="(header, i) in tableData.header"
+              :key="'patient-table-header' + i"
+            >
+              {{ header }}
+            </TableHead>
+          </template>
+          <template v-slot:body>
+            <TableRowBody
+              v-for="(row, i) in tableData.row"
+              :key="'patient-table-row-' + i"
+            >
+              <TableBody>
+                <button
+                  @click="handleOnTreatmentDetail(patients[i].id)"
+                  class="px-4 py-1 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
+                >
+                  Pilih
+                </button>
+              </TableBody>
+              <TableBody v-for="(col, j) in row" :key="'patient-table-col-' + j"
+                >{{ col }}
+              </TableBody>
+            </TableRowBody>
+          </template>
+        </ResponsiveTable>
+        <Pagination
+          :current-page="paginationData.currentPage"
+          :total-pages="paginationData.totalPage"
+          :total-items="paginationData.totalItems"
+          :limit="paginationData.limit"
+          @page-change="getPatientData"
+        ></Pagination>
+      </div>
+      <EmptyData v-else></EmptyData>
     </div>
-    <EmptyData v-else></EmptyData>
   </div>
 </template>
