@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, ref } from "vue";
+import { Ref, computed, onBeforeUnmount, onMounted, ref } from "vue";
 import PlusIcon from "../../components/icon/PlusIcon.vue";
 import {
   IUserResponse,
@@ -15,12 +15,13 @@ import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
 import { useRouter } from "vue-router";
-import LoadingButton from "../../components/LoadingButton.vue";
 import TextSearch from "../../components/form/TextSearch.vue";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
+import { Debouncer } from "../../utils/debounce";
 
+const debouncer = new Debouncer();
 const router = useRouter();
 
 const Users: Ref<IUserResponse[]> = ref([]);
@@ -113,8 +114,16 @@ const toPreviousPage = () => {
   router.push({ name: "Home" });
 };
 
+const onSearch = debouncer.debounce(() => {
+  getUserDataByQuery();
+}, 1000);
+
 onMounted(() => {
   getUserData();
+});
+
+onBeforeUnmount(() => {
+  debouncer.clearTimer();
 });
 </script>
 
@@ -147,15 +156,9 @@ onMounted(() => {
         <TextSearch
           label="Cari nama"
           v-model="searchQuery"
+          @update:model-value="onSearch"
           class="w-full lg:w-max"
         />
-        <LoadingButton
-          :loading="loadingUser"
-          @click="getUserDataByQuery"
-          class="px-4 py-1 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-        >
-          Cari
-        </LoadingButton>
       </div>
       <!-- table -->
       <div v-if="Users.length">
