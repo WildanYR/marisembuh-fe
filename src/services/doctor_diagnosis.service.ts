@@ -31,6 +31,7 @@ export const getAllDoctorDiagnosisWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -41,6 +42,7 @@ export const getDoctorDiagnosisById = async (doctordiagnosisId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getDoctorDiagnosisByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createDoctorDiagnosis = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateDoctorDiagnosis = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteDoctorDiagnosis = async (doctordiagnosisId: number) => {
     await axios.delete(`/doctor-diagnosis/${doctordiagnosisId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

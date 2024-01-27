@@ -31,6 +31,7 @@ export const getAllMedicineWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -42,6 +43,7 @@ export const getMedicineById = async (medicineId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -53,6 +55,7 @@ export const getMedicineByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createMedicine = async (medicineDTO: IMedicineCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -74,6 +78,7 @@ export const updateMedicine = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -82,5 +87,6 @@ export const deleteMedicine = async (medicineId: number) => {
     await axios.delete(`/medicine/${medicineId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

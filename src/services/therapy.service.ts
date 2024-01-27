@@ -29,6 +29,7 @@ export const getAllTherapyWithPagination = async (pagination?: IPagination) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -40,6 +41,7 @@ export const getTherapyById = async (therapyId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getTherapyByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -60,6 +63,7 @@ export const createTherapy = async (therapyDTO: ITherapyCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -72,6 +76,7 @@ export const updateTherapy = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -80,5 +85,6 @@ export const deleteTherapy = async (therapyId: number) => {
     await axios.delete(`/therapy/${therapyId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

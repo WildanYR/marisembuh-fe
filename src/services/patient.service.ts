@@ -50,6 +50,7 @@ export const getAllPatientWithPagination = async (pagination?: IPagination) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -61,6 +62,7 @@ export const getPatientById = async (patientId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -72,6 +74,7 @@ export const getPatientByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -81,6 +84,7 @@ export const createPatient = async (patientDTO: IPatientCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -93,6 +97,7 @@ export const updatePatient = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -101,5 +106,6 @@ export const deletePatient = async (patientId: number) => {
     await axios.delete(`/patient/${patientId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

@@ -31,6 +31,7 @@ export const getAllTongueCheckupWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -41,6 +42,7 @@ export const getTongueCheckupById = async (tonguecheckupId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getTongueCheckupByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createTongueCheckup = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateTongueCheckup = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteTongueCheckup = async (tonguecheckupId: number) => {
     await axios.delete(`/tongue-checkup/${tonguecheckupId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

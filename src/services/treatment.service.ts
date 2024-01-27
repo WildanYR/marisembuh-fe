@@ -75,6 +75,7 @@ export const getAllTreatmentWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -86,6 +87,7 @@ export const getTreatmentById = async (treatmentId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -94,6 +96,7 @@ export const createTreatment = async (treatmentDTO: any) => {
     return await axios.post("/treatment", treatmentDTO);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -105,6 +108,7 @@ export const updateTreatment = async (
     await axios.put(`/treatment/${treatmentId}`, treatmentDTO);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -113,5 +117,6 @@ export const deleteTreatment = async (treatmentId: number) => {
     await axios.delete(`/treatment/${treatmentId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

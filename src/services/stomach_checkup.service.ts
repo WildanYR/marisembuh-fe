@@ -31,6 +31,7 @@ export const getAllStomachCheckupWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -41,6 +42,7 @@ export const getStomachCheckupById = async (stomachcheckupId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getStomachCheckupByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createStomachCheckup = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateStomachCheckup = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteStomachCheckup = async (stomachcheckupId: number) => {
     await axios.delete(`/stomach-checkup/${stomachcheckupId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

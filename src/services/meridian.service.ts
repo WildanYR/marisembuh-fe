@@ -31,6 +31,7 @@ export const getAllMeridianWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -42,6 +43,7 @@ export const getMeridianById = async (meridianId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -53,6 +55,7 @@ export const getMeridianByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -65,6 +68,7 @@ export const createMeridian = async (meridianDTO: IMeridianCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateMeridian = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteMeridian = async (meridianId: number) => {
     await axios.delete(`/meridian/${meridianId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

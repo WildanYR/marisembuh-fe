@@ -34,6 +34,7 @@ export const getAllComplaintWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -45,6 +46,7 @@ export const getComplaintById = async (complaintId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -56,6 +58,7 @@ export const getComplaintByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -65,6 +68,7 @@ export const createComplaint = async (complaintDTO: IComplaintCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateComplaint = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteComplaint = async (complaintId: number) => {
     await axios.delete(`/complaint/${complaintId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

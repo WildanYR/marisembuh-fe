@@ -29,6 +29,7 @@ export const getAllClinicWithPagination = async (pagination?: IPagination) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -40,6 +41,7 @@ export const getClinicById = async (clinicId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getClinicByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -60,6 +63,7 @@ export const createClinic = async (clinicDTO: IClinicCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -72,6 +76,7 @@ export const updateClinic = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -80,5 +85,6 @@ export const deleteClinic = async (clinicId: number) => {
     await axios.delete(`/clinic/${clinicId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

@@ -31,6 +31,7 @@ export const getAllTreatmentPacketWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -41,6 +42,7 @@ export const getTreatmentPacketById = async (treatmentpacketId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getTreatmentPacketByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createTreatmentPacket = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateTreatmentPacket = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteTreatmentPacket = async (treatmentpacketId: number) => {
     await axios.delete(`/treatment-packet/${treatmentpacketId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

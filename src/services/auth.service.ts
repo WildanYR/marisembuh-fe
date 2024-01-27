@@ -27,5 +27,6 @@ export const login = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

@@ -31,6 +31,7 @@ export const getAllSelfTherapyWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -42,6 +43,7 @@ export const getSelfTherapyById = async (selftherapyId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -52,6 +54,7 @@ export const getSelfTherapyByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -61,6 +64,7 @@ export const createSelfTherapy = async (selftherapyDTO: ISelfTherapyCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -76,6 +80,7 @@ export const updateSelfTherapy = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -84,5 +89,6 @@ export const deleteSelfTherapy = async (selftherapyId: number) => {
     await axios.delete(`/self-therapy/${selftherapyId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

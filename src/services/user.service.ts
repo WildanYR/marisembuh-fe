@@ -34,6 +34,7 @@ export const getAllUserWithPagination = async (pagination?: IPagination) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -45,6 +46,7 @@ export const getUserById = async (userId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -56,6 +58,7 @@ export const getUserByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -65,6 +68,7 @@ export const createUser = async (userDTO: IUserCreate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -74,6 +78,7 @@ export const updateUser = async (userId: number, userDTO: IUserUpdate) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -82,5 +87,6 @@ export const deleteUser = async (userId: number) => {
     await axios.delete(`/user/${userId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };

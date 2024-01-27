@@ -31,6 +31,7 @@ export const getAllDurationAdviceWithPagination = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -41,6 +42,7 @@ export const getDurationAdviceById = async (durationadviceId: number) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -51,6 +53,7 @@ export const getDurationAdviceByName = async (query: string) => {
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -62,6 +65,7 @@ export const createDurationAdvice = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -77,6 +81,7 @@ export const updateDurationAdvice = async (
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
 
@@ -85,5 +90,6 @@ export const deleteDurationAdvice = async (durationadviceId: number) => {
     await axios.delete(`/duration-advice/${durationadviceId}`);
   } catch (error) {
     requestErrorHandler(error);
+    throw error;
   }
 };
