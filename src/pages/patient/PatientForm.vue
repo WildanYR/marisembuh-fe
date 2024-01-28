@@ -44,6 +44,8 @@ const loadingSubmit = ref(false);
 
 const selectedClinic = ref(null);
 
+const showAge = ref(false);
+
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
   return false;
@@ -117,14 +119,17 @@ onMounted(() => {
         selectedClinic.value = response.register_clinic as any;
         // Detail
         registeringUser.value = response.registered_by.name;
-        const today = new Date();
-        const birthDate = new Date(response.birthdate);
-        const m = today.getMonth() - birthDate.getMonth();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-          age--;
+        if (response.birthdate) {
+          const today = new Date();
+          const birthDate = new Date(response.birthdate);
+          const m = today.getMonth() - birthDate.getMonth();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+          }
+          patientAge.value = age;
+          showAge.value = true;
         }
-        patientAge.value = age;
       })
       .finally(() => {
         loadingGetPatient.value = false;
@@ -218,7 +223,7 @@ onMounted(() => {
         />
       </div>
       <div
-        v-if="readOnly"
+        v-if="readOnly && showAge"
         class="flex items-center justify-center w-full gap-1"
       >
         <p class="text-gray-700">

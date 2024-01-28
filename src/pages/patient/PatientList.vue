@@ -41,18 +41,22 @@ const modalDeleteOpen = ref(false);
 const tableData = computed(() => {
   if (!patients.value.length) return null;
   const row = patients.value.map((patient) => {
-    const today = new Date();
-    const birthDate = new Date(patient.birthdate);
-    const m = today.getMonth() - birthDate.getMonth();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    let patientAge = "";
+    if (patient.birthdate) {
+      const today = new Date();
+      const birthDate = new Date(patient.birthdate);
+      const m = today.getMonth() - birthDate.getMonth();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      patientAge = age.toString();
     }
     return [
       patient.no_rm,
       patient.name,
       patient.gender === "L" ? "Laki-laki" : "Perempuan",
-      age,
+      patientAge,
       patient.address,
     ];
   });
