@@ -85,6 +85,7 @@ const pulseLocationDifferentiation = ref({
   guan_right: "",
   chi_right: "",
 });
+const bloodPressureData = ref(["", ""]);
 const formDataError = reactive({
   objective: [],
 });
@@ -214,6 +215,13 @@ const onPulseLocDiffInput = () => {
   formData.pulse_checkup.location_differentiation = diffLocArr.join(";");
   onEditDataChange("pulse_checkup");
 };
+const onBloodPressureInput = () => {
+  if (!bloodPressureData.value[0] && !bloodPressureData.value[1]) {
+    formData.blood_pressure = "";
+    return;
+  }
+  formData.blood_pressure = bloodPressureData.value.join("/");
+};
 
 const onEditDataChange = (key: string) => {
   editedFormKey.set(key, true);
@@ -236,7 +244,11 @@ onMounted(() => {
       .then((response) => {
         if (!response) return;
         formData.objective = response.objective;
-        formData.blood_pressure = response.blood_pressure || "";
+        if (response.blood_pressure) {
+          formData.blood_pressure = response.blood_pressure;
+          const splitValue = response.blood_pressure.split("/");
+          bloodPressureData.value = splitValue;
+        }
         formData.pulse_frequency = response.pulse_frequency || "";
         formData.is_pregnant =
           typeof response.is_pregnant === "boolean"
@@ -406,12 +418,23 @@ onBeforeUnmount(() => {
         <p class="mb-3 text-lg font-medium">Pemeriksaan</p>
         <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
           <!-- Tekanan Darah -->
-          <TextInput
-            v-model="formData.blood_pressure"
-            type="number"
-            label="Tekanan Darah"
-            :disabled="readOnly"
-          ></TextInput>
+          <div class="flex items-center gap-1">
+            <TextInput
+              v-model="bloodPressureData[0]"
+              type="number"
+              label="Tekanan Darah"
+              :disabled="readOnly"
+              @update:model-value="onBloodPressureInput"
+            ></TextInput>
+            <p class="font-bold text-gray-300">/</p>
+            <TextInput
+              v-model="bloodPressureData[1]"
+              type="number"
+              label="Tekanan Darah"
+              :disabled="readOnly"
+              @update:model-value="onBloodPressureInput"
+            ></TextInput>
+          </div>
           <!-- Frekuensi Nadi -->
           <TextInput
             v-model="formData.pulse_frequency"
