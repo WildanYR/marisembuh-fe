@@ -26,6 +26,13 @@ interface IUserCreate {
 
 interface IUserUpdate extends Partial<IUserCreate> {}
 
+export interface IUserStatistic {
+  id: number;
+  name: string;
+  today_patient: number;
+  month_patient: number;
+}
+
 export const getAllUserWithPagination = async (pagination?: IPagination) => {
   try {
     let uri = "/user";
@@ -93,6 +100,20 @@ export const updateUser = async (userId: number, userDTO: IUserUpdate) => {
 export const deleteUser = async (userId: number) => {
   try {
     await axios.delete(`/user/${userId}`);
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getUserStatistic = async (date?: Date) => {
+  try {
+    let url = "/user/statistic";
+    if (date) {
+      url += `?date=${date.toISOString()}`;
+    }
+    const response = await axios.get(url);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
     throw error;

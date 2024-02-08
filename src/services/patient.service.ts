@@ -34,6 +34,14 @@ export interface IPatientResponse {
   };
 }
 
+interface IPatientCountCondition {
+  start_date?: string;
+  end_date?: string;
+  user_id?: number;
+  patient_id?: number;
+  clinic_id?: number;
+}
+
 export const getAllPatientWithPagination = async (pagination?: IPagination) => {
   try {
     let uri = "/patient";
@@ -104,6 +112,25 @@ export const updatePatient = async (
 export const deletePatient = async (patientId: number) => {
   try {
     await axios.delete(`/patient/${patientId}`);
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getPatientCount = async (
+  patientCondition: IPatientCountCondition
+): Promise<number> => {
+  try {
+    let query = "";
+    if (patientCondition) {
+      query += "?";
+      query += Object.entries(patientCondition)
+        .map((item) => item.join("="))
+        .join("&");
+    }
+    const response = await axios.get(`/patient/count${query}`);
+    return response.data;
   } catch (error) {
     requestErrorHandler(error);
     throw error;
