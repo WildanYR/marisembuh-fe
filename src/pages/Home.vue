@@ -57,7 +57,9 @@ onMounted(() => {
   getUserById(authStore.id).then((response) => {
     if (!response) return;
     userData.value.name = response.name;
-    userData.value.clinic = response.clinic.name;
+    userData.value.clinic = response.clinic
+      ? response.clinic.name
+      : "Marisembuh";
   });
   const todayDateString = new Date().toISOString();
   const monthDate = new Date();
