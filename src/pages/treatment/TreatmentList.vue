@@ -51,10 +51,12 @@ const tableData = computed(() => {
         day: "2-digit",
       }
     );
-    return [dateString, treatment.objective];
+    const therapist = treatment.user ? treatment.user.name : "";
+    const clinic = treatment.clinic ? treatment.clinic.name : "Homecare";
+    return [dateString, treatment.objective, therapist, clinic];
   });
   return {
-    header: ["Tanggal", "Tujuan"],
+    header: ["Tanggal", "Tujuan", "Terapis", "Klinik"],
     row,
   };
 });

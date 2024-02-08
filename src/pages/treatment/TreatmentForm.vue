@@ -24,9 +24,12 @@ import SingleDurationAdviceSelect from "../../components/form/custom_data/Single
 import TextArea from "../../components/form/TextArea.vue";
 import { getPatientById } from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
+import { useAuthStore } from "../../stores/auth.store";
+import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const editedFormKey = new Map();
 
@@ -76,6 +79,8 @@ const formData = reactive({
     abnormal_type: "",
     location_differentiation: "",
   },
+  user_id: null,
+  clinic_id: null,
 });
 const pulseLocationDifferentiation = ref({
   cun_left: "",
@@ -86,6 +91,7 @@ const pulseLocationDifferentiation = ref({
   chi_right: "",
 });
 const bloodPressureData = ref(["", ""]);
+const isHomecareTreatment = ref(false);
 const formDataError = reactive({
   objective: [],
 });
@@ -107,6 +113,7 @@ const selectedTongueCheckup = ref([]);
 const selectedTherapy = ref([]);
 const selectedSelfTherapy = ref([]);
 const selectedDurationAdvice = ref(null);
+const selectedClinic = ref(null);
 
 const loadingGetTreatment = ref(false);
 const loadingSubmit = ref(false);
@@ -124,6 +131,11 @@ const handleAddTreatment = () => {
     return;
   }
   loadingSubmit.value = true;
+  if (!isHomecareTreatment.value) {
+    formData.clinic_id = authStore.clinic_id as any;
+  } else {
+    formData.clinic_id = null;
+  }
   createTreatment({ ...formData })
     .then(() => {
       router.back();
@@ -134,12 +146,6 @@ const handleAddTreatment = () => {
 };
 
 const handleEditTreatment = () => {
-  const validator = new Validator();
-  validator.addValidation("objective", formData.objective, [isRequired]);
-  if (validator.validate()) {
-    formDataError.objective = validator.getError("objective") as any;
-    return;
-  }
   loadingSubmit.value = true;
   const dataKey: string[] = Array.from(editedFormKey.keys());
   const editData = new Map();
@@ -209,6 +215,10 @@ const onSelectDurationAdvice = (durationAdvice: any) => {
   formData.duration_advice_id = durationAdvice.id;
   onEditDataChange("duration_advice_id");
 };
+const onSelectClinic = (clinic: any) => {
+  formData.clinic_id = clinic.id;
+  onEditDataChange("clinic_id");
+};
 
 const onPulseLocDiffInput = () => {
   const diffLocArr = Object.values(pulseLocationDifferentiation.value);
@@ -238,6 +248,7 @@ const toPreviousPage = () => {
 onMounted(() => {
   const patientId = parseInt(route.params.patientId as any);
   formData.patient_id = patientId as any;
+  formData.user_id = authStore.id as any;
   if (route.params.id) {
     loadingGetTreatment.value = true;
     getTreatmentById(parseInt(route.params.id as any))
@@ -297,6 +308,8 @@ onMounted(() => {
         formData.pulse_checkup.location_differentiation = response.pulse_checkup
           ? response.pulse_checkup.location_differentiation
           : "";
+        formData.clinic_id = response.clinic_id as any;
+        isHomecareTreatment.value = response.clinic_id ? false : true;
         if (response.pulse_checkup) {
           const diffLoc =
             response.pulse_checkup.location_differentiation.split(";");
@@ -406,6 +419,62 @@ onBeforeUnmount(() => {
             </RadioGroupOption>
           </div>
         </RadioGroup>
+        <!-- Jenis Perawatan -->
+        <RadioGroup
+          v-if="route.name === 'TreatmentAdd'"
+          v-model="isHomecareTreatment"
+          :disabled="readOnly"
+          @update:model-value="onEditDataChange('clinic_id')"
+        >
+          <RadioGroupLabel class="font-medium">Jenis Perawatan</RadioGroupLabel>
+          <div class="flex items-center gap-3 mt-3 md:gap-5">
+            <RadioGroupOption
+              as="template"
+              :value="false"
+              v-slot="{ active, checked }"
+            >
+              <div
+                :class="[
+                  active
+                    ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                    : '',
+                  checked
+                    ? 'bg-sky-500/75 text-white '
+                    : 'bg-white border border-gray-200',
+                ]"
+                class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
+              >
+                <RadioGroupLabel>Klinik</RadioGroupLabel>
+              </div>
+            </RadioGroupOption>
+            <RadioGroupOption
+              as="template"
+              :value="true"
+              v-slot="{ active, checked }"
+            >
+              <div
+                :class="[
+                  active
+                    ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                    : '',
+                  checked
+                    ? 'bg-sky-500/75 text-white '
+                    : 'bg-white border border-gray-200',
+                ]"
+                class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
+              >
+                <RadioGroupLabel>Homecare</RadioGroupLabel>
+              </div>
+            </RadioGroupOption>
+          </div>
+        </RadioGroup>
+        <SingleClinicSelect
+          v-else
+          label="Klinik"
+          v-model="selectedClinic"
+          :disabled="readOnly"
+          @update:model-value="onSelectClinic"
+        />
         <!-- Paket Perawatan -->
         <SingleTreatmentPacketSelect
           label="Paket Perawatan"

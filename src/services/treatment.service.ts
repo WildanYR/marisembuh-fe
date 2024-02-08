@@ -54,6 +54,10 @@ export interface ITreatmentResponse {
   tongue_checkup?: ITreatmentData[];
   self_therapy?: ITreatmentData[];
   therapy: ITreatmentTherapy[];
+  user_id: number;
+  clinic_id: number;
+  user: ITreatmentData;
+  clinic: ITreatmentData;
 }
 
 export const getAllTreatmentWithPagination = async (
