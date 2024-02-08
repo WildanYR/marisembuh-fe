@@ -42,6 +42,7 @@ const handleLogin = () => {
         email: response.email,
         name: response.name,
         role: response.role,
+        clinic_id: response.clinic_id,
       });
       router.push({ name: "Home" });
     })

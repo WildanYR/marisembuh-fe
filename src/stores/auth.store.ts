@@ -4,6 +4,7 @@ interface IUserStoreData {
   email: string;
   name: string;
   role: string;
+  clinic_id: number;
 }
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -11,6 +12,7 @@ export const useAuthStore = defineStore("auth", {
     email: "",
     name: "",
     role: "",
+    clinic_id: 0,
   }),
   actions: {
     setUserData(userData: IUserStoreData) {
@@ -18,12 +20,14 @@ export const useAuthStore = defineStore("auth", {
       this.email = userData.email;
       this.name = userData.name;
       this.role = userData.role;
+      this.clinic_id = userData.clinic_id;
     },
     resetState() {
       this.id = 0;
       this.email = "";
       this.name = "";
       this.role = "";
+      this.clinic_id = 0;
     },
   },
   persist: true,
