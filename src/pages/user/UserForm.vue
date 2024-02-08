@@ -12,9 +12,12 @@ import TextInput from "../../components/form/TextInput.vue";
 import LoadingButton from "../../components/LoadingButton.vue";
 import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
 import GrayButton from "../../components/button/GrayButton.vue";
+import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
+import { useAuthStore } from "../../stores/auth.store";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const userRoles = ref([
   { id: "ADMIN", name: "Admin" },
@@ -26,13 +29,18 @@ const formData = reactive({
   password: "",
   name: "",
   role: "",
+  clinic_id: null,
 });
 const formDataError = reactive({
   email: [],
   password: [],
   name: [],
   role: [],
+  clinic: [],
 });
+
+const selectedClinic = ref(null);
+
 const loadingGetUser = ref(false);
 const loadingSubmit = ref(false);
 
@@ -43,13 +51,21 @@ const readOnly = computed(() => {
 
 const handleAddUser = () => {
   const validator = new Validator();
-  validator.addValidation("name", formData.email, [isRequired]);
+  validator.addValidation("email", formData.email, [isRequired]);
+  validator.addValidation("password", formData.password, [isRequired]);
+  validator.addValidation("name", formData.name, [isRequired]);
+  validator.addValidation("role", formData.role, [isRequired]);
+  validator.addValidation("clinic", formData.clinic_id, [isRequired]);
   if (validator.validate()) {
-    formDataError.email = validator.getError("name") as any;
+    formDataError.email = validator.getError("email") as any;
+    formDataError.password = validator.getError("password") as any;
+    formDataError.name = validator.getError("name") as any;
+    formDataError.role = validator.getError("role") as any;
+    formDataError.clinic = validator.getError("clinic") as any;
     return;
   }
   loadingSubmit.value = true;
-  createUser({ ...formData })
+  createUser({ ...(formData as any) })
     .then(() => {
       router.back();
     })
@@ -59,15 +75,12 @@ const handleAddUser = () => {
 };
 
 const handleEditUser = () => {
-  const validator = new Validator();
-  validator.addValidation("name", formData.email, [isRequired]);
-  if (validator.validate()) {
-    formDataError.email = validator.getError("name") as any;
-    return;
-  }
   loadingSubmit.value = true;
-  updateUser(parseInt(route.params.id as any), { ...formData })
+  const { password, ...editData } = formData;
+  if (password) (editData as any).password = password;
+  updateUser(parseInt(route.params.id as any), { ...(editData as any) })
     .then(() => {
+      authStore.clinic_id = formData.clinic_id as any;
       router.back();
     })
     .finally(() => {
@@ -87,6 +100,10 @@ const toPreviousPage = () => {
   router.push({ name: "UserList" });
 };
 
+const onSelectClinic = (clinic: any) => {
+  formData.clinic_id = clinic.id || null;
+};
+
 onMounted(() => {
   if (route.params.id) {
     loadingGetUser.value = true;
@@ -96,6 +113,11 @@ onMounted(() => {
         formData.email = response.email;
         formData.name = response.name;
         formData.role = response.role;
+        formData.clinic_id = response.clinic_id as any;
+        selectedClinic.value = {
+          id: response.clinic.id,
+          name: response.clinic.name,
+        } as any;
       })
       .finally(() => {
         loadingGetUser.value = false;
@@ -160,6 +182,12 @@ onMounted(() => {
           </RadioGroupOption>
         </div>
       </RadioGroup>
+      <SingleClinicSelect
+        label="Klinik"
+        v-model="selectedClinic"
+        :disabled="readOnly"
+        @update:model-value="onSelectClinic"
+      />
       <div class="pt-3 space-y-4">
         <LoadingButton
           v-show="!readOnly"

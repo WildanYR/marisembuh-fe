@@ -2,11 +2,18 @@ import axios, { AxiosResponse } from "axios";
 import { IPagination, IPaginationResponse } from "../types/pagination.type";
 import { requestErrorHandler } from "../utils/request_error_handler.util";
 
+interface IUserClinic {
+  id: number;
+  name: string;
+}
+
 export interface IUserResponse {
   id: number;
   email: string;
   name: string;
   role: string;
+  clinic_id: number;
+  clinic: IUserClinic;
 }
 
 interface IUserCreate {
@@ -14,6 +21,7 @@ interface IUserCreate {
   password: string;
   name: string;
   role: string;
+  clinic_id: number;
 }
 
 interface IUserUpdate extends Partial<IUserCreate> {}

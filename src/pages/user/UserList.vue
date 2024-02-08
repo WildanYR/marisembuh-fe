@@ -41,10 +41,11 @@ const modalDeleteOpen = ref(false);
 const tableData = computed(() => {
   if (!Users.value.length) return null;
   const row = Users.value.map((user) => {
-    return [user.email, user.name, user.role];
+    const clinicName = user.clinic_id ? user.clinic.name : "";
+    return [user.email, user.name, user.role, clinicName];
   });
   return {
-    header: ["Email", "Nama", "Role"],
+    header: ["Email", "Nama", "Role", "Klinik"],
     row,
   };
 });
