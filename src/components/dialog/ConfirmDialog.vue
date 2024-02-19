@@ -27,9 +27,10 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue", "confirm"]);
+const emit = defineEmits(["update:modelValue", "confirm", "deny"]);
 
 const closeModal = () => {
+  emit("deny");
   emit("update:modelValue", false);
 };
 

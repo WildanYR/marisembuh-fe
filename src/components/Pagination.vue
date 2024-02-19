@@ -57,21 +57,17 @@ const handlePaginate = (page: string | number) => {
     class="flex flex-col items-center justify-center p-4 space-y-3 lg:justify-between lg:flex-row lg:space-y-0"
     aria-label="Table navigation"
   >
-    <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+    <span class="text-sm font-normal text-gray-500">
       Menampilkan
-      <span class="font-semibold text-gray-900 dark:text-white">{{
-        numberItem
-      }}</span>
+      <span class="font-semibold text-gray-900">{{ numberItem }}</span>
       dari
-      <span class="font-semibold text-gray-900 dark:text-white">{{
-        props.totalItems
-      }}</span>
+      <span class="font-semibold text-gray-900">{{ props.totalItems }}</span>
     </span>
     <ul class="inline-flex items-stretch -space-x-px">
       <li v-show="props.currentPage != 1">
         <button
           @click="handlePaginate(props.currentPage - 1)"
-          class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
         >
           <span class="sr-only">Previous</span>
           <ChevLeftIcon class="w-5 h-5" />
@@ -82,17 +78,17 @@ const handlePaginate = (page: string | number) => {
           v-if="page !== '...'"
           @click="handlePaginate(page)"
           :class="[
-            'flex items-center justify-center px-3 py-2 text-sm leading-tight border dark:border-gray-700',
+            'flex items-center justify-center px-3 py-2 text-sm leading-tight border',
             page === props.currentPage
-              ? 'z-10 text-blue-600 bg-blue-50 border-blue-300 hover:bg-blue-100 hover:text-blue-700 dark:bg-gray-700 dark:text-white'
-              : 'text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white',
+              ? 'z-10 text-blue-600 bg-blue-50 border-blue-300 hover:bg-blue-100 hover:text-blue-700'
+              : 'text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700',
           ]"
         >
           {{ page }}
         </button>
         <div
           v-else
-          class="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 dark:border-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          class="flex items-center justify-center px-3 py-2 text-sm leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
         >
           {{ page }}
         </div>
@@ -100,7 +96,7 @@ const handlePaginate = (page: string | number) => {
       <li v-show="props.currentPage != props.totalPages">
         <button
           @click="handlePaginate(props.currentPage + 1)"
-          class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
         >
           <span class="sr-only">Next</span>
           <ChevRightIcon class="w-5 h-5" />
