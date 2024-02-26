@@ -17,6 +17,7 @@ const routes = ref([
       { to: "PatientList", name: "Pasien" },
       { to: "TreatmentPatientList", name: "Perawatan" },
       { to: "StatisticPage", name: "Statistik" },
+      { to: "AbsencePage", name: "Absensi" },
     ],
   },
   {

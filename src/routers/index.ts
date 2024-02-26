@@ -17,6 +17,7 @@ import UserRoutes from "./user.router";
 import DurationAdviceRoutes from "./duration_advice.router";
 import TreatmentRoutes from "./treatment.router";
 import StatisticRoutes from "./statistic.router";
+import AbsenceRoutes from "./absence.router";
 import { tokenKey } from "../configs";
 
 const router = createRouter({
@@ -118,6 +119,12 @@ const router = createRouter({
       path: "/statistik",
       component: GrayBgLayout,
       children: StatisticRoutes,
+    },
+    {
+      name: "AbsenceLayout",
+      path: "/absen",
+      component: GrayBgLayout,
+      children: AbsenceRoutes,
     },
   ],
 });
