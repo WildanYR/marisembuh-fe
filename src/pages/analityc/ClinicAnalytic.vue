@@ -2,10 +2,11 @@
 import { Ref, computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import {
-  getClinicStatistic,
-  IClinicStatistic,
-} from "../../services/clinic.service";
-import { getUserStatistic, IUserStatistic } from "../../services/user.service";
+  getClinicAnalytic,
+  getUserAnalytic,
+  IClinicAnalytic,
+  IUserAnalytic,
+} from "../../services/clinic_analytic.service";
 import ResponsiveTable from "../../components/tables/ResponsiveTable.vue";
 import TableHead from "../../components/tables/TableHead.vue";
 import TableRowBody from "../../components/tables/TableRowBody.vue";
@@ -16,8 +17,8 @@ import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 
 const router = useRouter();
 
-const clinicStatistics: Ref<IClinicStatistic[]> = ref([]);
-const therapistStatistics: Ref<IUserStatistic[]> = ref([]);
+const clinicStatistics: Ref<IClinicAnalytic[]> = ref([]);
+const therapistStatistics: Ref<IUserAnalytic[]> = ref([]);
 
 const clinicStatisticLoading = ref(false);
 const therapistStatisticLoading = ref(false);
@@ -52,9 +53,9 @@ const toPreviousPage = () => {
   router.push({ name: "Home" });
 };
 
-const getClinicStatistics = () => {
+const getClinicAnalytics = () => {
   clinicStatisticLoading.value = true;
-  getClinicStatistic()
+  getClinicAnalytic()
     .then((response) => {
       if (!response) return;
       clinicStatistics.value = response;
@@ -66,7 +67,7 @@ const getClinicStatistics = () => {
 
 const getTherapistStatistics = () => {
   therapistStatisticLoading.value = true;
-  getUserStatistic()
+  getUserAnalytic()
     .then((response) => {
       if (!response) return;
       therapistStatistics.value = response;
@@ -77,7 +78,7 @@ const getTherapistStatistics = () => {
 };
 
 onMounted(() => {
-  getClinicStatistics();
+  getClinicAnalytics();
   getTherapistStatistics();
 });
 </script>
@@ -95,7 +96,7 @@ onMounted(() => {
           >
             <ChevLeftIcon class="w-5 h-5" />
           </GrayButton>
-          <h1 class="text-2xl font-medium">Statistik Klinik</h1>
+          <h1 class="text-2xl font-medium">Analisis Klinik</h1>
         </div>
       </div>
       <div class="mt-5">
@@ -138,7 +139,7 @@ onMounted(() => {
           >
             <ChevLeftIcon class="w-5 h-5" />
           </GrayButton>
-          <h1 class="text-2xl font-medium">Statistik Terapis</h1>
+          <h1 class="text-2xl font-medium">Analisis Terapis</h1>
         </div>
       </div>
       <div class="mt-5">
@@ -172,3 +173,4 @@ onMounted(() => {
     </div>
   </div>
 </template>
+../../services/clinic_analityc.service

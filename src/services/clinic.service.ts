@@ -13,13 +13,6 @@ interface IClinicCreate {
 
 interface IClinicUpdate extends Partial<IClinicCreate> {}
 
-export interface IClinicStatistic {
-  id: number;
-  name: string;
-  today_patient: number;
-  month_patient: number;
-}
-
 export const getAllClinicWithPagination = async (pagination?: IPagination) => {
   try {
     let uri = "/clinic";
@@ -90,20 +83,6 @@ export const updateClinic = async (
 export const deleteClinic = async (clinicId: number) => {
   try {
     await axios.delete(`/clinic/${clinicId}`);
-  } catch (error) {
-    requestErrorHandler(error);
-    throw error;
-  }
-};
-
-export const getClinicStatistic = async (date?: Date) => {
-  try {
-    let url = "/clinic/statistic";
-    if (date) {
-      url += `?date=${date.toISOString()}`;
-    }
-    const response = await axios.get(url);
-    return response.data;
   } catch (error) {
     requestErrorHandler(error);
     throw error;

@@ -9,34 +9,6 @@ import { getPatientCount } from "../services/patient.service";
 const router = useRouter();
 const authStore = useAuthStore();
 
-const routes = ref([
-  {
-    name: "Fitur",
-    routes: [
-      { to: "UserList", name: "User" },
-      { to: "PatientList", name: "Pasien" },
-      { to: "TreatmentPatientList", name: "Perawatan" },
-      { to: "StatisticPage", name: "Statistik" },
-      { to: "AbsencePage", name: "Absensi" },
-    ],
-  },
-  {
-    name: "Data",
-    routes: [
-      { to: "ClinicList", name: "Klinik" },
-      { to: "TreatmentPacketList", name: "Paket Perawatan" },
-      { to: "TherapyList", name: "Terapi (Tidakan)" },
-      { to: "MeridianList", name: "Meridian" },
-      { to: "ComplaintList", name: "Keluhan" },
-      { to: "MedicineList", name: "Riwayat Minum Obat" },
-      { to: "DoctorDiagnosisList", name: "Diagnosa Dokter" },
-      { to: "SelfTherapyList", name: "Terapi Mandiri" },
-      { to: "StomachCheckupList", name: "Pemeriksaan Perut" },
-      { to: "TongueCheckupList", name: "Pemeriksaan Lidah" },
-      { to: "DurationAdviceList", name: "Saran Perawatan" },
-    ],
-  },
-]);
 const userData = ref({
   name: "",
   clinic: "",
@@ -101,6 +73,79 @@ onMounted(() => {
     patientCount.value.therapist_month = response;
   });
 });
+
+const routes = ref([
+  {
+    name: "Fitur",
+    list: [
+      { type: "route", data: { name: "UserList" }, name: "User" },
+      { type: "route", data: { name: "PatientList" }, name: "Pasien" },
+      {
+        type: "route",
+        data: { name: "TreatmentPatientList" },
+        name: "Perawatan",
+      },
+      {
+        type: "route",
+        data: { name: "ClinicAnalytic" },
+        name: "Analisis Klinik",
+      },
+      { type: "route", data: { name: "AbsencePage" }, name: "Absensi" },
+    ],
+  },
+  {
+    name: "Data",
+    list: [
+      { type: "route", data: { name: "ClinicList" }, name: "Klinik" },
+      {
+        type: "route",
+        data: { name: "TreatmentPacketList" },
+        name: "Paket Perawatan",
+      },
+      {
+        type: "route",
+        data: { name: "TherapyList" },
+        name: "Terapi (Tidakan)",
+      },
+      { type: "route", data: { name: "MeridianList" }, name: "Meridian" },
+      { type: "route", data: { name: "ComplaintList" }, name: "Keluhan" },
+      {
+        type: "route",
+        data: { name: "MedicineList" },
+        name: "Riwayat Minum Obat",
+      },
+      {
+        type: "route",
+        data: { name: "DoctorDiagnosisList" },
+        name: "Diagnosa Dokter",
+      },
+      {
+        type: "route",
+        data: { name: "SelfTherapyList" },
+        name: "Terapi Mandiri",
+      },
+      {
+        type: "route",
+        data: { name: "StomachCheckupList" },
+        name: "Pemeriksaan Perut",
+      },
+      {
+        type: "route",
+        data: { name: "TongueCheckupList" },
+        name: "Pemeriksaan Lidah",
+      },
+      {
+        type: "route",
+        data: { name: "DurationAdviceList" },
+        name: "Saran Perawatan",
+      },
+    ],
+  },
+  {
+    name: "Setting",
+    list: [{ type: "func", data: onLogout, name: "Logout" }],
+  },
+]);
 </script>
 
 <template>
@@ -140,25 +185,22 @@ onMounted(() => {
       <div v-for="(group, i) in routes" :key="'route-' + i">
         <h2 class="mb-3 text-2xl font-medium">{{ group.name }}</h2>
         <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
-          <RouterLink
-            v-for="(route, i) in group.routes"
-            :key="'route-' + i"
-            :to="{ name: route.to }"
-            class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-          >
-            {{ route.name }}
-          </RouterLink>
-        </div>
-      </div>
-      <div>
-        <h2 class="mb-3 text-2xl font-medium">Setting</h2>
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
-          <button
-            @click="onLogout"
-            class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-          >
-            Logout
-          </button>
+          <template v-for="list in group.list">
+            <RouterLink
+              v-if="list.type === 'route'"
+              :to="(list.data as any)"
+              class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
+            >
+              {{ list.name }}
+            </RouterLink>
+            <button
+              v-else
+              @click="list.data"
+              class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
+            >
+              Logout
+            </button>
+          </template>
         </div>
       </div>
     </div>
