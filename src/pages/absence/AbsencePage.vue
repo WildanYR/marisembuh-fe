@@ -35,7 +35,7 @@ const absenceTitle = computed(() => {
     return "Absen Berhasil";
   if (absenceStatus.status === AbsenceStatus.AFTERWORK)
     return "Terimakasih atas kerja kerasnya";
-  return "Silahkan absen dibawah ini";
+  return "Silahkan Scan QR Code di klinik";
 });
 
 const onQrDetected = (codes: any[]) => {
@@ -121,18 +121,24 @@ onBeforeMount(() => {
           @detect="onQrDetected"
           @error="onQrScannerError"
         ></QrcodeStream>
+      </template>
+      <template v-if="absenceStatus.status === AbsenceStatus.NO_ABSENCE">
+        <div class="inline-flex items-center justify-center w-full">
+          <hr class="w-full h-px bg-gray-500 border-0" />
+          <span
+            class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2"
+            >Metode Lain</span
+          >
+        </div>
         <LoadingButton
-          v-if="absenceStatus.status === AbsenceStatus.NO_ABSENCE"
           :loading="loadingAbsence"
           @click="onHandleAbsence(AbsenceType.HOMECARE)"
           class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
         >
           Absen Homecare
         </LoadingButton>
-        <div
-          v-if="absenceStatus.status === AbsenceStatus.NO_ABSENCE"
-          class="space-y-2"
-        >
+        <hr class="h-px bg-gray-500 border-0" />
+        <div class="space-y-2">
           <TextInput v-model="absenceCode" label="Kode Absen"></TextInput>
           <LoadingButton
             :loading="loadingAbsence"
