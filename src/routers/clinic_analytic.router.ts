@@ -1,5 +1,5 @@
 import { RouteRecordRaw } from "vue-router";
-import ClinicAnalytic from "../pages/analityc/ClinicAnalytic.vue";
+import ClinicAnalytic from "../pages/analytic/ClinicAnalytic.vue";
 
 const routes: RouteRecordRaw[] = [
   { name: "ClinicAnalytic", path: "", component: ClinicAnalytic },

@@ -85,12 +85,22 @@ const routes = ref([
         data: { name: "TreatmentPatientList" },
         name: "Perawatan",
       },
+      { type: "route", data: { name: "AbsencePage" }, name: "Absensi" },
+    ],
+  },
+  {
+    name: "Analisis",
+    list: [
       {
         type: "route",
         data: { name: "ClinicAnalytic" },
         name: "Analisis Klinik",
       },
-      { type: "route", data: { name: "AbsencePage" }, name: "Absensi" },
+      {
+        type: "route",
+        data: { name: "AbsenceAnalytic" },
+        name: "Analisis Absen",
+      },
     ],
   },
   {
