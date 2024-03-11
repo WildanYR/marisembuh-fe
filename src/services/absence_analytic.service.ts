@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { IPagination, IPaginationResponse } from "../types/pagination.type";
 import { requestErrorHandler } from "../utils/request_error_handler.util";
+import { IDateFilterQuery } from "../types/date_filter.type";
 
 export interface IAbsenceAnalyticResponse {
   id: number;
@@ -24,11 +25,6 @@ export interface IAbsenceAnalyticDetailResponse {
   lateHour: string;
   summary: IAbsenceAnalyticResponse;
   pagination: IPaginationResponse<IAbsenceDataResponse>;
-}
-
-interface IDateFilterQuery {
-  startDate: Date;
-  endDate: Date;
 }
 
 export const getAbsenceAnalyticPagination = async (

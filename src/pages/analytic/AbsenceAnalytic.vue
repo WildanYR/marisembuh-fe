@@ -19,11 +19,11 @@ import {
   getAbsenceAnalyticPagination,
 } from "../../services/absence_analytic.service";
 import { id as dateLocalId } from "date-fns/locale";
-import { useAbsenceDateFilterStore } from "../../stores/absence_date_filter.store";
+import { useDateFilterStore } from "../../stores/date_filter.store";
 
 const debouncer = new Debouncer();
 const router = useRouter();
-const absenceDateFilterStore = useAbsenceDateFilterStore();
+const dateFilterStore = useDateFilterStore();
 
 const absenceAnalytics: Ref<IAbsenceAnalyticResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -108,7 +108,7 @@ const onSearch = debouncer.debounce(() => {
 }, DEBOUNCE_TIMEOUT);
 
 const handleDateFilter = () => {
-  absenceDateFilterStore.setStoreData({
+  dateFilterStore.setStoreData({
     start_date: filter.value.date[0],
     end_date: filter.value.date[1],
   });
@@ -116,10 +116,10 @@ const handleDateFilter = () => {
 };
 
 onMounted(() => {
-  if (absenceDateFilterStore.start_date && absenceDateFilterStore.end_date) {
+  if (dateFilterStore.start_date && dateFilterStore.end_date) {
     filter.value.date = [
-      absenceDateFilterStore.start_date,
-      absenceDateFilterStore.end_date,
+      dateFilterStore.start_date,
+      dateFilterStore.end_date,
     ] as any;
   } else {
     const today = new Date();
@@ -225,3 +225,4 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
+../../stores/date_filter.store

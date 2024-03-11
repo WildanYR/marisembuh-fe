@@ -17,11 +17,11 @@ import {
 } from "../../services/absence_analytic.service";
 import { id as dateLocalId } from "date-fns/locale";
 import { isTimeGreaterThan } from "../../utils/date.util";
-import { useAbsenceDateFilterStore } from "../../stores/absence_date_filter.store";
+import { useDateFilterStore } from "../../stores/date_filter.store";
 
 const router = useRouter();
 const route = useRoute();
-const absenceDateFilterStore = useAbsenceDateFilterStore();
+const dateFilterStore = useDateFilterStore();
 
 const absenceAnalytics: Ref<IAbsenceDataResponse[]> = ref([]);
 const absenceSummary: Ref<IAbsenceAnalyticResponse> = ref({
@@ -125,10 +125,10 @@ const handleDateFilter = () => {
 };
 
 onMounted(() => {
-  if (absenceDateFilterStore.start_date && absenceDateFilterStore.end_date) {
+  if (dateFilterStore.start_date && dateFilterStore.end_date) {
     filter.value.date = [
-      absenceDateFilterStore.start_date,
-      absenceDateFilterStore.end_date,
+      dateFilterStore.start_date,
+      dateFilterStore.end_date,
     ] as any;
   } else {
     const today = new Date();
@@ -228,3 +228,4 @@ onMounted(() => {
     </div>
   </div>
 </template>
+../../stores/date_filter.store
