@@ -9,6 +9,118 @@ export interface ITotalPatientAnalyticResponse {
   total_patient: number;
 }
 
+export const getTotalPatientAnalyticClinicPagination = async (
+  pagination?: IPagination,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const queryData = [];
+    if (pagination) {
+      queryData.push(
+        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
+      );
+    }
+    if (dateFilter) {
+      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
+      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    }
+    let url = "analytic/total-patient/clinic";
+    if (queryData.length) {
+      const queryJoin = queryData.join("&");
+      url += "?" + queryJoin;
+    }
+    const response: AxiosResponse<
+      IPaginationResponse<ITotalPatientAnalyticResponse>,
+      any
+    > = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticClinicByName = async (
+  name: string,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const queryData = [`s=${name}`];
+    if (dateFilter) {
+      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
+      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    }
+
+    let url = "analytic/total-patient/clinic";
+    if (queryData.length) {
+      const queryJoin = queryData.join("&");
+      url += "?" + queryJoin;
+    }
+    const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
+      await axios.get(url);
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticUserPagination = async (
+  pagination?: IPagination,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const queryData = [];
+    if (pagination) {
+      queryData.push(
+        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
+      );
+    }
+    if (dateFilter) {
+      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
+      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    }
+    let url = "analytic/total-patient/user";
+    if (queryData.length) {
+      const queryJoin = queryData.join("&");
+      url += "?" + queryJoin;
+    }
+    const response: AxiosResponse<
+      IPaginationResponse<ITotalPatientAnalyticResponse>,
+      any
+    > = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticUserByName = async (
+  name: string,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const queryData = [`s=${name}`];
+    if (dateFilter) {
+      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
+      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    }
+
+    let url = "analytic/total-patient/user";
+    if (queryData.length) {
+      const queryJoin = queryData.join("&");
+      url += "?" + queryJoin;
+    }
+    const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
+      await axios.get(url);
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
 export const getTotalPatientAnalyticTherapyPagination = async (
   pagination?: IPagination,
   dateFilter?: IDateFilterQuery

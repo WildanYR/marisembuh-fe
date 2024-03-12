@@ -16,7 +16,6 @@ import ComplaintRoutes from "./complaint.router";
 import UserRoutes from "./user.router";
 import DurationAdviceRoutes from "./duration_advice.router";
 import TreatmentRoutes from "./treatment.router";
-import ClinicAnalyticRoutes from "./clinic_analytic.router";
 import AbsenceRoutes from "./absence.router";
 import AbsenceAnalyticRoutes from "./absence_analytic.router";
 import TotalPatientAnalyticRoutes from "./total_patient_analytic.router";
@@ -115,12 +114,6 @@ const router = createRouter({
       path: "/treatment",
       component: GrayBgLayout,
       children: TreatmentRoutes,
-    },
-    {
-      name: "ClinicAnalyticLayout",
-      path: "/analisis/klinik",
-      component: GrayBgLayout,
-      children: ClinicAnalyticRoutes,
     },
     {
       name: "AbsenceLayout",

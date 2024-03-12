@@ -6,6 +6,8 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const routes = [
+  { data: { name: "TotalPatientAnalyticClinic" }, name: "Klinik" },
+  { data: { name: "TotalPatientAnalyticUser" }, name: "Terapis" },
   { data: { name: "TotalPatientAnalyticTherapy" }, name: "Jenis Terapi" },
 ];
 

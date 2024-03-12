@@ -93,11 +93,6 @@ const routes = ref([
     list: [
       {
         type: "route",
-        data: { name: "ClinicAnalytic" },
-        name: "Analisis Klinik",
-      },
-      {
-        type: "route",
         data: { name: "TotalPatientAnalytic" },
         name: "Analisis Jumlah Pasien",
       },
