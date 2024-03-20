@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/auth.store";
 import { tokenKey } from "../configs";
 import { getUserById } from "../services/user.service";
 import { getPatientCount } from "../services/patient.service";
+import { getStartEndOfMonthDate } from "../utils/date.util";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -34,14 +35,15 @@ onMounted(() => {
       ? response.clinic.name
       : "Marisembuh";
   });
-  const todayDateString = new Date().toISOString();
-  const monthDate = new Date();
-  monthDate.setDate(1);
-  const monthDateString = monthDate.toISOString();
+  const todayDateStr = new Date().toISOString();
+  const { startOfMonth, endOfMonth } = getStartEndOfMonthDate();
+  const startOfMonthStr = startOfMonth.toISOString();
+  const endOfMonthStr = endOfMonth.toISOString();
   // pasien hari ini di klinik (filter clinic_id)
   getPatientCount({
     clinic_id: authStore.clinic_id,
-    start_date: todayDateString,
+    start_date: todayDateStr,
+    end_date: todayDateStr,
   }).then((response) => {
     if (!response) return;
     patientCount.value.clinic_today = response;
@@ -49,8 +51,8 @@ onMounted(() => {
   // pasien bulan ini di klinik (filter clinic_id)
   getPatientCount({
     clinic_id: authStore.clinic_id,
-    start_date: monthDateString,
-    end_date: todayDateString,
+    start_date: startOfMonthStr,
+    end_date: endOfMonthStr,
   }).then((response) => {
     if (!response) return;
     patientCount.value.clinic_month = response;
@@ -58,7 +60,8 @@ onMounted(() => {
   // jumlah terapi hari ini (filter user_id)
   getPatientCount({
     user_id: authStore.id,
-    start_date: todayDateString,
+    start_date: todayDateStr,
+    end_date: todayDateStr,
   }).then((response) => {
     if (!response) return;
     patientCount.value.therapist_today = response;
@@ -66,8 +69,8 @@ onMounted(() => {
   // jumlah terapi bulan ini (filter user_id)
   getPatientCount({
     user_id: authStore.id,
-    start_date: monthDateString,
-    end_date: todayDateString,
+    start_date: startOfMonthStr,
+    end_date: endOfMonthStr,
   }).then((response) => {
     if (!response) return;
     patientCount.value.therapist_month = response;

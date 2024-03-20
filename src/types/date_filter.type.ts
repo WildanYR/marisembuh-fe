@@ -1,4 +1,4 @@
 export interface IDateFilterQuery {
-  startDate: Date;
-  endDate: Date;
+  startDate?: string | null;
+  endDate?: string | null;
 }

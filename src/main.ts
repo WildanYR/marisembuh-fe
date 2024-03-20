@@ -8,6 +8,10 @@ import * as axiosConfig from "./configs/axios.config";
 import Notifications from "@kyvg/vue3-notification";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import { Settings as luxonSetting } from "luxon";
+
+luxonSetting.defaultLocale = "id-ID";
+luxonSetting.defaultZone = "asia/jakarta";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);

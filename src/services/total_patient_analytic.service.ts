@@ -14,25 +14,23 @@ export const getTotalPatientAnalyticClinicPagination = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [];
+    const params = new URLSearchParams();
     if (pagination) {
-      queryData.push(
-        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
-      );
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
     }
-    let url = "analytic/total-patient/clinic";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITotalPatientAnalyticResponse>,
       any
-    > = await axios.get(url);
+    > = await axios.get("analytic/total-patient/clinic", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -45,19 +43,17 @@ export const getTotalPatientAnalyticClinicByName = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [`s=${name}`];
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
 
-    let url = "analytic/total-patient/clinic";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
-    }
     const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
-      await axios.get(url);
+      await axios.get("analytic/total-patient/clinic", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -70,25 +66,23 @@ export const getTotalPatientAnalyticUserPagination = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [];
+    const params = new URLSearchParams();
     if (pagination) {
-      queryData.push(
-        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
-      );
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
     }
-    let url = "analytic/total-patient/user";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITotalPatientAnalyticResponse>,
       any
-    > = await axios.get(url);
+    > = await axios.get("analytic/total-patient/user", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -101,19 +95,17 @@ export const getTotalPatientAnalyticUserByName = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [`s=${name}`];
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
 
-    let url = "analytic/total-patient/user";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
-    }
     const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
-      await axios.get(url);
+      await axios.get("analytic/total-patient/user", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -126,25 +118,23 @@ export const getTotalPatientAnalyticTherapyPagination = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [];
+    const params = new URLSearchParams();
     if (pagination) {
-      queryData.push(
-        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
-      );
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
     }
-    let url = "analytic/total-patient/therapy";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITotalPatientAnalyticResponse>,
       any
-    > = await axios.get(url);
+    > = await axios.get("analytic/total-patient/therapy", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -157,19 +147,17 @@ export const getTotalPatientAnalyticTherapyByName = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [`s=${name}`];
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
 
-    let url = "analytic/total-patient/therapy";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
-    }
     const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
-      await axios.get(url);
+      await axios.get("analytic/total-patient/therapy", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

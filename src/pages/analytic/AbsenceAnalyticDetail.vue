@@ -16,7 +16,14 @@ import {
   getAbsenceAnalyticDetail,
 } from "../../services/absence_analytic.service";
 import { id as dateLocalId } from "date-fns/locale";
-import { isTimeGreaterThan } from "../../utils/date.util";
+import {
+  formatLocaleStringDate,
+  formatSQLStringDate,
+  formatTimeStringDate,
+  getFilterStartEndISODate,
+  getStartEndOfMonthDate,
+  isTimeGreaterThan,
+} from "../../utils/date.util";
 import { useDateFilterStore } from "../../stores/date_filter.store";
 
 const router = useRouter();
@@ -46,30 +53,20 @@ const filter = ref({
 const tableData = computed(() => {
   if (!absenceAnalytics.value.length) return null;
   const row = absenceAnalytics.value.map((absence) => {
-    const absenceDate = new Date(absence.created_at);
-    const dateString = absenceDate.toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "2-digit",
-    });
-    const dateTime = `${("0" + absenceDate.getHours().toString()).slice(-2)}.${(
-      "0" + absenceDate.getMinutes().toString()
-    ).slice(-2)}`;
+    const dateString = formatLocaleStringDate(absence.created_at);
+    const dateTime = formatTimeStringDate(absence.created_at);
     let afterworkTime = "-";
     if (absence.afterwork_time) {
-      const afterworkDate = new Date(absence.afterwork_time);
-      afterworkTime = `${("0" + afterworkDate.getHours().toString()).slice(
-        -2
-      )}.${("0" + afterworkDate.getMinutes().toString()).slice(-2)}`;
+      afterworkTime = formatTimeStringDate(absence.afterwork_time);
     }
     let inClinicTime = "-";
     if (absence.in_clinic_time) {
-      const inClinicDate = new Date(absence.in_clinic_time);
-      inClinicTime = `${("0" + inClinicDate.getHours().toString()).slice(
-        -2
-      )}.${("0" + inClinicDate.getMinutes().toString()).slice(-2)}`;
+      inClinicTime = formatTimeStringDate(absence.in_clinic_time);
     }
-    const timeStatus = isTimeGreaterThan(absenceLateHour.value, absenceDate)
+    const timeStatus = isTimeGreaterThan(
+      absenceLateHour.value,
+      absence.created_at
+    )
       ? "Terlambat"
       : "Tepat Waktu";
     return [
@@ -96,12 +93,16 @@ const tableData = computed(() => {
 
 const getAbsenceAnalyticData = (page = 1, limit = 10) => {
   loadingAbsenceAnalytic.value = true;
+  const { startDate, endDate } = getFilterStartEndISODate(
+    filter.value.date[0],
+    filter.value.date[1]
+  );
   getAbsenceAnalyticDetail(
     parseInt(route.params.userId as string),
     { page, limit },
     {
-      startDate: new Date(`${filter.value.date[0]} 00:00:01`),
-      endDate: new Date(`${filter.value.date[1]} 23:59:59`),
+      startDate,
+      endDate,
     }
   )
     .then((response) => {
@@ -131,20 +132,10 @@ onMounted(() => {
       dateFilterStore.end_date,
     ] as any;
   } else {
-    const today = new Date();
-    today.setDate(1);
-    const startOfMonth = new Date(today);
-    today.setMonth(today.getMonth() + 1);
-    today.setDate(0);
-    const endOfMonth = new Date(today);
+    const { startOfMonth, endOfMonth } = getStartEndOfMonthDate();
     filter.value.date = [
-      `${startOfMonth.getFullYear()}-${(
-        "0" +
-        (startOfMonth.getMonth() + 1)
-      ).slice(-2)}-${("0" + startOfMonth.getDate()).slice(-2)}`,
-      `${endOfMonth.getFullYear()}-${("0" + (endOfMonth.getMonth() + 1)).slice(
-        -2
-      )}-${("0" + endOfMonth.getDate()).slice(-2)}`,
+      formatSQLStringDate(startOfMonth),
+      formatSQLStringDate(endOfMonth),
     ] as any;
   }
   getAbsenceAnalyticData();
@@ -228,4 +219,5 @@ onMounted(() => {
     </div>
   </div>
 </template>
-../../stores/date_filter.store
+../../stores/date_filter.store formatSQLStringDate, getStartEndOfMonthDate,
+formatSQLStringDate, getStartEndOfMonthDate,

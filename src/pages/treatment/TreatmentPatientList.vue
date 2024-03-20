@@ -18,6 +18,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import { calculateAgeFromBirthdate } from "../../utils/date.util";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -37,14 +38,7 @@ const tableData = computed(() => {
   const row = patients.value.map((patient) => {
     let patientAge = "";
     if (patient.birthdate) {
-      const today = new Date();
-      const birthDate = new Date(patient.birthdate);
-      const m = today.getMonth() - birthDate.getMonth();
-      let age = today.getFullYear() - birthDate.getFullYear();
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-      patientAge = age.toString();
+      patientAge = calculateAgeFromBirthdate(patient.birthdate).toString();
     }
     return [
       patient.no_rm,

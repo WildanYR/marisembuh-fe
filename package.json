@@ -13,6 +13,7 @@
     "@kyvg/vue3-notification": "^3.1.2",
     "@vuepic/vue-datepicker": "^7.4.0",
     "axios": "^1.6.2",
+    "luxon": "^3.4.4",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "vue": "^3.3.11",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@types/luxon": "^3.4.2",
     "@vitejs/plugin-vue": "^4.5.2",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",

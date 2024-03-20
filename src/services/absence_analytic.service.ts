@@ -33,28 +33,25 @@ export const getAbsenceAnalyticPagination = async (
   clinicId?: number
 ) => {
   try {
-    const queryData = [];
+    const params = new URLSearchParams();
     if (pagination) {
-      queryData.push(
-        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
-      );
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
     if (clinicId) {
-      queryData.push(`clinic_id=${clinicId}`);
-    }
-    let url = "analytic/absence";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
+      params.append("clinic_id", clinicId.toString());
     }
     const response: AxiosResponse<
       IPaginationResponse<IAbsenceAnalyticResponse>,
       any
-    > = await axios.get(url);
+    > = await axios.get("analytic/absence", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -67,19 +64,17 @@ export const getAbsenceAnalyticByName = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [`s=${name}`];
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
 
-    let url = "analytic/absence";
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
-    }
     const response: AxiosResponse<IAbsenceAnalyticResponse[], any> =
-      await axios.get(url);
+      await axios.get("analytic/absence", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -93,24 +88,21 @@ export const getAbsenceAnalyticDetail = async (
   dateFilter?: IDateFilterQuery
 ) => {
   try {
-    const queryData = [];
+    const params = new URLSearchParams();
     if (pagination) {
-      queryData.push(
-        ...Object.entries(pagination).map((q) => `${q[0]}=${q[1]}`)
-      );
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    if (dateFilter) {
-      queryData.push(`start_date=${dateFilter.startDate.toISOString()}`);
-      queryData.push(`end_date=${dateFilter.endDate.toISOString()}`);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
     }
 
-    let url = `analytic/absence/user/${userId}`;
-    if (queryData.length) {
-      const queryJoin = queryData.join("&");
-      url += "?" + queryJoin;
-    }
     const response: AxiosResponse<IAbsenceAnalyticDetailResponse, any> =
-      await axios.get(url);
+      await axios.get(`analytic/absence/user/${userId}`, { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

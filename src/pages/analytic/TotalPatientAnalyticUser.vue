@@ -20,6 +20,11 @@ import {
 } from "../../services/total_patient_analytic.service";
 import { id as dateLocalId } from "date-fns/locale";
 import { useDateFilterStore } from "../../stores/date_filter.store";
+import {
+  formatSQLStringDate,
+  getFilterStartEndISODate,
+  getStartEndOfMonthDate,
+} from "../../utils/date.util";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -58,11 +63,15 @@ const resetPaginationData = () => {
 
 const getTotalPatientAnalyticData = (page = 1, limit = 10) => {
   loadingTotalPatientAnalytic.value = true;
+  const { startDate, endDate } = getFilterStartEndISODate(
+    filter.value.date[0],
+    filter.value.date[1]
+  );
   getTotalPatientAnalyticUserPagination(
     { page, limit },
     {
-      startDate: new Date(`${filter.value.date[0]} 00:00:01`),
-      endDate: new Date(`${filter.value.date[1]} 23:59:59`),
+      startDate,
+      endDate,
     }
   )
     .then((response) => {
@@ -82,9 +91,13 @@ const getTotalPatientAnalyticDataByQuery = () => {
     return;
   }
   loadingTotalPatientAnalytic.value = true;
+  const { startDate, endDate } = getFilterStartEndISODate(
+    filter.value.date[0],
+    filter.value.date[1]
+  );
   getTotalPatientAnalyticUserByName(searchQuery.value, {
-    startDate: new Date(`${filter.value.date[0]} 00:00:01`),
-    endDate: new Date(`${filter.value.date[1]} 23:59:59`),
+    startDate,
+    endDate,
   })
     .then((response) => {
       if (!response) return;
@@ -118,20 +131,10 @@ onMounted(() => {
       dateFilterStore.end_date,
     ] as any;
   } else {
-    const today = new Date();
-    today.setDate(1);
-    const startOfMonth = new Date(today);
-    today.setMonth(today.getMonth() + 1);
-    today.setDate(0);
-    const endOfMonth = new Date(today);
+    const { startOfMonth, endOfMonth } = getStartEndOfMonthDate();
     filter.value.date = [
-      `${startOfMonth.getFullYear()}-${(
-        "0" +
-        (startOfMonth.getMonth() + 1)
-      ).slice(-2)}-${("0" + startOfMonth.getDate()).slice(-2)}`,
-      `${endOfMonth.getFullYear()}-${("0" + (endOfMonth.getMonth() + 1)).slice(
-        -2
-      )}-${("0" + endOfMonth.getDate()).slice(-2)}`,
+      formatSQLStringDate(startOfMonth),
+      formatSQLStringDate(endOfMonth),
     ] as any;
   }
   getTotalPatientAnalyticData();

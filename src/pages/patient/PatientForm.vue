@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import { id as dateLocalId } from "date-fns/locale";
+import { calculateAgeFromBirthdate } from "../../utils/date.util";
 
 const router = useRouter();
 const route = useRoute();
@@ -118,16 +119,11 @@ onMounted(() => {
         formData.clinic_id = response.register_clinic.id;
         selectedClinic.value = response.register_clinic as any;
         // Detail
-        registeringUser.value = response.registered_by.name;
+        registeringUser.value = response.registered_by
+          ? response.registered_by.name
+          : "";
         if (response.birthdate) {
-          const today = new Date();
-          const birthDate = new Date(response.birthdate);
-          const m = today.getMonth() - birthDate.getMonth();
-          let age = today.getFullYear() - birthDate.getFullYear();
-          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-          }
-          patientAge.value = age;
+          patientAge.value = calculateAgeFromBirthdate(response.birthdate);
           showAge.value = true;
         }
       })

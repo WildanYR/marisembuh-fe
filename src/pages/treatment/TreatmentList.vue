@@ -18,6 +18,7 @@ import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import { getPatientById } from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
+import { formatLocaleStringDate } from "../../utils/date.util";
 
 const router = useRouter();
 const route = useRoute();
@@ -43,14 +44,7 @@ const modalDeleteOpen = ref(false);
 const tableData = computed(() => {
   if (!treatments.value.length) return null;
   const row = treatments.value.map((treatment) => {
-    const dateString = new Date(treatment.created_at).toLocaleDateString(
-      "id-ID",
-      {
-        year: "numeric",
-        month: "long",
-        day: "2-digit",
-      }
-    );
+    const dateString = formatLocaleStringDate(treatment.created_at);
     const therapist = treatment.user ? treatment.user.name : "";
     const clinic = treatment.clinic ? treatment.clinic.name : "Homecare";
     return [dateString, treatment.objective, therapist, clinic];
