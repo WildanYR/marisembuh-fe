@@ -17,17 +17,17 @@ export const getAllSelfTherapyWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/self-therapy";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ISelfTherapyResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/self-therapy", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -49,8 +49,11 @@ export const getSelfTherapyById = async (selftherapyId: number) => {
 
 export const getSelfTherapyByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<ISelfTherapyResponse[], any> =
-      await axios.get(`/self-therapy?s=${query}`);
+      await axios.get("/self-therapy", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

@@ -17,17 +17,16 @@ export const getAllDoctorDiagnosisWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/doctor-diagnosis";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
     const response: AxiosResponse<
       IPaginationResponse<IDoctorDiagnosisResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/doctor-diagnosis", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -48,8 +47,11 @@ export const getDoctorDiagnosisById = async (doctordiagnosisId: number) => {
 
 export const getDoctorDiagnosisByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IDoctorDiagnosisResponse[], any> =
-      await axios.get(`/doctor-diagnosis?s=${query}`);
+      await axios.get("/doctor-diagnosis", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

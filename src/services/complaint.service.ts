@@ -20,17 +20,18 @@ export const getAllComplaintWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/complaint?with-meridian=true";
+    const params = new URLSearchParams();
+    params.append("with-meridian", "true");
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `&${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IComplaintResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/complaint", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -40,8 +41,11 @@ export const getAllComplaintWithPagination = async (
 
 export const getComplaintById = async (complaintId: number) => {
   try {
+    const params = new URLSearchParams();
+    params.append("with-meridian", "true");
     const response: AxiosResponse<IComplaintResponse, any> = await axios.get(
-      `/complaint/${complaintId}?with-meridian=true`
+      `/complaint/${complaintId}`,
+      { params }
     );
     return response.data;
   } catch (error) {
@@ -52,8 +56,12 @@ export const getComplaintById = async (complaintId: number) => {
 
 export const getComplaintByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IComplaintResponse[], any> = await axios.get(
-      `/complaint?s=${query}`
+      "/complaint",
+      { params }
     );
     return response.data;
   } catch (error) {

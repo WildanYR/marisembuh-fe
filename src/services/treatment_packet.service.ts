@@ -17,17 +17,17 @@ export const getAllTreatmentPacketWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/treatment-packet";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITreatmentPacketResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/treatment-packet", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -48,8 +48,11 @@ export const getTreatmentPacketById = async (treatmentpacketId: number) => {
 
 export const getTreatmentPacketByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<ITreatmentPacketResponse[], any> =
-      await axios.get(`/treatment-packet?s=${query}`);
+      await axios.get("/treatment-packet", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

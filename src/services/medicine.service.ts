@@ -17,17 +17,17 @@ export const getAllMedicineWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/medicine";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IMedicineResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/medicine", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -49,8 +49,12 @@ export const getMedicineById = async (medicineId: number) => {
 
 export const getMedicineByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IMedicineResponse[], any> = await axios.get(
-      `/medicine?s=${query}`
+      "/medicine",
+      { params }
     );
     return response.data;
   } catch (error) {

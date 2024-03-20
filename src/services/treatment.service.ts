@@ -65,17 +65,17 @@ export const getAllTreatmentWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = `/treatment/patient/${patientId}`;
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITreatmentResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get(`/treatment/patient/${patientId}`, { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

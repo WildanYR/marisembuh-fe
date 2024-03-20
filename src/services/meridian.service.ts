@@ -17,17 +17,17 @@ export const getAllMeridianWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/meridian";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IMeridianResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/meridian", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -49,8 +49,12 @@ export const getMeridianById = async (meridianId: number) => {
 
 export const getMeridianByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IMeridianResponse[], any> = await axios.get(
-      `/meridian?name=${query}`
+      "/meridian",
+      { params }
     );
     return response.data;
   } catch (error) {

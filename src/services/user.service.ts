@@ -28,17 +28,17 @@ interface IUserUpdate extends Partial<IUserCreate> {}
 
 export const getAllUserWithPagination = async (pagination?: IPagination) => {
   try {
-    let uri = "/user";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IUserResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/user", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -60,8 +60,12 @@ export const getUserById = async (userId: number) => {
 
 export const getUserByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IUserResponse[], any> = await axios.get(
-      `/user?s=${query}`
+      "/user",
+      { params }
     );
     return response.data;
   } catch (error) {

@@ -44,17 +44,17 @@ interface IPatientCountCondition {
 
 export const getAllPatientWithPagination = async (pagination?: IPagination) => {
   try {
-    let uri = "/patient";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IPatientResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/patient", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -76,8 +76,12 @@ export const getPatientById = async (patientId: number) => {
 
 export const getPatientByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IPatientResponse[], any> = await axios.get(
-      `/patient?s=${query}`
+      "/patient",
+      { params }
     );
     return response.data;
   } catch (error) {
@@ -122,14 +126,14 @@ export const getPatientCount = async (
   patientCondition: IPatientCountCondition
 ): Promise<number> => {
   try {
-    let query = "";
+    const params = new URLSearchParams();
     if (patientCondition) {
-      query += "?";
-      query += Object.entries(patientCondition)
-        .map((item) => item.join("="))
-        .join("&");
+      Object.entries(patientCondition).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
-    const response = await axios.get(`/patient/count${query}`);
+
+    const response = await axios.get("/patient/count", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

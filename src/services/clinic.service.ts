@@ -15,17 +15,17 @@ interface IClinicUpdate extends Partial<IClinicCreate> {}
 
 export const getAllClinicWithPagination = async (pagination?: IPagination) => {
   try {
-    let uri = "/clinic";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IClinicResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/clinic", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -47,8 +47,12 @@ export const getClinicById = async (clinicId: number) => {
 
 export const getClinicByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IClinicResponse[], any> = await axios.get(
-      `/clinic?s=${query}`
+      "/clinic",
+      { params }
     );
     return response.data;
   } catch (error) {

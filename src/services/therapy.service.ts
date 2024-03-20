@@ -15,17 +15,17 @@ interface ITherapyUpdate extends Partial<ITherapyCreate> {}
 
 export const getAllTherapyWithPagination = async (pagination?: IPagination) => {
   try {
-    let uri = "/therapy";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITherapyResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/therapy", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -47,8 +47,12 @@ export const getTherapyById = async (therapyId: number) => {
 
 export const getTherapyByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<ITherapyResponse[], any> = await axios.get(
-      `/therapy?s=${query}`
+      "/therapy",
+      { params }
     );
     return response.data;
   } catch (error) {

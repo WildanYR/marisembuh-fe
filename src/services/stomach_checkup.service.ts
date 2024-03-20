@@ -17,17 +17,17 @@ export const getAllStomachCheckupWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/stomach-checkup";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<IStomachCheckupResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/stomach-checkup", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -48,8 +48,11 @@ export const getStomachCheckupById = async (stomachcheckupId: number) => {
 
 export const getStomachCheckupByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<IStomachCheckupResponse[], any> =
-      await axios.get(`/stomach-checkup?s=${query}`);
+      await axios.get("/stomach-checkup", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);

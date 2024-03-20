@@ -17,17 +17,17 @@ export const getAllTongueCheckupWithPagination = async (
   pagination?: IPagination
 ) => {
   try {
-    let uri = "/tongue-checkup";
+    const params = new URLSearchParams();
     if (pagination) {
-      const query = Object.entries(pagination)
-        .map((q) => `${q[0]}=${q[1]}`)
-        .join("&");
-      uri += `?${query}`;
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
     }
+
     const response: AxiosResponse<
       IPaginationResponse<ITongueCheckupResponse>,
       any
-    > = await axios.get(uri);
+    > = await axios.get("/tongue-checkup", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
@@ -48,8 +48,11 @@ export const getTongueCheckupById = async (tonguecheckupId: number) => {
 
 export const getTongueCheckupByName = async (query: string) => {
   try {
+    const params = new URLSearchParams();
+    params.append("s", query);
+
     const response: AxiosResponse<ITongueCheckupResponse[], any> =
-      await axios.get(`/tongue-checkup?s=${query}`);
+      await axios.get("/tongue-checkup", { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
