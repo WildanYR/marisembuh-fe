@@ -154,7 +154,12 @@ onMounted(() => {
         >
           <ChevLeftIcon class="w-5 h-5" />
         </GrayButton>
-        <h1 class="text-2xl font-medium">Detail Absen</h1>
+        <div>
+          <h1 class="text-2xl font-medium">Detail Absen</h1>
+          <p class="text-sm text-gray-500">
+            {{ absenceSummary.name }}
+          </p>
+        </div>
       </div>
     </div>
     <div class="grid grid-cols-1 gap-5 mt-5 lg:grid-cols-3 md:grid-cols-2">
