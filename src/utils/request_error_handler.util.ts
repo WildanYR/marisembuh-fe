@@ -19,11 +19,18 @@ export const requestErrorHandler = (error: AxiosError | any) => {
       return;
     }
     if (error.request) {
-      console.error("Request tidak terkirim");
+      if (!navigator.onLine) {
+        notify({
+          type: "error",
+          title: "Koneksi Error",
+          text: "Request tidak terkirim. silahkan cek koneksi internet",
+        });
+        return;
+      }
       notify({
         type: "error",
-        title: "Koneksi Error",
-        text: "Request tidak terkirim. silahkan cek koneksi internet",
+        title: "Server Error",
+        text: "Server error, silahkan hubungi admin",
       });
       return;
     }
