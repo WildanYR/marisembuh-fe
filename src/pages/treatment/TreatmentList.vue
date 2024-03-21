@@ -78,7 +78,10 @@ const getPatientData = () => {
 
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
-  getAllTreatmentWithPagination(route.params.patientId as any, { page, limit })
+  getAllTreatmentWithPagination(
+    { patient_id: route.params.patientId as string },
+    { page, limit }
+  )
     .then((response) => {
       if (!response) return;
       treatments.value = response.items;

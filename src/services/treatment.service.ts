@@ -60,8 +60,15 @@ export interface ITreatmentResponse {
   clinic: ITreatmentData;
 }
 
+export interface IGetTreatmentQuery {
+  patient_id?: number | string;
+  user_id?: number | string;
+  clinic_id?: number | string;
+  with_relation?: boolean;
+}
+
 export const getAllTreatmentWithPagination = async (
-  patientId: number,
+  query: IGetTreatmentQuery,
   pagination?: IPagination
 ) => {
   try {
@@ -71,11 +78,33 @@ export const getAllTreatmentWithPagination = async (
         params.append(q[0], q[1]);
       });
     }
+    if (query.with_relation) {
+      params.append("with_relation", query.with_relation ? "true" : "false");
+    }
+    if (query.patient_id) {
+      let val: string = "";
+      if (typeof query.patient_id === "number")
+        val = query.patient_id.toString();
+      else val = query.patient_id;
+      params.append("patient_id", val);
+    }
+    if (query.user_id) {
+      let val: string = "";
+      if (typeof query.user_id === "number") val = query.user_id.toString();
+      else val = query.user_id;
+      params.append("user_id", val);
+    }
+    if (query.clinic_id) {
+      let val: string = "";
+      if (typeof query.clinic_id === "number") val = query.clinic_id.toString();
+      else val = query.clinic_id;
+      params.append("clinic_id", val);
+    }
 
     const response: AxiosResponse<
       IPaginationResponse<ITreatmentResponse>,
       any
-    > = await axios.get(`/treatment/patient/${patientId}`, { params });
+    > = await axios.get(`/treatment`, { params });
     return response.data;
   } catch (error) {
     requestErrorHandler(error);
