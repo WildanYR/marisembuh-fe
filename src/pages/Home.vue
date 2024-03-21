@@ -104,6 +104,11 @@ const routes = ref([
         data: { name: "AbsenceAnalytic" },
         name: "Analisis Absen",
       },
+      {
+        type: "route",
+        data: { name: "TreatmentAnalyticList" },
+        name: "Analisis Perawatan",
+      },
     ],
   },
   {

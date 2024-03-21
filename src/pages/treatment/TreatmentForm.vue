@@ -238,10 +238,18 @@ const onEditDataChange = (key: string) => {
 };
 
 const toPreviousPage = () => {
-  const patientId = route.params.patientId || patientData.id;
+  let params: any = {};
+  if ((route.meta.pageParams as string[])?.length) {
+    (route.meta.pageParams as string[]).forEach((item) => {
+      params[item] = route.params[item];
+    });
+  } else {
+    params.patientId = route.params.patientId || patientData.id;
+  }
+  const pageName = (route.meta?.previousPage as string) || "TreatmentList";
   router.push({
-    name: "TreatmentList",
-    params: { patientId },
+    name: pageName,
+    params,
   });
 };
 

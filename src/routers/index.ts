@@ -19,6 +19,7 @@ import TreatmentRoutes from "./treatment.router";
 import AbsenceRoutes from "./absence.router";
 import AbsenceAnalyticRoutes from "./absence_analytic.router";
 import TotalPatientAnalyticRoutes from "./total_patient_analytic.router";
+import TreatmentAnalyticRoutes from "./treatment_analytic.router";
 import { tokenKey } from "../configs";
 
 const router = createRouter({
@@ -132,6 +133,12 @@ const router = createRouter({
       path: "/analisis/jumlah-pasien",
       component: GrayBgLayout,
       children: TotalPatientAnalyticRoutes,
+    },
+    {
+      name: "TreatmentAnalyticLayout",
+      path: "/analisis/perawatan",
+      component: GrayBgLayout,
+      children: TreatmentAnalyticRoutes,
     },
   ],
 });
