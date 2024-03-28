@@ -14,15 +14,11 @@ import { RadioGroup, RadioGroupOption, RadioGroupLabel } from "@headlessui/vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import { useAuthStore } from "../../stores/auth.store";
+import { Roles } from "../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-
-const userRoles = ref([
-  { id: "ADMIN", name: "Admin" },
-  { id: "TERAPIS", name: "Terapis" },
-]);
 
 const formData = reactive({
   email: "",
@@ -49,19 +45,31 @@ const readOnly = computed(() => {
   return false;
 });
 
+const showClinicSelect = computed(() => {
+  if (formData.role !== Roles.ADMIN) {
+    return true;
+  }
+  formData.clinic_id = null;
+  return false;
+});
+
 const handleAddUser = () => {
   const validator = new Validator();
   validator.addValidation("email", formData.email, [isRequired]);
   validator.addValidation("password", formData.password, [isRequired]);
   validator.addValidation("name", formData.name, [isRequired]);
   validator.addValidation("role", formData.role, [isRequired]);
-  validator.addValidation("clinic", formData.clinic_id, [isRequired]);
+  if (showClinicSelect) {
+    validator.addValidation("clinic", formData.clinic_id, [isRequired]);
+  }
   if (validator.validate()) {
     formDataError.email = validator.getError("email") as any;
     formDataError.password = validator.getError("password") as any;
     formDataError.name = validator.getError("name") as any;
     formDataError.role = validator.getError("role") as any;
-    formDataError.clinic = validator.getError("clinic") as any;
+    if (showClinicSelect) {
+      formDataError.clinic = validator.getError("clinic") as any;
+    }
     return;
   }
   loadingSubmit.value = true;
@@ -160,10 +168,10 @@ onMounted(() => {
         <RadioGroupLabel class="text-gray-700">Role</RadioGroupLabel>
         <div class="grid grid-cols-2 gap-3 mt-3">
           <RadioGroupOption
-            v-for="(role, i) in userRoles"
+            v-for="(role, i) in Object.values(Roles)"
             :key="'role-' + i"
             as="template"
-            :value="role.id"
+            :value="role"
             v-slot="{ active, checked }"
           >
             <div
@@ -177,17 +185,19 @@ onMounted(() => {
               ]"
               class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
             >
-              <RadioGroupLabel class="text-sm">{{ role.name }}</RadioGroupLabel>
+              <RadioGroupLabel class="text-sm">{{ role }}</RadioGroupLabel>
             </div>
           </RadioGroupOption>
         </div>
       </RadioGroup>
-      <SingleClinicSelect
-        label="Klinik"
-        v-model="selectedClinic"
-        :disabled="readOnly"
-        @update:model-value="onSelectClinic"
-      />
+      <template v-show="showClinicSelect">
+        <SingleClinicSelect
+          label="Klinik"
+          v-model="selectedClinic"
+          :disabled="readOnly"
+          @update:model-value="onSelectClinic"
+        />
+      </template>
       <div class="pt-3 space-y-4">
         <LoadingButton
           v-show="!readOnly"

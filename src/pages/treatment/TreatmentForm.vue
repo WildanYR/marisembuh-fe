@@ -26,6 +26,7 @@ import { getPatientById } from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
 import { useAuthStore } from "../../stores/auth.store";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
+import { Roles } from "../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
@@ -123,6 +124,17 @@ const readOnly = computed(() => {
   return false;
 });
 
+const showClinicSelect = computed(() => {
+  if (!isHomecareTreatment.value && route.name !== "TreatmentAdd") return true;
+  if (
+    !isHomecareTreatment.value &&
+    route.name === "TreatmentAdd" &&
+    authStore.role === Roles.ADMIN
+  )
+    return true;
+  return false;
+});
+
 const handleAddTreatment = () => {
   const validator = new Validator();
   validator.addValidation("objective", formData.objective, [isRequired]);
@@ -132,7 +144,11 @@ const handleAddTreatment = () => {
   }
   loadingSubmit.value = true;
   if (!isHomecareTreatment.value) {
-    formData.clinic_id = authStore.clinic_id as any;
+    if (authStore.role === Roles.ADMIN) {
+      formData.clinic_id = ((selectedClinic.value as any).id as any) || null;
+    } else {
+      formData.clinic_id = authStore.clinic_id as any;
+    }
   } else {
     formData.clinic_id = null;
   }
@@ -429,7 +445,6 @@ onBeforeUnmount(() => {
         </RadioGroup>
         <!-- Jenis Perawatan -->
         <RadioGroup
-          v-if="route.name === 'TreatmentAdd'"
           v-model="isHomecareTreatment"
           :disabled="readOnly"
           @update:model-value="onEditDataChange('clinic_id')"
@@ -476,13 +491,14 @@ onBeforeUnmount(() => {
             </RadioGroupOption>
           </div>
         </RadioGroup>
-        <SingleClinicSelect
-          v-else
-          label="Klinik"
-          v-model="selectedClinic"
-          :disabled="readOnly"
-          @update:model-value="onSelectClinic"
-        />
+        <template v-if="showClinicSelect">
+          <SingleClinicSelect
+            label="Klinik"
+            v-model="selectedClinic"
+            :disabled="readOnly"
+            @update:model-value="onSelectClinic"
+          />
+        </template>
         <!-- Paket Perawatan -->
         <SingleTreatmentPacketSelect
           label="Paket Perawatan"

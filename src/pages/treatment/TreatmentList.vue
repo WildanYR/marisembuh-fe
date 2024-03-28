@@ -2,6 +2,7 @@
 import { Ref, computed, onMounted, reactive, ref } from "vue";
 import PlusIcon from "../../components/icon/PlusIcon.vue";
 import {
+  IGetTreatmentQuery,
   ITreatmentResponse,
   deleteTreatment,
   getAllTreatmentWithPagination,
@@ -19,9 +20,12 @@ import { getPatientById } from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../utils/date.util";
+import { useAuthStore } from "../../stores/auth.store";
+import { Roles } from "../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
 const selectedTreatment: Ref<ITreatmentResponse | null> = ref(null);
@@ -78,10 +82,13 @@ const getPatientData = () => {
 
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
-  getAllTreatmentWithPagination(
-    { patient_id: route.params.patientId as string },
-    { page, limit }
-  )
+  const condition: IGetTreatmentQuery = {
+    patient_id: route.params.patientId as string,
+  };
+  if (authStore.role !== Roles.ADMIN) {
+    condition.user_id = authStore.id;
+  }
+  getAllTreatmentWithPagination(condition, { page, limit })
     .then((response) => {
       if (!response) return;
       treatments.value = response.items;

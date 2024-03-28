@@ -6,6 +6,7 @@ import { tokenKey } from "../configs";
 import { getUserById } from "../services/user.service";
 import { getPatientCount } from "../services/patient.service";
 import { getStartEndOfMonthDate } from "../utils/date.util";
+import { Roles } from "../types/role.enum";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -25,6 +26,12 @@ const onLogout = () => {
   authStore.resetState();
   localStorage.removeItem(tokenKey);
   router.push({ name: "Login" });
+};
+
+const checkRoles = (roles?: Roles[]) => {
+  if (!roles?.length) return true;
+
+  return roles.includes(authStore.role as any);
 };
 
 onMounted(() => {
@@ -77,11 +84,29 @@ onMounted(() => {
   });
 });
 
-const routes = ref([
+interface IRouteList {
+  type: "route" | "func";
+  name: string;
+  data: any;
+  roles?: Roles[];
+}
+
+interface IRoutes {
+  name: string;
+  roles?: Roles[];
+  list: IRouteList[];
+}
+
+const routes: IRoutes[] = [
   {
     name: "Fitur",
     list: [
-      { type: "route", data: { name: "UserList" }, name: "User" },
+      {
+        type: "route",
+        data: { name: "UserList" },
+        name: "User",
+        roles: [Roles.ADMIN],
+      },
       { type: "route", data: { name: "PatientList" }, name: "Pasien" },
       {
         type: "route",
@@ -93,6 +118,7 @@ const routes = ref([
   },
   {
     name: "Analisis",
+    roles: [Roles.ADMIN],
     list: [
       {
         type: "route",
@@ -163,7 +189,7 @@ const routes = ref([
     name: "Setting",
     list: [{ type: "func", data: onLogout, name: "Logout" }],
   },
-]);
+];
 </script>
 
 <template>
@@ -175,9 +201,15 @@ const routes = ref([
         </h2>
         <h2 class="mb-3 text-xl">
           selamat datang di
-          <span class="font-medium">{{ userData.clinic }}</span>
+          <span v-if="authStore.role !== Roles.ADMIN" class="font-medium">{{
+            userData.clinic
+          }}</span>
+          <span v-else class="font-medium">Marisembuh</span>
         </h2>
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
+        <div
+          v-if="authStore.role !== Roles.ADMIN"
+          class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2"
+        >
           <div class="w-full px-6 py-2 border border-gray-300 rounded-md">
             <p class="text-sm text-gray-600">Pasien Klinik Hari ini</p>
             <p class="text-3xl font-medium">{{ patientCount.clinic_today }}</p>
@@ -200,27 +232,33 @@ const routes = ref([
           </div>
         </div>
       </div>
-      <div v-for="(group, i) in routes" :key="'route-' + i">
-        <h2 class="mb-3 text-2xl font-medium">{{ group.name }}</h2>
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
-          <template v-for="list in group.list">
-            <RouterLink
-              v-if="list.type === 'route'"
-              :to="(list.data as any)"
-              class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-            >
-              {{ list.name }}
-            </RouterLink>
-            <button
-              v-else
-              @click="list.data"
-              class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-            >
-              Logout
-            </button>
-          </template>
+      <template v-for="(group, i) in routes">
+        <div v-if="checkRoles(group.roles)" :key="'menu-' + i">
+          <h2 class="mb-3 text-2xl font-medium">{{ group.name }}</h2>
+          <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
+            <template v-for="(list, j) in group.list">
+              <template v-if="checkRoles(list.roles)">
+                <RouterLink
+                  v-if="list.type === 'route'"
+                  :key="'menu-route-' + j"
+                  :to="(list.data as any)"
+                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
+                >
+                  {{ list.name }}
+                </RouterLink>
+                <button
+                  v-else
+                  :key="'menu-action-' + j"
+                  @click="list.data"
+                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
+                >
+                  {{ list.name }}
+                </button>
+              </template>
+            </template>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>

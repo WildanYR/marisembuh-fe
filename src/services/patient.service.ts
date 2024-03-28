@@ -9,7 +9,7 @@ interface IPatientCreate {
   address: string;
   telp: string;
   user_id: number;
-  clinic_id: number;
+  clinic_id: number | null;
 }
 
 interface IPatientUpdate extends Partial<IPatientCreate> {}

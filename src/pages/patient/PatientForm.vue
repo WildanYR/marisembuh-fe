@@ -20,6 +20,7 @@ import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSe
 import GrayButton from "../../components/button/GrayButton.vue";
 import { id as dateLocalId } from "date-fns/locale";
 import { calculateAgeFromBirthdate } from "../../utils/date.util";
+import { Roles } from "../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
@@ -31,7 +32,7 @@ const formData = reactive({
   birthdate: "",
   address: "",
   telp: "",
-  clinic_id: 0,
+  clinic_id: null,
 });
 const formDataError = reactive({
   name: [],
@@ -52,12 +53,19 @@ const readOnly = computed(() => {
   return false;
 });
 
+const showClinicSelect = computed(() => {
+  return authStore.role === Roles.ADMIN;
+});
+
 const handleAddPatient = () => {
   const validator = new Validator();
   validator.addValidation("name", formData.name, [isRequired]);
   if (validator.validate()) {
     formDataError.name = validator.getError("name") as any;
     return;
+  }
+  if (!showClinicSelect) {
+    formData.clinic_id = authStore.clinic_id as any;
   }
   loadingSubmit.value = true;
   createPatient({ ...formData, user_id: authStore.id })
@@ -116,7 +124,7 @@ onMounted(() => {
         formData.birthdate = response.birthdate;
         formData.address = response.address;
         formData.telp = response.telp;
-        formData.clinic_id = response.register_clinic.id;
+        formData.clinic_id = response.register_clinic.id as any;
         selectedClinic.value = response.register_clinic as any;
         // Detail
         registeringUser.value = response.registered_by
@@ -237,12 +245,14 @@ onMounted(() => {
         label="No Telpon / WA"
         :disabled="readOnly"
       ></TextInput>
-      <SingleClinicSelect
-        label="Klinik"
-        v-model="selectedClinic"
-        :disabled="readOnly"
-        @update:model-value="onSelectClinic"
-      />
+      <template v-if="showClinicSelect">
+        <SingleClinicSelect
+          label="Klinik"
+          v-model="selectedClinic"
+          :disabled="readOnly"
+          @update:model-value="onSelectClinic"
+        />
+      </template>
       <div v-if="readOnly">
         <p class="text-sm text-gray-700">Didaftarkan oleh</p>
         <p class="font-medium">{{ registeringUser }}</p>
