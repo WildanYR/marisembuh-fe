@@ -9,12 +9,16 @@ jobs:
       - uses: actions/checkout@v2
       - name: Deploy in Server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          VITE_API_URL: ${{secrets.API_URL}}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+          envs: VITE_API_URL
           script: |
+            export VITE_API_URL=$VITE_API_URL
             cd /home/marisembuh/marisembuh-fe
             git pull
             npm install
