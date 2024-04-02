@@ -117,9 +117,7 @@ onMounted(() => {
   <div
     class="w-full max-w-xl p-6 mx-auto mb-24 bg-white shadow-lg mt-14 rounded-xl"
   >
-    <h1 class="mb-3 text-4xl font-medium text-center">
-      {{ route.meta.title }}
-    </h1>
+    <h1 class="mb-3 text-4xl font-medium text-center">Profil</h1>
     <div class="flex items-center justify-center mb-3">
       <GrayButton @click="toPreviousPage" class="text-sm">Kembali</GrayButton>
     </div>
@@ -156,7 +154,7 @@ onMounted(() => {
           @click="handleSubmit"
           class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
         >
-          {{ route.meta.title }}
+          Edit Profil
         </LoadingButton>
         <GrayButton @click="toPreviousPage" class="w-full">Kembali</GrayButton>
       </div>

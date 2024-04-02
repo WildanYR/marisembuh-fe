@@ -187,7 +187,14 @@ const routes: IRoutes[] = [
   },
   {
     name: "Setting",
-    list: [{ type: "func", data: onLogout, name: "Logout" }],
+    list: [
+      { type: "func", data: onLogout, name: "Logout" },
+      {
+        type: "route",
+        data: { name: "UserProfile" },
+        name: "Profil",
+      },
+    ],
   },
 ];
 </script>
