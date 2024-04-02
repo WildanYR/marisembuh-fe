@@ -87,7 +87,7 @@ const handleSubmit = () => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "UserList" });
+  router.push({ name: "Home" });
 };
 
 const onSelectClinic = (clinic: any) => {
