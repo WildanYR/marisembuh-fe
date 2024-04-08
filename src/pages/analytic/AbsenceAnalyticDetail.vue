@@ -25,9 +25,12 @@ import {
   isTimeGreaterThan,
 } from "../../utils/date.util";
 import { useDateFilterStore } from "../../stores/date_filter.store";
+import { useAuthStore } from "../../stores/auth.store";
+import { Roles } from "../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 const dateFilterStore = useDateFilterStore();
 
 const absenceAnalytics: Ref<IAbsenceDataResponse[]> = ref([]);
@@ -91,14 +94,14 @@ const tableData = computed(() => {
   };
 });
 
-const getAbsenceAnalyticData = (page = 1, limit = 10) => {
+const getAbsenceAnalyticData = (userId: number, page = 1, limit = 10) => {
   loadingAbsenceAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
   );
   getAbsenceAnalyticDetail(
-    parseInt(route.params.userId as string),
+    userId,
     { page, limit },
     {
       startDate,
@@ -118,11 +121,21 @@ const getAbsenceAnalyticData = (page = 1, limit = 10) => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "AbsenceAnalytic" });
+  if (authStore.role === Roles.ADMIN) {
+    router.push({ name: "AbsenceAnalytic" });
+  } else {
+    router.push({ name: "Home" });
+  }
 };
 
 const handleDateFilter = () => {
-  getAbsenceAnalyticData();
+  let userId: number;
+  if (authStore.role !== Roles.ADMIN) {
+    userId = authStore.id;
+  } else {
+    userId = parseInt(route.params.userId as string);
+  }
+  getAbsenceAnalyticData(userId);
 };
 
 onMounted(() => {
@@ -138,7 +151,13 @@ onMounted(() => {
       formatSQLStringDate(endOfMonth),
     ] as any;
   }
-  getAbsenceAnalyticData();
+  let userId: number;
+  if (authStore.role !== Roles.ADMIN) {
+    userId = authStore.id;
+  } else {
+    userId = parseInt(route.params.userId as string);
+  }
+  getAbsenceAnalyticData(userId);
 });
 </script>
 

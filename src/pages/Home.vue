@@ -138,6 +138,17 @@ const routes: IRoutes[] = [
     ],
   },
   {
+    name: "Analisis",
+    roles: [Roles.TERAPIS, Roles.FRONTDESK],
+    list: [
+      {
+        type: "route",
+        data: { name: "AbsenceAnalyticDetailUser" },
+        name: "Analisis Absen",
+      },
+    ],
+  },
+  {
     name: "Data",
     list: [
       { type: "route", data: { name: "ClinicList" }, name: "Klinik" },

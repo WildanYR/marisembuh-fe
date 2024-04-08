@@ -9,6 +9,11 @@ const routes: RouteRecordRaw[] = [
     path: "user/:userId",
     component: AbsenceAnalyticDetail,
   },
+  {
+    name: "AbsenceAnalyticDetailUser",
+    path: "user",
+    component: AbsenceAnalyticDetail,
+  },
 ];
 
 export default routes;
