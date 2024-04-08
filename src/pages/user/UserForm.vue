@@ -190,7 +190,7 @@ onMounted(() => {
           </RadioGroupOption>
         </div>
       </RadioGroup>
-      <template v-show="showClinicSelect">
+      <template v-if="showClinicSelect">
         <SingleClinicSelect
           label="Klinik"
           v-model="selectedClinic"
