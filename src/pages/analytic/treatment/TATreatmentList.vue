@@ -19,9 +19,12 @@ import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../../utils/date.util";
 import { getUserById } from "../../../services/user.service";
 import { getClinicById } from "../../../services/clinic.service";
+import { useAuthStore } from "../../../stores/auth.store";
+import { Roles } from "../../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -74,8 +77,18 @@ const getDetailData = () => {
       .finally(() => {
         loadingGetDetail.value = false;
       });
-  } else {
+  } else if (route.name === "TAClinicTreatmentList") {
     getClinicById(route.params.clinicId as any)
+      .then((response) => {
+        if (!response) return;
+        detailData.id = response.id;
+        detailData.name = response.name;
+      })
+      .finally(() => {
+        loadingGetDetail.value = false;
+      });
+  } else {
+    getUserById(authStore.id)
       .then((response) => {
         if (!response) return;
         detailData.id = response.id;
@@ -90,14 +103,18 @@ const getDetailData = () => {
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
   let condition: IGetTreatmentQuery = {};
-  if (route.params.patientId) {
-    condition.patient_id = route.params.patientId as string;
-  }
-  if (route.params.userId) {
-    condition.user_id = route.params.userId as string;
-  }
-  if (route.params.clinicId) {
-    condition.clinic_id = route.params.clinicId as string;
+  if (authStore.role === Roles.ADMIN) {
+    if (route.params.patientId) {
+      condition.patient_id = route.params.patientId as string;
+    }
+    if (route.params.userId) {
+      condition.user_id = route.params.userId as string;
+    }
+    if (route.params.clinicId) {
+      condition.clinic_id = route.params.clinicId as string;
+    }
+  } else {
+    condition.user_id = authStore.id.toString();
   }
   getAllTreatmentWithPagination(condition, { page, limit })
     .then((response) => {
@@ -122,8 +139,10 @@ const toPreviousPage = () => {
     router.push({ name: "TAPatientList" });
   } else if (route.name === "TAUserTreatmentList") {
     router.push({ name: "TAUserList" });
-  } else {
+  } else if (route.name === "TAClinicTreatmentList") {
     router.push({ name: "TAClinicList" });
+  } else {
+    router.push({ name: "Home" });
   }
 };
 

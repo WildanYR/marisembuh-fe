@@ -56,6 +56,21 @@ const routes: RouteRecordRaw[] = [
       pageParams: ["userId"],
     },
   },
+  {
+    name: "TAUserTreatmentListUser",
+    path: "user",
+    component: TATreatmentList,
+  },
+  {
+    name: "TAUserTreatmentDetailUser",
+    path: "user/perawatan/:id",
+    component: TreatmentForm,
+    meta: {
+      title: "Detail Perawatan (Analisis)",
+      readOnly: true,
+      previousPage: "TAUserTreatmentListUser",
+    },
+  },
   // Klinik
   {
     name: "TAClinicList",

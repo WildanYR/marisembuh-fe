@@ -146,6 +146,11 @@ const routes: IRoutes[] = [
         data: { name: "AbsenceAnalyticDetailUser" },
         name: "Analisis Absen",
       },
+      {
+        type: "route",
+        data: { name: "TAUserTreatmentListUser" },
+        name: "Analisis Perawatan",
+      },
     ],
   },
   {
