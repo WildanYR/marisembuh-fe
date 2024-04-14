@@ -5,6 +5,7 @@ import TAUserList from "../pages/analytic/treatment/TAUserList.vue";
 import TAClinicList from "../pages/analytic/treatment/TAClinicList.vue";
 import TATreatmentList from "../pages/analytic/treatment/TATreatmentList.vue";
 import TreatmentForm from "../pages/treatment/TreatmentForm.vue";
+import TATreatmentListUser from "../pages/analytic/treatment/TATreatmentListUser.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -59,7 +60,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: "TAUserTreatmentListUser",
     path: "user",
-    component: TATreatmentList,
+    component: TATreatmentListUser,
   },
   {
     name: "TAUserTreatmentDetailUser",

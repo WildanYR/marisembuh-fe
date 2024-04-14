@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { Ref, computed, onMounted, ref } from "vue";
-import { IPaginationData } from "../../types/pagination.type";
-import ResponsiveTable from "../../components/tables/ResponsiveTable.vue";
-import TableHead from "../../components/tables/TableHead.vue";
-import TableRowBody from "../../components/tables/TableRowBody.vue";
-import TableBody from "../../components/tables/TableBody.vue";
-import Pagination from "../../components/Pagination.vue";
-import EmptyData from "../../components/EmptyData.vue";
-import { useRoute, useRouter } from "vue-router";
-import GrayButton from "../../components/button/GrayButton.vue";
-import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
+import { IPaginationData } from "../../../types/pagination.type";
+import ResponsiveTable from "../../../components/tables/ResponsiveTable.vue";
+import TableHead from "../../../components/tables/TableHead.vue";
+import TableRowBody from "../../../components/tables/TableRowBody.vue";
+import TableBody from "../../../components/tables/TableBody.vue";
+import Pagination from "../../../components/Pagination.vue";
+import EmptyData from "../../../components/EmptyData.vue";
+import { useRouter } from "vue-router";
+import GrayButton from "../../../components/button/GrayButton.vue";
+import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import {
   IAbsenceAnalyticResponse,
   IAbsenceDataResponse,
   getAbsenceAnalyticDetail,
-} from "../../services/absence_analytic.service";
+} from "../../../services/absence_analytic.service";
 import { id as dateLocalId } from "date-fns/locale";
 import {
   formatLocaleStringDate,
@@ -23,13 +23,11 @@ import {
   getFilterStartEndISODate,
   getStartEndOfMonthDate,
   isTimeGreaterThan,
-} from "../../utils/date.util";
-import { useDateFilterStore } from "../../stores/date_filter.store";
-import { useAuthStore } from "../../stores/auth.store";
-import { Roles } from "../../types/role.enum";
+} from "../../../utils/date.util";
+import { useDateFilterStore } from "../../../stores/date_filter.store";
+import { useAuthStore } from "../../../stores/auth.store";
 
 const router = useRouter();
-const route = useRoute();
 const authStore = useAuthStore();
 const dateFilterStore = useDateFilterStore();
 
@@ -121,21 +119,11 @@ const getAbsenceAnalyticData = (userId: number, page = 1, limit = 10) => {
 };
 
 const toPreviousPage = () => {
-  if (authStore.role === Roles.ADMIN) {
-    router.push({ name: "AbsenceAnalytic" });
-  } else {
-    router.push({ name: "Home" });
-  }
+  router.push({ name: "Home" });
 };
 
 const handleDateFilter = () => {
-  let userId: number;
-  if (authStore.role !== Roles.ADMIN) {
-    userId = authStore.id;
-  } else {
-    userId = parseInt(route.params.userId as string);
-  }
-  getAbsenceAnalyticData(userId);
+  getAbsenceAnalyticData(authStore.id);
 };
 
 onMounted(() => {
@@ -151,13 +139,7 @@ onMounted(() => {
       formatSQLStringDate(endOfMonth),
     ] as any;
   }
-  let userId: number;
-  if (authStore.role !== Roles.ADMIN) {
-    userId = authStore.id;
-  } else {
-    userId = parseInt(route.params.userId as string);
-  }
-  getAbsenceAnalyticData(userId);
+  getAbsenceAnalyticData(authStore.id);
 });
 </script>
 

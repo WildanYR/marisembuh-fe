@@ -13,15 +13,15 @@ import TableBody from "../../../components/tables/TableBody.vue";
 import Pagination from "../../../components/Pagination.vue";
 import EmptyData from "../../../components/EmptyData.vue";
 import { useRoute, useRouter } from "vue-router";
-import { getPatientById } from "../../../services/patient.service";
 import GrayButton from "../../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../../utils/date.util";
 import { getUserById } from "../../../services/user.service";
-import { getClinicById } from "../../../services/clinic.service";
+import { useAuthStore } from "../../../stores/auth.store";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -54,51 +54,21 @@ const tableData = computed(() => {
 
 const getDetailData = () => {
   loadingGetDetail.value = true;
-  if (route.name === "TAPatientTreatmentList") {
-    getPatientById(route.params.patientId as any)
-      .then((response) => {
-        if (!response) return;
-        detailData.id = response.id;
-        detailData.name = response.name;
-      })
-      .finally(() => {
-        loadingGetDetail.value = false;
-      });
-  } else if (route.name === "TAUserTreatmentList") {
-    getUserById(route.params.userId as any)
-      .then((response) => {
-        if (!response) return;
-        detailData.id = response.id;
-        detailData.name = response.name;
-      })
-      .finally(() => {
-        loadingGetDetail.value = false;
-      });
-  } else {
-    getClinicById(route.params.clinicId as any)
-      .then((response) => {
-        if (!response) return;
-        detailData.id = response.id;
-        detailData.name = response.name;
-      })
-      .finally(() => {
-        loadingGetDetail.value = false;
-      });
-  }
+  getUserById(authStore.id)
+    .then((response) => {
+      if (!response) return;
+      detailData.id = response.id;
+      detailData.name = response.name;
+    })
+    .finally(() => {
+      loadingGetDetail.value = false;
+    });
 };
 
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
   let condition: IGetTreatmentQuery = {};
-  if (route.params.patientId) {
-    condition.patient_id = route.params.patientId as string;
-  }
-  if (route.params.userId) {
-    condition.user_id = route.params.userId as string;
-  }
-  if (route.params.clinicId) {
-    condition.clinic_id = route.params.clinicId as string;
-  }
+  condition.user_id = authStore.id.toString();
   getAllTreatmentWithPagination(condition, { page, limit })
     .then((response) => {
       if (!response) return;
@@ -111,22 +81,10 @@ const getTreatmentData = (page = 1, limit = 10) => {
 };
 
 const handleOnTreatmentDetail = (treatmentId: number) => {
-  if (route.name === "TAPatientTreatmentList") {
-    router.push({
-      name: "TAPatientTreatmentDetail",
-      params: { patientId: route.params.patientId, id: treatmentId },
-    });
-  } else if (route.name === "TAUserTreatmentList") {
-    router.push({
-      name: "TAUserTreatmentDetail",
-      params: { userId: route.params.userId, id: treatmentId },
-    });
-  } else {
-    router.push({
-      name: "TAClinicTreatmentDetail",
-      params: { clinicId: route.params.clinicId, id: treatmentId },
-    });
-  }
+  router.push({
+    name: "TAUserTreatmentDetailUser",
+    params: { id: treatmentId },
+  });
 };
 
 const toPreviousPage = () => {

@@ -1,6 +1,7 @@
 import { RouteRecordRaw } from "vue-router";
-import AbsenceAnalytic from "../pages/analytic/AbsenceAnalytic.vue";
-import AbsenceAnalyticDetail from "../pages/analytic/AbsenceAnalyticDetail.vue";
+import AbsenceAnalytic from "../pages/analytic/absence/AbsenceAnalytic.vue";
+import AbsenceAnalyticDetail from "../pages/analytic/absence/AbsenceAnalyticDetail.vue";
+import AbsenceAnalyticDetailUser from "../pages/analytic/absence/AbsenceAnalyticDetailUser.vue";
 
 const routes: RouteRecordRaw[] = [
   { name: "AbsenceAnalytic", path: "", component: AbsenceAnalytic },
@@ -12,7 +13,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: "AbsenceAnalyticDetailUser",
     path: "user",
-    component: AbsenceAnalyticDetail,
+    component: AbsenceAnalyticDetailUser,
   },
 ];
 
