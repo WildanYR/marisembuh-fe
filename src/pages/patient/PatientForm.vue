@@ -70,7 +70,7 @@ const handleAddPatient = () => {
   loadingSubmit.value = true;
   createPatient({ ...formData, user_id: authStore.id })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -90,7 +90,7 @@ const handleEditPatient = () => {
     user_id: authStore.id,
   })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -110,7 +110,12 @@ const onSelectClinic = (clinic: any) => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "PatientList" });
+  if (route.query.ref) {
+    const ref = JSON.parse(decodeURIComponent(route.query.ref as string));
+    router.push(ref);
+  } else {
+    router.push({ name: "PatientList" });
+  }
 };
 
 onMounted(() => {

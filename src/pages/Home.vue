@@ -110,6 +110,11 @@ const routes: IRoutes[] = [
       { type: "route", data: { name: "PatientList" }, name: "Pasien" },
       {
         type: "route",
+        data: { name: "PatientArrivalList" },
+        name: "Kedatangan Pasien",
+      },
+      {
+        type: "route",
         data: { name: "TreatmentPatientList" },
         name: "Perawatan",
       },
