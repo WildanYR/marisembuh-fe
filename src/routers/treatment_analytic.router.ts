@@ -5,13 +5,26 @@ import TAUserList from "../pages/analytic/treatment/TAUserList.vue";
 import TAClinicList from "../pages/analytic/treatment/TAClinicList.vue";
 import TATreatmentList from "../pages/analytic/treatment/TATreatmentList.vue";
 import TreatmentForm from "../pages/treatment/TreatmentForm.vue";
-import TATreatmentListUser from "../pages/analytic/treatment/TATreatmentListUser.vue";
 
 const routes: RouteRecordRaw[] = [
   {
     name: "TreatmentAnalyticList",
     path: "",
     component: TreatmentAnalyticList,
+  },
+  {
+    name: "TreatmentAnalyticListUser",
+    path: "me",
+    component: TATreatmentList,
+  },
+  {
+    name: "TATreatmentDetail",
+    path: "detail/:id",
+    component: TreatmentForm,
+    meta: {
+      title: "Detail Perawatan (Analisis)",
+      readOnly: true,
+    },
   },
   // Patient
   {
@@ -24,17 +37,6 @@ const routes: RouteRecordRaw[] = [
     path: "pasien/:patientId",
     component: TATreatmentList,
   },
-  {
-    name: "TAPatientTreatmentDetail",
-    path: "pasien/:patientId/perawatan/:id",
-    component: TreatmentForm,
-    meta: {
-      title: "Detail Perawatan (Analisis)",
-      readOnly: true,
-      previousPage: "TAPatientTreatmentList",
-      pageParams: ["patientId"],
-    },
-  },
   // User
   {
     name: "TAUserList",
@@ -46,32 +48,6 @@ const routes: RouteRecordRaw[] = [
     path: "user/:userId",
     component: TATreatmentList,
   },
-  {
-    name: "TAUserTreatmentDetail",
-    path: "user/:userId/perawatan/:id",
-    component: TreatmentForm,
-    meta: {
-      title: "Detail Perawatan (Analisis)",
-      readOnly: true,
-      previousPage: "TAUserTreatmentList",
-      pageParams: ["userId"],
-    },
-  },
-  {
-    name: "TAUserTreatmentListUser",
-    path: "user",
-    component: TATreatmentListUser,
-  },
-  {
-    name: "TAUserTreatmentDetailUser",
-    path: "user/perawatan/:id",
-    component: TreatmentForm,
-    meta: {
-      title: "Detail Perawatan (Analisis)",
-      readOnly: true,
-      previousPage: "TAUserTreatmentListUser",
-    },
-  },
   // Klinik
   {
     name: "TAClinicList",
@@ -82,17 +58,6 @@ const routes: RouteRecordRaw[] = [
     name: "TAClinicTreatmentList",
     path: "klinik/:clinicId",
     component: TATreatmentList,
-  },
-  {
-    name: "TAClinicTreatmentDetail",
-    path: "klinik/:clinicId/perawatan/:id",
-    component: TreatmentForm,
-    meta: {
-      title: "Detail Perawatan (Analisis)",
-      readOnly: true,
-      previousPage: "TAClinicTreatmentList",
-      pageParams: ["clinicId"],
-    },
   },
 ];
 

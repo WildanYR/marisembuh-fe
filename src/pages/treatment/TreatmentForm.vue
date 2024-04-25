@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { Ref, computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Validator } from "../../validator";
 import isRequired from "../../validator/isRequired.validator";
@@ -22,11 +22,15 @@ import MultiTherapySelect from "../../components/form/custom_data/MultiTherapySe
 import SingleTreatmentPacketSelect from "../../components/form/custom_data/SingleTreatmentPacketSelect.vue";
 import SingleDurationAdviceSelect from "../../components/form/custom_data/SingleDurationAdviceSelect.vue";
 import TextArea from "../../components/form/TextArea.vue";
-import { getPatientById } from "../../services/patient.service";
+import {
+  IPatientResponse,
+  getPatientById,
+} from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
 import { useAuthStore } from "../../stores/auth.store";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import { Roles } from "../../types/role.enum";
+import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -97,13 +101,7 @@ const formDataError = reactive({
   objective: [],
 });
 
-const patientData = reactive({
-  id: 0,
-  no_rm: "",
-  name: "",
-  gender: "",
-});
-
+const selectedPatient: Ref<IPatientResponse | null> = ref(null);
 const selectedTreatmentPacket = ref(null);
 const selectedDoctorDiagnosis = ref([]);
 const selectedMedicine = ref([]);
@@ -115,6 +113,8 @@ const selectedTherapy = ref([]);
 const selectedSelfTherapy = ref([]);
 const selectedDurationAdvice = ref(null);
 const selectedClinic = ref(null);
+
+const showModalPatient = ref(false);
 
 const loadingGetTreatment = ref(false);
 const loadingSubmit = ref(false);
@@ -132,6 +132,11 @@ const showClinicSelect = computed(() => {
     authStore.role === Roles.ADMIN
   )
     return true;
+  return false;
+});
+
+const patientLock = computed(() => {
+  if (route.params.patientId) return true;
   return false;
 });
 
@@ -181,13 +186,18 @@ const handleEditTreatment = () => {
 };
 
 const handleSubmit = () => {
-  if (route.name === "TreatmentAdd") {
+  if (route.meta.submitMode === "ADD") {
     handleAddTreatment();
-  } else {
+  }
+  if (route.meta.submitMode === "EDIT") {
     handleEditTreatment();
   }
 };
 
+const onSelectPatient = (patient: any) => {
+  formData.patient_id = patient.id;
+  onEditDataChange("patient_id");
+};
 const onSelectTreatmentPacket = (packet: any) => {
   formData.treatment_packet_id = packet.id;
   onEditDataChange("treatment_packet_id");
@@ -254,25 +264,29 @@ const onEditDataChange = (key: string) => {
 };
 
 const toPreviousPage = () => {
-  let params: any = {};
-  if ((route.meta.pageParams as string[])?.length) {
-    (route.meta.pageParams as string[]).forEach((item) => {
-      params[item] = route.params[item];
-    });
+  if (route.query.ref) {
+    const ref = JSON.parse(decodeURIComponent(route.query.ref as string));
+    router.push(ref);
   } else {
-    params.patientId = route.params.patientId || patientData.id;
+    router.push({ name: "TreatmentList" });
   }
-  const pageName = (route.meta?.previousPage as string) || "TreatmentList";
-  router.push({
-    name: pageName,
-    params,
-  });
 };
 
 onMounted(() => {
-  const patientId = parseInt(route.params.patientId as any);
-  formData.patient_id = patientId as any;
   formData.user_id = authStore.id as any;
+  if (route.params.patientId) {
+    loadingGetTreatment.value = true;
+    const patientId = parseInt(route.params.patientId as any);
+    formData.patient_id = patientId as any;
+    getPatientById(patientId)
+      .then((response) => {
+        if (!response) return;
+        selectedPatient.value = response as any;
+      })
+      .finally(() => {
+        loadingGetTreatment.value = false;
+      });
+  }
   if (route.params.id) {
     loadingGetTreatment.value = true;
     getTreatmentById(parseInt(route.params.id as any))
@@ -358,22 +372,7 @@ onMounted(() => {
           name: item.name,
           detail: item.TreatmentTherapy.detail,
         })) as any;
-        patientData.id = response.patient.id;
-        patientData.no_rm = response.patient.no_rm;
-        patientData.name = response.patient.name;
-        patientData.gender = response.patient.gender;
-      })
-      .finally(() => {
-        loadingGetTreatment.value = false;
-      });
-  } else {
-    loadingGetTreatment.value = true;
-    getPatientById(patientId)
-      .then((response) => {
-        if (!response) return;
-        patientData.no_rm = response.no_rm;
-        patientData.name = response.name;
-        patientData.gender = response.gender;
+        selectedPatient.value = response.patient as any;
       })
       .finally(() => {
         loadingGetTreatment.value = false;
@@ -398,14 +397,13 @@ onBeforeUnmount(() => {
     </div>
     <div class="divide-y-2 divide-gray-400">
       <div class="py-8 space-y-5">
-        <div>
-          <p class="font-medium text-gray-700">No RM</p>
-          <p>{{ patientData.no_rm }}</p>
-        </div>
-        <div>
-          <p class="font-medium text-gray-700">Nama Pasien</p>
-          <p>{{ patientData.name }}</p>
-        </div>
+        <SinglePatientSelect
+          label="Pasien"
+          v-model="selectedPatient"
+          v-model:modal-show="showModalPatient"
+          :disabled="readOnly || patientLock"
+          @update:model-value="onSelectPatient"
+        />
       </div>
       <div class="py-8 space-y-5">
         <!-- Tujuan Perawatan -->
@@ -540,7 +538,7 @@ onBeforeUnmount(() => {
       <div class="py-8 space-y-5">
         <!-- Status Kehamilan -->
         <RadioGroup
-          v-if="patientData.gender === 'P'"
+          v-if="selectedPatient?.gender === 'P'"
           v-model="formData.is_pregnant"
           :disabled="readOnly"
           @update:model-value="onEditDataChange('is_pregnant')"

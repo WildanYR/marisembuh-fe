@@ -115,7 +115,7 @@ const routes: IRoutes[] = [
       },
       {
         type: "route",
-        data: { name: "TreatmentPatientList" },
+        data: { name: "TreatmentList" },
         name: "Perawatan",
       },
       { type: "route", data: { name: "AbsencePage" }, name: "Absensi" },
@@ -153,7 +153,7 @@ const routes: IRoutes[] = [
       },
       {
         type: "route",
-        data: { name: "TAUserTreatmentListUser" },
+        data: { name: "TreatmentAnalyticListUser" },
         name: "Analisis Perawatan",
       },
     ],

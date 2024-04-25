@@ -37,13 +37,27 @@ export interface IPatientArrivalUpdate {
   user_id?: number;
 }
 
+export interface IQueryFilterPatientArrival {
+  done?: boolean;
+  patient_id?: number;
+  user_id?: number;
+  tag_user_id?: number;
+}
+
 export const getAllPatientArrivalWithPagination = async (
-  pagination?: IPagination
+  pagination?: IPagination,
+  queryFilter?: IQueryFilterPatientArrival
 ) => {
   try {
     const params = new URLSearchParams();
     if (pagination) {
       Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
+    }
+
+    if (queryFilter) {
+      Object.entries(queryFilter).forEach((q) => {
         params.append(q[0], q[1]);
       });
     }

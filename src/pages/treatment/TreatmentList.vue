@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, reactive, ref } from "vue";
+import { Ref, computed, onMounted, ref } from "vue";
 import PlusIcon from "../../components/icon/PlusIcon.vue";
 import {
   IGetTreatmentQuery,
@@ -14,20 +14,24 @@ import TableRowBody from "../../components/tables/TableRowBody.vue";
 import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
-import { getPatientById } from "../../services/patient.service";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../utils/date.util";
 import { useAuthStore } from "../../stores/auth.store";
 import { Roles } from "../../types/role.enum";
+import {
+  getAllPatientArrivalWithPagination,
+  IPatientArrivalResponse,
+  IQueryFilterPatientArrival,
+} from "../../services/patient_arrival.service";
 
 const router = useRouter();
-const route = useRoute();
 const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
+const patientArrivals: Ref<IPatientArrivalResponse[]> = ref([]);
 const selectedTreatment: Ref<ITreatmentResponse | null> = ref(null);
 const paginationData: Ref<IPaginationData> = ref({
   currentPage: 1,
@@ -35,13 +39,14 @@ const paginationData: Ref<IPaginationData> = ref({
   totalItems: 0,
   totalPage: 1,
 });
-const patientData = reactive({
-  id: 0,
-  no_rm: "",
-  name: "",
+const patientArrivalPaginationData: Ref<IPaginationData> = ref({
+  currentPage: 1,
+  limit: 10,
+  totalItems: 0,
+  totalPage: 1,
 });
 const loadingGetTreatment = ref(false);
-const loadingGetPatient = ref(false);
+const loadingGetPatientArrival = ref(false);
 const loadingDeleteTreatment = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -51,40 +56,41 @@ const tableData = computed(() => {
     const dateString = formatLocaleStringDate(treatment.created_at);
     const therapist = treatment.user ? treatment.user.name : "";
     const clinic = treatment.clinic ? treatment.clinic.name : "Homecare";
-    return [dateString, treatment.objective, therapist, clinic];
+
+    const data = [dateString, treatment.patient.name, clinic];
+    if (authStore.role === Roles.ADMIN) {
+      data.push(therapist);
+    }
+    return data;
   });
+
+  const header = ["Tanggal", "Pasien", "Klinik"];
+  if (authStore.role === Roles.ADMIN) {
+    header.push("Terapis");
+  }
+
   return {
-    header: ["Tanggal", "Tujuan", "Terapis", "Klinik"],
+    header,
     row,
   };
 });
 
-// const resetPaginationData = () => {
-//   paginationData.value.currentPage = 1;
-//   paginationData.value.limit = 10;
-//   paginationData.value.totalItems = 0;
-//   paginationData.value.totalPage = 1;
-// };
+const patientArrivalTableData = computed(() => {
+  if (!patientArrivals.value.length) return null;
+  const row = patientArrivals.value.map((item) => {
+    const dateString = formatLocaleStringDate(item.created_at);
+    return [dateString, item.patient.name, item.user.name];
+  });
 
-const getPatientData = () => {
-  loadingGetPatient.value = true;
-  getPatientById(route.params.patientId as any)
-    .then((response) => {
-      if (!response) return;
-      patientData.id = response.id;
-      patientData.no_rm = response.no_rm;
-      patientData.name = response.name;
-    })
-    .finally(() => {
-      loadingGetPatient.value = false;
-    });
-};
+  return {
+    header: ["Tanggal", "Pasien", "Terapis"],
+    row,
+  };
+});
 
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
-  const condition: IGetTreatmentQuery = {
-    patient_id: route.params.patientId as string,
-  };
+  const condition: IGetTreatmentQuery = {};
   if (authStore.role !== Roles.ADMIN) {
     condition.user_id = authStore.id;
   }
@@ -99,11 +105,28 @@ const getTreatmentData = (page = 1, limit = 10) => {
     });
 };
 
+const getPatientArrivalData = (
+  page = 1,
+  limit = 10,
+  queryFilter?: IQueryFilterPatientArrival
+) => {
+  loadingGetPatientArrival.value = true;
+  getAllPatientArrivalWithPagination({ page, limit }, queryFilter)
+    .then((response) => {
+      patientArrivals.value = response.items;
+      patientArrivalPaginationData.value = response.paginationData;
+    })
+    .finally(() => {
+      loadingGetPatientArrival.value = false;
+    });
+};
+
 const handleOnTreatmentAdd = () => {
-  router.push({
-    name: "TreatmentAdd",
-    params: { patientId: route.params.patientId },
-  });
+  router.push({ name: "TreatmentAdd" });
+};
+
+const handleOnTreatmentFill = (patientId: number) => {
+  router.push({ name: "TreatmentFill", params: { patientId } });
 };
 
 const handleOnTreatmentDetail = (treatmentId: number) => {
@@ -137,11 +160,15 @@ const openDeleteModal = (treatmentId: number) => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "TreatmentPatientList" });
+  router.push({ name: "Home" });
 };
 
 onMounted(() => {
-  getPatientData();
+  getPatientArrivalData(
+    patientArrivalPaginationData.value.currentPage,
+    patientArrivalPaginationData.value.limit,
+    { done: false, user_id: authStore.id }
+  );
   getTreatmentData();
 });
 </script>
@@ -158,12 +185,7 @@ onMounted(() => {
         >
           <ChevLeftIcon class="w-5 h-5" />
         </GrayButton>
-        <div>
-          <h1 class="text-2xl font-medium">Daftar Perawatan</h1>
-          <p class="text-sm text-gray-500">
-            {{ patientData.no_rm }} | {{ patientData.name }}
-          </p>
-        </div>
+        <h1 class="text-2xl font-medium">Daftar Perawatan</h1>
       </div>
       <button
         type="button"
@@ -175,8 +197,55 @@ onMounted(() => {
       </button>
     </div>
     <div class="mt-5">
+      <!-- TAMBAHKAN TABEL LIST DARI DATA PERAWATAN YANG PERLU DIISI (YANG SUDAH DITAMBAHKAN DI KEDATANGAN PASIEN) -->
+      <div v-if="patientArrivals.length">
+        <p class="mb-3 text-xl font-medium text-gray-700">
+          Data perawatan perlu dilengkapi
+        </p>
+        <ResponsiveTable v-if="patientArrivalTableData">
+          <template v-slot:header>
+            <TableHead
+              v-for="(header, i) in patientArrivalTableData.header"
+              :key="'treatment-table-header' + i"
+            >
+              {{ header }}
+            </TableHead>
+            <TableHead>Aksi</TableHead>
+          </template>
+          <template v-slot:body>
+            <TableRowBody
+              v-for="(row, i) in patientArrivalTableData.row"
+              :key="'treatment-table-row-' + i"
+            >
+              <TableBody
+                v-for="(col, j) in row"
+                :key="'treatment-table-col-' + j"
+                >{{ col }}
+              </TableBody>
+              <TableBody class="flex items-center gap-3">
+                <button
+                  @click="handleOnTreatmentFill(patientArrivals[i].patient.id)"
+                  class="flex items-center gap-1 px-4 py-1 text-sm text-blue-900 bg-blue-100 rounded-md hover:bg-blue-200 group"
+                >
+                  Isi data
+                </button>
+              </TableBody>
+            </TableRowBody>
+          </template>
+        </ResponsiveTable>
+        <Pagination
+          :current-page="patientArrivalPaginationData.currentPage"
+          :total-pages="patientArrivalPaginationData.totalPage"
+          :total-items="patientArrivalPaginationData.totalItems"
+          :limit="patientArrivalPaginationData.limit"
+          @page-change="getPatientArrivalData"
+        ></Pagination>
+      </div>
       <!-- table -->
       <div v-if="treatments.length">
+        <p class="mb-3 text-xl font-medium text-gray-700">
+          Daftar Pasien yang pernah dirawat
+        </p>
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

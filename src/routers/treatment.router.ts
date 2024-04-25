@@ -1,13 +1,11 @@
 import { RouteRecordRaw } from "vue-router";
 import TreatmentList from "../pages/treatment/TreatmentList.vue";
 import TreatmentForm from "../pages/treatment/TreatmentForm.vue";
-import TreatmentPatientList from "../pages/treatment/TreatmentPatientList.vue";
 
 const routes: RouteRecordRaw[] = [
-  { name: "TreatmentPatientList", path: "", component: TreatmentPatientList },
   {
     name: "TreatmentList",
-    path: "pasien/:patientId",
+    path: "",
     component: TreatmentList,
   },
   {
@@ -18,15 +16,21 @@ const routes: RouteRecordRaw[] = [
   },
   {
     name: "TreatmentAdd",
-    path: "tambah/pasien/:patientId",
+    path: "tambah",
     component: TreatmentForm,
-    meta: { title: "Tambah Perawatan" },
+    meta: { title: "Tambah Perawatan", submitMode: "ADD" },
+  },
+  {
+    name: "TreatmentFill",
+    path: "pasien-datang/:patientId",
+    component: TreatmentForm,
+    meta: { title: "Lengkapi Perawatan", submitMode: "ADD" },
   },
   {
     name: "TreatmentEdit",
     path: "edit/:id",
     component: TreatmentForm,
-    meta: { title: "Edit Perawatan" },
+    meta: { title: "Edit Perawatan", submitMode: "EDIT" },
   },
 ];
 

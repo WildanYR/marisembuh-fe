@@ -19,9 +19,12 @@ import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../../utils/date.util";
 import { getUserById } from "../../../services/user.service";
 import { getClinicById } from "../../../services/clinic.service";
+import { useAuthStore } from "../../../stores/auth.store";
+import { Roles } from "../../../types/role.enum";
 
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -64,8 +67,8 @@ const getDetailData = () => {
       .finally(() => {
         loadingGetDetail.value = false;
       });
-  } else if (route.name === "TAUserTreatmentList") {
-    getUserById(route.params.userId as any)
+  } else if (route.name === "TAClinicTreatmentList") {
+    getClinicById(route.params.clinicId as any)
       .then((response) => {
         if (!response) return;
         detailData.id = response.id;
@@ -75,7 +78,7 @@ const getDetailData = () => {
         loadingGetDetail.value = false;
       });
   } else {
-    getClinicById(route.params.clinicId as any)
+    getUserById(route.params.userId as any)
       .then((response) => {
         if (!response) return;
         detailData.id = response.id;
@@ -90,15 +93,20 @@ const getDetailData = () => {
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
   let condition: IGetTreatmentQuery = {};
-  if (route.params.patientId) {
-    condition.patient_id = route.params.patientId as string;
+  if (authStore.role === Roles.ADMIN) {
+    if (route.params.patientId) {
+      condition.patient_id = route.params.patientId as string;
+    }
+    if (route.params.userId) {
+      condition.user_id = route.params.userId as string;
+    }
+    if (route.params.clinicId) {
+      condition.clinic_id = route.params.clinicId as string;
+    }
+  } else {
+    condition.user_id = authStore.id;
   }
-  if (route.params.userId) {
-    condition.user_id = route.params.userId as string;
-  }
-  if (route.params.clinicId) {
-    condition.clinic_id = route.params.clinicId as string;
-  }
+
   getAllTreatmentWithPagination(condition, { page, limit })
     .then((response) => {
       if (!response) return;
@@ -111,22 +119,13 @@ const getTreatmentData = (page = 1, limit = 10) => {
 };
 
 const handleOnTreatmentDetail = (treatmentId: number) => {
-  if (route.name === "TAPatientTreatmentList") {
-    router.push({
-      name: "TAPatientTreatmentDetail",
-      params: { patientId: route.params.patientId, id: treatmentId },
-    });
-  } else if (route.name === "TAUserTreatmentList") {
-    router.push({
-      name: "TAUserTreatmentDetail",
-      params: { userId: route.params.userId, id: treatmentId },
-    });
-  } else {
-    router.push({
-      name: "TAClinicTreatmentDetail",
-      params: { clinicId: route.params.clinicId, id: treatmentId },
-    });
-  }
+  const ref = { name: route.name, params: route.params, query: route.query };
+  const refStr = encodeURIComponent(JSON.stringify(ref));
+  router.push({
+    name: "TATreatmentDetail",
+    params: { id: treatmentId },
+    query: { ref: refStr },
+  });
 };
 
 const toPreviousPage = () => {
@@ -142,7 +141,9 @@ const toPreviousPage = () => {
 };
 
 onMounted(() => {
-  getDetailData();
+  if (authStore.role === Roles.ADMIN) {
+    getDetailData();
+  }
   getTreatmentData();
 });
 </script>
@@ -161,7 +162,7 @@ onMounted(() => {
         </GrayButton>
         <div>
           <h1 class="text-2xl font-medium">Daftar Perawatan (Analisis)</h1>
-          <p class="text-sm text-gray-500">
+          <p v-if="detailData.id" class="text-sm text-gray-500">
             {{ detailData.id }} | {{ detailData.name }}
           </p>
         </div>
