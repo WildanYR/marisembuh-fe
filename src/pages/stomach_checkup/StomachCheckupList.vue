@@ -14,7 +14,7 @@ import TableRowBody from "../../components/tables/TableRowBody.vue";
 import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import TextSearch from "../../components/form/TextSearch.vue";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
@@ -24,6 +24,7 @@ import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
 
 const debouncer = new Debouncer();
 const router = useRouter();
+const route = useRoute();
 
 const StomachCheckups: Ref<IStomachCheckupResponse[]> = ref([]);
 const selectedStomachCheckup: Ref<IStomachCheckupResponse | null> = ref(null);
@@ -127,8 +128,18 @@ const onSearch = debouncer.debounce(() => {
   getStomachCheckupDataByQuery();
 }, DEBOUNCE_TIMEOUT);
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getStomachCheckupData(page);
+};
+
 onMounted(() => {
-  getStomachCheckupData();
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
+  getStomachCheckupData(page);
 });
 
 onBeforeUnmount(() => {
@@ -213,7 +224,7 @@ onBeforeUnmount(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getStomachCheckupData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>

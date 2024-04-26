@@ -7,7 +7,7 @@ import TableRowBody from "../../../components/tables/TableRowBody.vue";
 import TableBody from "../../../components/tables/TableBody.vue";
 import Pagination from "../../../components/Pagination.vue";
 import EmptyData from "../../../components/EmptyData.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import GrayButton from "../../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import {
@@ -28,6 +28,7 @@ import { useDateFilterStore } from "../../../stores/date_filter.store";
 import { useAuthStore } from "../../../stores/auth.store";
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const dateFilterStore = useDateFilterStore();
 
@@ -126,7 +127,17 @@ const handleDateFilter = () => {
   getAbsenceAnalyticData(authStore.id);
 };
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getAbsenceAnalyticData(authStore.id, page);
+};
+
 onMounted(() => {
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
   if (dateFilterStore.start_date && dateFilterStore.end_date) {
     filter.value.date = [
       dateFilterStore.start_date,
@@ -139,7 +150,7 @@ onMounted(() => {
       formatSQLStringDate(endOfMonth),
     ] as any;
   }
-  getAbsenceAnalyticData(authStore.id);
+  getAbsenceAnalyticData(authStore.id, page);
 });
 </script>
 
@@ -218,7 +229,7 @@ onMounted(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getAbsenceAnalyticData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>

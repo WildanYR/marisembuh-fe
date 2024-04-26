@@ -125,7 +125,17 @@ const handleDateFilter = () => {
   getAbsenceAnalyticData(parseInt(route.params.userId as string));
 };
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getAbsenceAnalyticData(parseInt(route.params.userId as string), page);
+};
+
 onMounted(() => {
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
   if (dateFilterStore.start_date && dateFilterStore.end_date) {
     filter.value.date = [
       dateFilterStore.start_date,
@@ -138,7 +148,7 @@ onMounted(() => {
       formatSQLStringDate(endOfMonth),
     ] as any;
   }
-  getAbsenceAnalyticData(parseInt(route.params.userId as string));
+  getAbsenceAnalyticData(parseInt(route.params.userId as string), page);
 });
 </script>
 
@@ -217,12 +227,10 @@ onMounted(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getAbsenceAnalyticData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>
     </div>
   </div>
 </template>
-../../stores/date_filter.store formatSQLStringDate, getStartEndOfMonthDate,
-formatSQLStringDate, getStartEndOfMonthDate,

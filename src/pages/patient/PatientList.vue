@@ -14,7 +14,7 @@ import TableRowBody from "../../components/tables/TableRowBody.vue";
 import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import TextSearch from "../../components/form/TextSearch.vue";
 import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
@@ -25,6 +25,7 @@ import { calculateAgeFromBirthdate } from "../../utils/date.util";
 
 const debouncer = new Debouncer();
 const router = useRouter();
+const route = useRoute();
 
 const patients: Ref<IPatientResponse[]> = ref([]);
 const selectedPatient: Ref<IPatientResponse | null> = ref(null);
@@ -139,8 +140,18 @@ const onSearch = debouncer.debounce(() => {
   getPatientDataByQuery();
 }, DEBOUNCE_TIMEOUT);
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getPatientData(page);
+};
+
 onMounted(() => {
-  getPatientData();
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
+  getPatientData(page);
 });
 
 onBeforeUnmount(() => {
@@ -229,7 +240,7 @@ onBeforeUnmount(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getPatientData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>

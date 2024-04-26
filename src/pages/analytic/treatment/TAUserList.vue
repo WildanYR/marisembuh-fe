@@ -12,7 +12,7 @@ import TableRowBody from "../../../components/tables/TableRowBody.vue";
 import TableBody from "../../../components/tables/TableBody.vue";
 import Pagination from "../../../components/Pagination.vue";
 import EmptyData from "../../../components/EmptyData.vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import TextSearch from "../../../components/form/TextSearch.vue";
 import GrayButton from "../../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
@@ -21,6 +21,7 @@ import { DEBOUNCE_TIMEOUT } from "../../../configs/debounce.config";
 
 const debouncer = new Debouncer();
 const router = useRouter();
+const route = useRoute();
 
 const users: Ref<IUserResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -96,8 +97,18 @@ const onSearch = debouncer.debounce(() => {
   getUserDataByQuery();
 }, DEBOUNCE_TIMEOUT);
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getUserData(page);
+};
+
 onMounted(() => {
-  getUserData();
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
+  getUserData(page);
 });
 
 onBeforeUnmount(() => {
@@ -169,7 +180,7 @@ onBeforeUnmount(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getUserData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>

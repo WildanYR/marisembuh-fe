@@ -99,9 +99,19 @@ const toPreviousPage = () => {
   }
 };
 
+const handlePaginationChange = (page: number) => {
+  router.replace({ query: { ...route.query, page } });
+  getTreatmentData(page);
+};
+
 onMounted(() => {
+  let page = 1;
+  if (route.query.page) {
+    page = parseInt(route.query.page as string);
+  }
+
   getDetailData();
-  getTreatmentData();
+  getTreatmentData(page);
 });
 </script>
 
@@ -164,7 +174,7 @@ onMounted(() => {
           :total-pages="paginationData.totalPage"
           :total-items="paginationData.totalItems"
           :limit="paginationData.limit"
-          @page-change="getTreatmentData"
+          @page-change="handlePaginationChange"
         ></Pagination>
       </div>
       <EmptyData v-else></EmptyData>
