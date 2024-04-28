@@ -9,12 +9,13 @@ import SinglePatientSelect from "../../components/form/custom_data/SinglePatient
 import SingleUserSelect from "../../components/form/custom_data/SingleUserSelect.vue";
 import { createPatientArrival } from "../../services/patient_arrival.service";
 import { useAuthStore } from "../../stores/auth.store";
+import { cacheFormDataKey } from "../../configs";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
-const formData = reactive({
+const formData = ref({
   patient_id: null,
   user_id: null,
   tag_user_id: null,
@@ -39,16 +40,16 @@ const readOnly = computed(() => {
 
 const handleSubmit = () => {
   const validator = new Validator();
-  validator.addValidation("patient", formData.patient_id, [isRequired]);
-  validator.addValidation("user", formData.user_id, [isRequired]);
+  validator.addValidation("patient", formData.value.patient_id, [isRequired]);
+  validator.addValidation("user", formData.value.user_id, [isRequired]);
   if (validator.validate()) {
     formDataError.patient = validator.getError("patient") as any;
     formDataError.user = validator.getError("user") as any;
     return;
   }
   loadingSubmit.value = true;
-  formData.tag_user_id = authStore.id as any;
-  createPatientArrival({ ...(formData as any) })
+  formData.value.tag_user_id = authStore.id as any;
+  createPatientArrival({ ...(formData.value as any) })
     .then(() => {
       toPreviousPage();
     })
@@ -62,9 +63,34 @@ const toPreviousPage = () => {
 };
 
 const onSelectPatient = (item: any) => {
-  formData.patient_id = item.id || null;
+  formData.value.patient_id = item.id || null;
 };
+const onSelectUser = (item: any) => {
+  formData.value.user_id = item.id || null;
+};
+
+const setCacheFormData = () => {
+  const cache = {
+    formData: formData.value,
+    selectedPatient: selectedPatient.value,
+    selectedUser: selectedUser.value,
+  };
+  localStorage.setItem(cacheFormDataKey, JSON.stringify(cache));
+};
+const getCacheFormData = () => {
+  const cacheStr = localStorage.getItem(cacheFormDataKey);
+  if (!cacheStr) return;
+  const cache = JSON.parse(cacheStr);
+
+  formData.value = cache.formData;
+  selectedPatient.value = cache.selectedPatient;
+  selectedUser.value = cache.selectedUser;
+
+  localStorage.removeItem(cacheFormDataKey);
+};
+
 const onAddPatient = () => {
+  setCacheFormData();
   const ref = {
     name: route.name,
     params: route.params,
@@ -74,11 +100,8 @@ const onAddPatient = () => {
   router.push({ name: "PatientAdd", query: { ref: refStr } });
 };
 
-const onSelectUser = (item: any) => {
-  formData.user_id = item.id || null;
-};
-
 onMounted(() => {
+  getCacheFormData();
   if (route.query.om === "patient") {
     showModalPatient.value = true;
   }

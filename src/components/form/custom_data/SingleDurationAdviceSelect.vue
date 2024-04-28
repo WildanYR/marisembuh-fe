@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { Ref, computed, onBeforeUnmount, onMounted, ref } from "vue";
 import {
   TransitionRoot,
   TransitionChild,
@@ -15,14 +15,9 @@ import {
   IDurationAdviceResponse,
   getAllDurationAdviceWithPagination,
   getDurationAdviceByName,
-  createDurationAdvice,
 } from "../../../services/duration_advice.service";
 import PlusIcon from "../../icon/PlusIcon.vue";
 import { IPaginationData } from "../../../types/pagination.type";
-import TextInput from "../TextInput.vue";
-import { Validator } from "../../../validator";
-import isRequired from "../../../validator/isRequired.validator";
-import LoadingButton from "../../LoadingButton.vue";
 import Pagination from "../../Pagination.vue";
 import GrayButton from "../../button/GrayButton.vue";
 import ChevLeftIcon from "../../icon/ChevLeftIcon.vue";
@@ -38,6 +33,10 @@ const props = defineProps({
   modelValue: {
     required: true,
   },
+  modalShow: {
+    type: Boolean,
+    required: true,
+  },
   errorMessage: {
     type: Array<String>,
   },
@@ -46,7 +45,7 @@ const props = defineProps({
     default: false,
   },
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "update:modalShow", "addData"]);
 
 const durationAdviceList: Ref<IDurationAdviceResponse[]> = ref([]);
 const paginationData: Ref<IPaginationData> = ref({
@@ -56,18 +55,8 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 
-const addDurationAdviceData = reactive({
-  name: "",
-});
-const addDurationAdviceDataError = reactive({
-  name: [],
-});
-
 const loadingGetDurationAdvice = ref(false);
-const loadingAddDurationAdvice = ref(false);
 
-const modalShow = ref(false);
-const mode = ref("get");
 const searchText = ref("");
 
 const id = computed(() => props.label.replace(/\s+/g, "-").toLowerCase());
@@ -103,12 +92,11 @@ const getDurationAdvice = (page = 1, limit = 20) => {
 };
 
 const openModal = () => {
-  modalShow.value = true;
+  emit("update:modalShow", true);
 };
 
 const closeModal = () => {
-  if (loadingAddDurationAdvice.value) return;
-  modalShow.value = false;
+  emit("update:modalShow", false);
   debouncer.clearTimer();
 };
 
@@ -138,37 +126,8 @@ const onSearch = debouncer.debounce((searchValue: string) => {
   }
 }, DEBOUNCE_TIMEOUT);
 
-const onAddDurationAdviceMode = () => {
-  mode.value = "add";
-};
-const onGetDurationAdviceMode = () => {
-  mode.value = "get";
-  resetPaginationData();
-  getDurationAdvice();
-};
-
-const handleAddDurationAdvice = () => {
-  const validator = new Validator();
-  validator.addValidation("name", addDurationAdviceData.name, [isRequired]);
-  if (validator.validate()) {
-    addDurationAdviceDataError.name = validator.getError("name") as any;
-    return;
-  }
-  loadingAddDurationAdvice.value = true;
-  createDurationAdvice({ ...addDurationAdviceData })
-    .then((response) => {
-      if (!response) return;
-      emit("update:modelValue", response);
-      loadingAddDurationAdvice.value = false;
-      mode.value = "get";
-      addDurationAdviceData.name = "";
-      resetPaginationData();
-      getDurationAdvice();
-      closeModal();
-    })
-    .finally(() => {
-      loadingAddDurationAdvice.value = false;
-    });
+const handleOnAddData = () => {
+  emit("addData");
 };
 
 onMounted(() => {
@@ -220,7 +179,7 @@ onBeforeUnmount(() => {
       </p>
     </div>
   </div>
-  <TransitionRoot appear :show="modalShow" as="template">
+  <TransitionRoot appear :show="props.modalShow" as="template">
     <Dialog as="div" @close="closeModal" class="relative z-30">
       <TransitionChild
         as="template"
@@ -269,8 +228,7 @@ onBeforeUnmount(() => {
                 </div>
                 <button
                   type="button"
-                  @click="onAddDurationAdviceMode"
-                  v-show="mode !== 'add'"
+                  @click="handleOnAddData"
                   class="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg md:w-max hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none"
                 >
                   <PlusIcon class="w-4 h-4"></PlusIcon>
@@ -280,7 +238,6 @@ onBeforeUnmount(() => {
               <div class="flex items-center justify-center mb-4 md:justify-end">
                 <TextSearch
                   label="Cari"
-                  v-show="mode !== 'add'"
                   v-model="searchText"
                   @update:model-value="onSearch"
                   class="w-full md:w-max"
@@ -295,60 +252,36 @@ onBeforeUnmount(() => {
                 ></LoadingSpinner>
                 <p class="text-lg text-gray-500">Memuat Data</p>
               </div>
-              <template v-else>
-                <template v-if="mode === 'add'">
-                  <div class="flex flex-col items-center justify-center gap-4">
-                    <TextInput
-                      v-model="addDurationAdviceData.name"
-                      label="Nama DurationAdvice"
-                      :error-message="addDurationAdviceDataError.name"
-                      class="w-full"
-                    ></TextInput>
-                    <LoadingButton
-                      :loading="loadingAddDurationAdvice"
-                      @click="handleAddDurationAdvice"
-                      class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-                    >
-                      Tambah Saran Perawatan
-                    </LoadingButton>
-                    <GrayButton @click="onGetDurationAdviceMode" class="w-full"
-                      >batal</GrayButton
-                    >
-                  </div>
-                </template>
-                <template v-else>
-                  <template v-if="durationAdviceList.length">
-                    <div
-                      class="grid grid-cols-1 gap-3 lg:grid-cols-4 md:grid-cols-2"
-                    >
-                      <button
-                        v-for="(item, i) in durationAdviceList"
-                        :key="id + '-' + i"
-                        :disabled="selectedItemIndex === i"
-                        @click="onSelectItem(item)"
-                        :class="[
-                          'py-2 px-3 rounded-md',
-                          selectedItemIndex === i
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-200 hover:bg-gray-300',
-                        ]"
-                      >
-                        {{ item.name }}
-                      </button>
-                    </div>
-                    <div class="mt-5">
-                      <Pagination
-                        :current-page="paginationData.currentPage"
-                        :total-pages="paginationData.totalPage"
-                        :total-items="paginationData.totalItems"
-                        :limit="paginationData.limit"
-                        @page-change="getDurationAdvice"
-                      ></Pagination>
-                    </div>
-                  </template>
-                  <EmptyData v-else></EmptyData>
-                </template>
+              <template v-else-if="durationAdviceList.length">
+                <div
+                  class="grid grid-cols-1 gap-3 lg:grid-cols-4 md:grid-cols-2"
+                >
+                  <button
+                    v-for="(item, i) in durationAdviceList"
+                    :key="id + '-' + i"
+                    :disabled="selectedItemIndex === i"
+                    @click="onSelectItem(item)"
+                    :class="[
+                      'py-2 px-3 rounded-md',
+                      selectedItemIndex === i
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 hover:bg-gray-300',
+                    ]"
+                  >
+                    {{ item.name }}
+                  </button>
+                </div>
+                <div class="mt-5">
+                  <Pagination
+                    :current-page="paginationData.currentPage"
+                    :total-pages="paginationData.totalPage"
+                    :total-items="paginationData.totalItems"
+                    :limit="paginationData.limit"
+                    @page-change="getDurationAdvice"
+                  ></Pagination>
+                </div>
               </template>
+              <EmptyData v-else></EmptyData>
             </DialogPanel>
           </TransitionChild>
         </div>

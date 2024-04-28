@@ -39,7 +39,7 @@ const handleAddClinic = () => {
   loadingSubmit.value = true;
   createClinic({ ...formData })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -56,7 +56,7 @@ const handleEditClinic = () => {
   loadingSubmit.value = true;
   updateClinic(parseInt(route.params.id as any), { ...formData })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -72,7 +72,12 @@ const handleSubmit = () => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "ClinicList" });
+  if (route.query.ref) {
+    const ref = JSON.parse(decodeURIComponent(route.query.ref as string));
+    router.push(ref);
+  } else {
+    router.push({ name: "ClinicList" });
+  }
 };
 
 onMounted(() => {

@@ -39,7 +39,7 @@ const handleAddDoctorDiagnosis = () => {
   loadingSubmit.value = true;
   createDoctorDiagnosis({ ...formData })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -56,7 +56,7 @@ const handleEditDoctorDiagnosis = () => {
   loadingSubmit.value = true;
   updateDoctorDiagnosis(parseInt(route.params.id as any), { ...formData })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -72,7 +72,12 @@ const handleSubmit = () => {
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "DoctorDiagnosisList" });
+  if (route.query.ref) {
+    const ref = JSON.parse(decodeURIComponent(route.query.ref as string));
+    router.push(ref);
+  } else {
+    router.push({ name: "DoctorDiagnosisList" });
+  }
 };
 
 onMounted(() => {

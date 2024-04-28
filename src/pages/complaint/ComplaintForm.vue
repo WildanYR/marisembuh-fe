@@ -12,11 +12,12 @@ import TextInput from "../../components/form/TextInput.vue";
 import LoadingButton from "../../components/LoadingButton.vue";
 import SingleMeridianSelect from "../../components/form/custom_data/SingleMeridianSelect.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
+import { cacheFormDataKey } from "../../configs";
 
 const router = useRouter();
 const route = useRoute();
 
-const formData = reactive({
+const formData = ref({
   name: "",
   meridian_id: null,
 });
@@ -27,6 +28,8 @@ const selectedMeridian = ref(null);
 const loadingGetComplaint = ref(false);
 const loadingSubmit = ref(false);
 
+const showModalMeridian = ref(false);
+
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
   return false;
@@ -34,15 +37,15 @@ const readOnly = computed(() => {
 
 const handleAddComplaint = () => {
   const validator = new Validator();
-  validator.addValidation("name", formData.name, [isRequired]);
+  validator.addValidation("name", formData.value.name, [isRequired]);
   if (validator.validate()) {
     formDataError.name = validator.getError("name") as any;
     return;
   }
   loadingSubmit.value = true;
-  createComplaint({ ...formData })
+  createComplaint({ ...formData.value })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -51,15 +54,15 @@ const handleAddComplaint = () => {
 
 const handleEditComplaint = () => {
   const validator = new Validator();
-  validator.addValidation("name", formData.name, [isRequired]);
+  validator.addValidation("name", formData.value.name, [isRequired]);
   if (validator.validate()) {
     formDataError.name = validator.getError("name") as any;
     return;
   }
   loadingSubmit.value = true;
-  updateComplaint(parseInt(route.params.id as any), { ...formData })
+  updateComplaint(parseInt(route.params.id as any), { ...formData.value })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -75,23 +78,61 @@ const handleSubmit = () => {
 };
 
 const onSelectMeridian = (meridian: any) => {
-  formData.meridian_id = meridian.id;
+  formData.value.meridian_id = meridian.id;
+};
+
+const setCacheFormData = () => {
+  const cache = {
+    formData: formData.value,
+    selectedMeridian: selectedMeridian.value,
+  };
+  localStorage.setItem(cacheFormDataKey, JSON.stringify(cache));
+};
+const getCacheFormData = () => {
+  const cacheStr = localStorage.getItem(cacheFormDataKey);
+  if (!cacheStr) return;
+  const cache = JSON.parse(cacheStr);
+
+  formData.value = cache.formData;
+  selectedMeridian.value = cache.selectedMeridian;
+
+  localStorage.removeItem(cacheFormDataKey);
+};
+
+const handleAddMeridian = () => {
+  setCacheFormData();
+  const ref = {
+    name: route.name,
+    params: route.params,
+    query: { ...route.query, om: "meridian" },
+  };
+  const refStr = encodeURIComponent(JSON.stringify(ref));
+  router.push({ name: "MeridianAdd", query: { ref: refStr } });
 };
 
 const toPreviousPage = () => {
-  router.push({ name: "ComplaintList" });
+  if (route.query.ref) {
+    const ref = JSON.parse(decodeURIComponent(route.query.ref as string));
+    router.push(ref);
+  } else {
+    router.push({ name: "ComplaintList" });
+  }
 };
 
 onMounted(() => {
+  getCacheFormData();
+  if (route.query.om === "meridian") {
+    showModalMeridian.value = true;
+  }
   if (route.params.id) {
     loadingGetComplaint.value = true;
     getComplaintById(parseInt(route.params.id as any))
       .then((response) => {
         if (!response) return;
-        formData.name = response.name;
+        formData.value.name = response.name;
         if (response.meridian?.id) {
           selectedMeridian.value = response.meridian as any;
-          formData.meridian_id = response.meridian.id as any;
+          formData.value.meridian_id = response.meridian.id as any;
         }
       })
       .finally(() => {
@@ -121,8 +162,10 @@ onMounted(() => {
       <SingleMeridianSelect
         label="Meridian"
         v-model="selectedMeridian"
+        v-model:modal-show="showModalMeridian"
         :disabled="readOnly"
         @update:model-value="onSelectMeridian"
+        @add-data="handleAddMeridian"
       />
       <div class="pt-3 space-y-4">
         <LoadingButton

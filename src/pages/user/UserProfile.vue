@@ -13,12 +13,13 @@ import LoadingButton from "../../components/LoadingButton.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import { useAuthStore } from "../../stores/auth.store";
+import { cacheFormDataKey } from "../../configs";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
-const formData = reactive({
+const formData = ref({
   email: "",
   password: "",
   name: "",
@@ -36,6 +37,8 @@ const selectedClinic = ref(null);
 const loadingGetUser = ref(false);
 const loadingSubmit = ref(false);
 
+const showModalClinic = ref(false);
+
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
   return false;
@@ -43,10 +46,10 @@ const readOnly = computed(() => {
 
 const handleAddUser = () => {
   const validator = new Validator();
-  validator.addValidation("email", formData.email, [isRequired]);
-  validator.addValidation("password", formData.password, [isRequired]);
-  validator.addValidation("name", formData.name, [isRequired]);
-  validator.addValidation("clinic", formData.clinic_id, [isRequired]);
+  validator.addValidation("email", formData.value.email, [isRequired]);
+  validator.addValidation("password", formData.value.password, [isRequired]);
+  validator.addValidation("name", formData.value.name, [isRequired]);
+  validator.addValidation("clinic", formData.value.clinic_id, [isRequired]);
   if (validator.validate()) {
     formDataError.email = validator.getError("email") as any;
     formDataError.password = validator.getError("password") as any;
@@ -55,9 +58,9 @@ const handleAddUser = () => {
     return;
   }
   loadingSubmit.value = true;
-  createUser({ ...(formData as any) })
+  createUser({ ...(formData.value as any) })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -66,12 +69,12 @@ const handleAddUser = () => {
 
 const handleEditUser = () => {
   loadingSubmit.value = true;
-  const { password, ...editData } = formData;
+  const { password, ...editData } = formData.value;
   if (password) (editData as any).password = password;
   updateUser(authStore.id, { ...(editData as any) })
     .then(() => {
-      authStore.clinic_id = formData.clinic_id as any;
-      router.back();
+      authStore.clinic_id = formData.value.clinic_id as any;
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -91,17 +94,47 @@ const toPreviousPage = () => {
 };
 
 const onSelectClinic = (clinic: any) => {
-  formData.clinic_id = clinic.id || null;
+  formData.value.clinic_id = clinic.id || null;
+};
+
+const setCacheFormData = () => {
+  const cache = {
+    formData: formData.value,
+    selectedClinic: selectedClinic.value,
+  };
+  localStorage.setItem(cacheFormDataKey, JSON.stringify(cache));
+};
+const getCacheFormData = () => {
+  const cacheStr = localStorage.getItem(cacheFormDataKey);
+  if (!cacheStr) return;
+  const cache = JSON.parse(cacheStr);
+
+  formData.value = cache.formData;
+  selectedClinic.value = cache.selectedClinic;
+
+  localStorage.removeItem(cacheFormDataKey);
+};
+
+const handleAddClinicData = () => {
+  setCacheFormData();
+  const ref = {
+    name: route.name,
+    params: route.params,
+    query: { ...route.query, om: "clinic" },
+  };
+  const refStr = encodeURIComponent(JSON.stringify(ref));
+  router.push({ name: "ClinicAdd", query: { ref: refStr } });
 };
 
 onMounted(() => {
+  getCacheFormData();
   loadingGetUser.value = true;
   getUserById(authStore.id)
     .then((response) => {
       if (!response) return;
-      formData.email = response.email;
-      formData.name = response.name;
-      formData.clinic_id = response.clinic_id as any;
+      formData.value.email = response.email;
+      formData.value.name = response.name;
+      formData.value.clinic_id = response.clinic_id as any;
       selectedClinic.value = {
         id: response.clinic.id,
         name: response.clinic.name,
@@ -144,8 +177,10 @@ onMounted(() => {
       <SingleClinicSelect
         label="Klinik"
         v-model="selectedClinic"
+        v-model:modal-show="showModalClinic"
         :disabled="readOnly"
         @update:model-value="onSelectClinic"
+        @add-data="handleAddClinicData"
       />
       <div class="pt-3 space-y-4">
         <LoadingButton

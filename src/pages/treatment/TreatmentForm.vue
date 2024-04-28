@@ -31,6 +31,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSelect.vue";
 import { Roles } from "../../types/role.enum";
 import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
+import { cacheFormDataKey } from "../../configs";
 
 const router = useRouter();
 const route = useRoute();
@@ -60,7 +61,7 @@ const pulseCheckupAbnormalType = ref([
 ]);
 const pulseCheckupDiffLoc = ref(["Lemah", "Normal", "Kuat"]);
 
-const formData = reactive({
+const formData = ref({
   objective: "",
   blood_pressure: "",
   pulse_frequency: "",
@@ -114,10 +115,21 @@ const selectedSelfTherapy = ref([]);
 const selectedDurationAdvice = ref(null);
 const selectedClinic = ref(null);
 
-const showModalPatient = ref(false);
-
 const loadingGetTreatment = ref(false);
 const loadingSubmit = ref(false);
+
+const showModalPatient = ref(false);
+const showModalComplaint = ref(false);
+const showModalDoctorDiagnosis = ref(false);
+const showModalMedicine = ref(false);
+const showModalSelfTherapy = ref(false);
+const showModalStomachCheckup = ref(false);
+const showModalTherapyHistory = ref(false);
+const showModalTherapy = ref(false);
+const showModalTongueCheckup = ref(false);
+const showModalClinic = ref(false);
+const showModalDurationAdvice = ref(false);
+const showModalTreatmentPacket = ref(false);
 
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
@@ -142,7 +154,7 @@ const patientLock = computed(() => {
 
 const handleAddTreatment = () => {
   const validator = new Validator();
-  validator.addValidation("objective", formData.objective, [isRequired]);
+  validator.addValidation("objective", formData.value.objective, [isRequired]);
   if (validator.validate()) {
     formDataError.objective = validator.getError("objective") as any;
     return;
@@ -150,16 +162,17 @@ const handleAddTreatment = () => {
   loadingSubmit.value = true;
   if (!isHomecareTreatment.value) {
     if (authStore.role === Roles.ADMIN) {
-      formData.clinic_id = ((selectedClinic.value as any).id as any) || null;
+      formData.value.clinic_id =
+        ((selectedClinic.value as any).id as any) || null;
     } else {
-      formData.clinic_id = authStore.clinic_id as any;
+      formData.value.clinic_id = authStore.clinic_id as any;
     }
   } else {
-    formData.clinic_id = null;
+    formData.value.clinic_id = null;
   }
-  createTreatment({ ...formData })
+  createTreatment({ ...formData.value })
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -178,7 +191,7 @@ const handleEditTreatment = () => {
     Object.fromEntries(editData)
   )
     .then(() => {
-      router.back();
+      toPreviousPage();
     })
     .finally(() => {
       loadingSubmit.value = false;
@@ -195,68 +208,70 @@ const handleSubmit = () => {
 };
 
 const onSelectPatient = (patient: any) => {
-  formData.patient_id = patient.id;
+  formData.value.patient_id = patient.id;
   onEditDataChange("patient_id");
 };
 const onSelectTreatmentPacket = (packet: any) => {
-  formData.treatment_packet_id = packet.id;
+  formData.value.treatment_packet_id = packet.id;
   onEditDataChange("treatment_packet_id");
 };
 const onSelectDoctorDiagnosis = (doctorDiagnosis: any[]) => {
-  formData.doctor_diagnosis = doctorDiagnosis.map((item) => item.id) as any;
+  formData.value.doctor_diagnosis = doctorDiagnosis.map(
+    (item) => item.id
+  ) as any;
   onEditDataChange("doctor_diagnosis");
 };
 const onSelectMedicine = (medicine: any[]) => {
-  formData.medicine = medicine.map((item) => item.id) as any;
+  formData.value.medicine = medicine.map((item) => item.id) as any;
   onEditDataChange("medicine");
 };
 const onSelectTherapyHistory = (therapyHistory: any[]) => {
-  formData.therapy_history = therapyHistory.map((item) => item.id) as any;
+  formData.value.therapy_history = therapyHistory.map((item) => item.id) as any;
   onEditDataChange("therapy_history");
 };
 const onSelectSelfTherapy = (selfTherapy: any[]) => {
-  formData.self_therapy = selfTherapy.map((item) => item.id) as any;
+  formData.value.self_therapy = selfTherapy.map((item) => item.id) as any;
   onEditDataChange("self_therapy");
 };
 const onSelectComplaint = (complaint: any[]) => {
-  formData.complaint = complaint.map((item) => item.id) as any;
+  formData.value.complaint = complaint.map((item) => item.id) as any;
   onEditDataChange("complaint");
 };
 const onSelectStomachCheckup = (stomachCheckup: any[]) => {
-  formData.stomach_checkup = stomachCheckup.map((item) => item.id) as any;
+  formData.value.stomach_checkup = stomachCheckup.map((item) => item.id) as any;
   onEditDataChange("stomach_checkup");
 };
 const onSelectTongueCheckup = (tongueCheckup: any[]) => {
-  formData.tongue_checkup = tongueCheckup.map((item) => item.id) as any;
+  formData.value.tongue_checkup = tongueCheckup.map((item) => item.id) as any;
   onEditDataChange("tongue_checkup");
 };
 const onSelectTherapy = (therapy: any[]) => {
-  formData.therapy = therapy.map((item) => ({
+  formData.value.therapy = therapy.map((item) => ({
     id: item.id,
     detail: item.detail,
   })) as any;
   onEditDataChange("therapy");
 };
 const onSelectDurationAdvice = (durationAdvice: any) => {
-  formData.duration_advice_id = durationAdvice.id;
+  formData.value.duration_advice_id = durationAdvice.id;
   onEditDataChange("duration_advice_id");
 };
 const onSelectClinic = (clinic: any) => {
-  formData.clinic_id = clinic.id;
+  formData.value.clinic_id = clinic.id;
   onEditDataChange("clinic_id");
 };
 
 const onPulseLocDiffInput = () => {
   const diffLocArr = Object.values(pulseLocationDifferentiation.value);
-  formData.pulse_checkup.location_differentiation = diffLocArr.join(";");
+  formData.value.pulse_checkup.location_differentiation = diffLocArr.join(";");
   onEditDataChange("pulse_checkup");
 };
 const onBloodPressureInput = () => {
   if (!bloodPressureData.value[0] && !bloodPressureData.value[1]) {
-    formData.blood_pressure = "";
+    formData.value.blood_pressure = "";
     return;
   }
-  formData.blood_pressure = bloodPressureData.value.join("/");
+  formData.value.blood_pressure = bloodPressureData.value.join("/");
 };
 
 const onEditDataChange = (key: string) => {
@@ -272,12 +287,87 @@ const toPreviousPage = () => {
   }
 };
 
+const setCacheFormData = () => {
+  const cache = {
+    formData: formData.value,
+    pulseLocationDifferentiation: pulseLocationDifferentiation.value,
+    bloodPressureData: bloodPressureData.value,
+    isHomecareTreatment: isHomecareTreatment.value,
+    selectedPatient: selectedPatient.value,
+    selectedTreatmentPacket: selectedTreatmentPacket.value,
+    selectedDoctorDiagnosis: selectedDoctorDiagnosis.value,
+    selectedMedicine: selectedMedicine.value,
+    selectedTherapyHistory: selectedTherapyHistory.value,
+    selectedComplaint: selectedComplaint.value,
+    selectedStomachCheckup: selectedStomachCheckup.value,
+    selectedTongueCheckup: selectedTongueCheckup.value,
+    selectedTherapy: selectedTherapy.value,
+    selectedSelfTherapy: selectedSelfTherapy.value,
+    selectedDurationAdvice: selectedDurationAdvice.value,
+    selectedClinic: selectedClinic.value,
+  };
+  localStorage.setItem(cacheFormDataKey, JSON.stringify(cache));
+};
+const getCacheFormData = () => {
+  const cacheStr = localStorage.getItem(cacheFormDataKey);
+  if (!cacheStr) return;
+  const cache = JSON.parse(cacheStr);
+
+  formData.value = cache.formData;
+  pulseLocationDifferentiation.value = cache.pulseLocationDifferentiation;
+  bloodPressureData.value = cache.bloodPressureData;
+  isHomecareTreatment.value = cache.isHomecareTreatment;
+  selectedPatient.value = cache.selectedPatient;
+  selectedTreatmentPacket.value = cache.selectedTreatmentPacket;
+  selectedDoctorDiagnosis.value = cache.selectedDoctorDiagnosis;
+  selectedMedicine.value = cache.selectedMedicine;
+  selectedTherapyHistory.value = cache.selectedTherapyHistory;
+  selectedComplaint.value = cache.selectedComplaint;
+  selectedStomachCheckup.value = cache.selectedStomachCheckup;
+  selectedTongueCheckup.value = cache.selectedTongueCheckup;
+  selectedTherapy.value = cache.selectedTherapy;
+  selectedSelfTherapy.value = cache.selectedSelfTherapy;
+  selectedDurationAdvice.value = cache.selectedDurationAdvice;
+  selectedClinic.value = cache.selectedClinic;
+
+  localStorage.removeItem(cacheFormDataKey);
+};
+
+const handleOnAddSelectData = (routeName: string, modalName: string) => {
+  setCacheFormData();
+  const ref = {
+    name: route.name,
+    params: route.params,
+    query: { ...route.query, om: modalName },
+  };
+  const refStr = encodeURIComponent(JSON.stringify(ref));
+  router.push({ name: routeName, query: { ref: refStr } });
+};
+
+const openModalOnMounted = () => {
+  const query = route.query.om;
+  if (!query) return;
+  if (query === "complaint") showModalComplaint.value = true;
+  if (query === "doctorDiagnosis") showModalDoctorDiagnosis.value = true;
+  if (query === "medicine") showModalMedicine.value = true;
+  if (query === "selfTherapy") showModalSelfTherapy.value = true;
+  if (query === "stomachCheckup") showModalStomachCheckup.value = true;
+  if (query === "therapyHistory") showModalTherapyHistory.value = true;
+  if (query === "therapy") showModalTherapy.value = true;
+  if (query === "tongueCheckup") showModalTongueCheckup.value = true;
+  if (query === "clinic") showModalClinic.value = true;
+  if (query === "durationAdvice") showModalDurationAdvice.value = true;
+  if (query === "treatmentPacket") showModalTreatmentPacket.value = true;
+};
+
 onMounted(() => {
-  formData.user_id = authStore.id as any;
+  getCacheFormData();
+  openModalOnMounted();
+  formData.value.user_id = authStore.id as any;
   if (route.params.patientId) {
     loadingGetTreatment.value = true;
     const patientId = parseInt(route.params.patientId as any);
-    formData.patient_id = patientId as any;
+    formData.value.patient_id = patientId as any;
     getPatientById(patientId)
       .then((response) => {
         if (!response) return;
@@ -292,61 +382,63 @@ onMounted(() => {
     getTreatmentById(parseInt(route.params.id as any))
       .then((response) => {
         if (!response) return;
-        formData.objective = response.objective;
+        formData.value.objective = response.objective;
         if (response.blood_pressure) {
-          formData.blood_pressure = response.blood_pressure;
+          formData.value.blood_pressure = response.blood_pressure;
           const splitValue = response.blood_pressure.split("/");
           bloodPressureData.value = splitValue;
         }
-        formData.pulse_frequency = response.pulse_frequency || "";
-        formData.is_pregnant =
+        formData.value.pulse_frequency = response.pulse_frequency || "";
+        formData.value.is_pregnant =
           typeof response.is_pregnant === "boolean"
             ? response.is_pregnant
             : false;
-        formData.duration_advice_id = response.duration_advice_id as any;
-        formData.patient_id = response.patient_id as any;
-        formData.treatment_packet_id = response.treatment_packet_id as any;
-        formData.evaluation = response.evaluation || "";
-        formData.doctor_diagnosis = response.doctor_diagnosis
+        formData.value.duration_advice_id = response.duration_advice_id as any;
+        formData.value.patient_id = response.patient_id as any;
+        formData.value.treatment_packet_id =
+          response.treatment_packet_id as any;
+        formData.value.evaluation = response.evaluation || "";
+        formData.value.doctor_diagnosis = response.doctor_diagnosis
           ? (response.doctor_diagnosis.map((item) => item.id) as any)
           : [];
-        formData.medicine = response.medicine
+        formData.value.medicine = response.medicine
           ? (response.medicine.map((item) => item.id) as any)
           : [];
-        formData.therapy_history = response.therapy_history
+        formData.value.therapy_history = response.therapy_history
           ? (response.therapy_history.map((item) => item.id) as any)
           : [];
-        formData.complaint = response.complaint
+        formData.value.complaint = response.complaint
           ? (response.complaint.map((item) => item.id) as any)
           : [];
-        formData.stomach_checkup = response.stomach_checkup
+        formData.value.stomach_checkup = response.stomach_checkup
           ? (response.stomach_checkup.map((item) => item.id) as any)
           : [];
-        formData.tongue_checkup = response.tongue_checkup
+        formData.value.tongue_checkup = response.tongue_checkup
           ? (response.tongue_checkup.map((item) => item.id) as any)
           : [];
-        formData.self_therapy = response.self_therapy
+        formData.value.self_therapy = response.self_therapy
           ? (response.self_therapy.map((item) => item.id) as any)
           : [];
-        formData.therapy = response.therapy
+        formData.value.therapy = response.therapy
           ? (response.therapy.map((item) => item.id) as any)
           : [];
-        formData.pulse_checkup.depth = response.pulse_checkup
+        formData.value.pulse_checkup.depth = response.pulse_checkup
           ? response.pulse_checkup.depth
           : "";
-        formData.pulse_checkup.speed = response.pulse_checkup
+        formData.value.pulse_checkup.speed = response.pulse_checkup
           ? response.pulse_checkup.speed
           : "";
-        formData.pulse_checkup.power = response.pulse_checkup
+        formData.value.pulse_checkup.power = response.pulse_checkup
           ? response.pulse_checkup.power
           : "";
-        formData.pulse_checkup.abnormal_type = response.pulse_checkup
+        formData.value.pulse_checkup.abnormal_type = response.pulse_checkup
           ? response.pulse_checkup.abnormal_type
           : "";
-        formData.pulse_checkup.location_differentiation = response.pulse_checkup
-          ? response.pulse_checkup.location_differentiation
-          : "";
-        formData.clinic_id = response.clinic_id as any;
+        formData.value.pulse_checkup.location_differentiation =
+          response.pulse_checkup
+            ? response.pulse_checkup.location_differentiation
+            : "";
+        formData.value.clinic_id = response.clinic_id as any;
         isHomecareTreatment.value = response.clinic_id ? false : true;
         if (response.pulse_checkup) {
           const diffLoc =
@@ -493,16 +585,22 @@ onBeforeUnmount(() => {
           <SingleClinicSelect
             label="Klinik"
             v-model="selectedClinic"
+            v-model:modal-show="showModalClinic"
             :disabled="readOnly"
             @update:model-value="onSelectClinic"
+            @add-data="handleOnAddSelectData('ClinicAdd', 'clinic')"
           />
         </template>
         <!-- Paket Perawatan -->
         <SingleTreatmentPacketSelect
           label="Paket Perawatan"
           v-model="selectedTreatmentPacket"
+          v-model:modal-show="showModalTreatmentPacket"
           :disabled="readOnly"
           @update:model-value="onSelectTreatmentPacket"
+          @add-data="
+            handleOnAddSelectData('TreatmentPacketAdd', 'treatmentPacket')
+          "
         />
       </div>
       <div class="py-8">
@@ -591,29 +689,39 @@ onBeforeUnmount(() => {
         <MultiDoctorDiagnosisSelect
           label="Diagnosa Dokter"
           v-model="selectedDoctorDiagnosis"
+          v-model:modal-show="showModalDoctorDiagnosis"
           :disabled="readOnly"
           @update:model-value="onSelectDoctorDiagnosis"
+          @add-data="
+            handleOnAddSelectData('DoctorDiagnosisAdd', 'doctorDiagnosis')
+          "
         />
         <!-- Riwayat Minum Obat -->
         <MultiMedicineSelect
           label="Riwayat Minum Obat"
           v-model="selectedMedicine"
+          v-model:modal-show="showModalMedicine"
           :disabled="readOnly"
           @update:model-value="onSelectMedicine"
+          @add-data="handleOnAddSelectData('MedicineAdd', 'medicine')"
         />
         <!-- Riwayat Diterapi -->
         <MultiTherapyHistorySelect
           label="Riwayat diterapi"
           v-model="selectedTherapyHistory"
+          v-model:modal-show="showModalTherapyHistory"
           :disabled="readOnly"
           @update:model-value="onSelectTherapyHistory"
+          @add-data="handleOnAddSelectData('TherapyAdd', 'therapyHistory')"
         />
         <!-- Keluhan -->
         <MultiComplaintSelect
           label="Keluhan"
           v-model="selectedComplaint"
+          v-model:modal-show="showModalComplaint"
           :disabled="readOnly"
           @update:model-value="onSelectComplaint"
+          @add-data="handleOnAddSelectData('ComplaintAdd', 'complaint')"
         />
       </div>
       <div class="py-8 space-y-5">
@@ -621,15 +729,21 @@ onBeforeUnmount(() => {
         <MultiStomachCheckupSelect
           label="Pemeriksaan Perut"
           v-model="selectedStomachCheckup"
+          v-model:modal-show="showModalStomachCheckup"
           :disabled="readOnly"
           @update:model-value="onSelectStomachCheckup"
+          @add-data="
+            handleOnAddSelectData('StomachCheckupAdd', 'stomachCheckup')
+          "
         />
         <!-- Pemeriksaan Lidah -->
         <MultiTongueCheckupSelect
           label="Pemeriksaan Lidah"
           v-model="selectedTongueCheckup"
+          v-model:modal-show="showModalTongueCheckup"
           :disabled="readOnly"
           @update:model-value="onSelectTongueCheckup"
+          @add-data="handleOnAddSelectData('TongueCheckupAdd', 'tongueCheckup')"
         />
         <!-- Pemeriksaan Nadi -->
         <div class="space-y-5">
@@ -983,8 +1097,10 @@ onBeforeUnmount(() => {
         <MultiTherapySelect
           label="Terapi (Tindakan)"
           v-model="selectedTherapy"
+          v-model:modal-show="showModalTherapy"
           :disabled="readOnly"
           @update:model-value="onSelectTherapy"
+          @add-data="handleOnAddSelectData('TherapyAdd', 'therapy')"
         />
       </div>
       <div class="py-8 space-y-5">
@@ -992,15 +1108,21 @@ onBeforeUnmount(() => {
         <MultiSelfTherapySelect
           label="Saran Terapi Mandiri"
           v-model="selectedSelfTherapy"
+          v-model:modal-show="showModalSelfTherapy"
           :disabled="readOnly"
           @update:model-value="onSelectSelfTherapy"
+          @add-data="handleOnAddSelectData('SelfTherapyAdd', 'selfTherapy')"
         />
         <!-- Saran Perawatan -->
         <SingleDurationAdviceSelect
           label="Saran Perawatan"
           v-model="selectedDurationAdvice"
+          v-model:modal-show="showModalDurationAdvice"
           :disabled="readOnly"
           @update:model-value="onSelectDurationAdvice"
+          @add-data="
+            handleOnAddSelectData('DurationAdviceAdd', 'durationAdvice')
+          "
         />
       </div>
       <div class="py-8">

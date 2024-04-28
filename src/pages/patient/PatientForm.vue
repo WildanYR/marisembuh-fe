@@ -21,12 +21,13 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import { id as dateLocalId } from "date-fns/locale";
 import { calculateAgeFromBirthdate } from "../../utils/date.util";
 import { Roles } from "../../types/role.enum";
+import { cacheFormDataKey } from "../../configs";
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
-const formData = reactive({
+const formData = ref({
   name: "",
   gender: "",
   birthdate: "",
@@ -46,6 +47,8 @@ const loadingSubmit = ref(false);
 
 const selectedClinic = ref(null);
 
+const showModalClinic = ref(false);
+
 const showAge = ref(false);
 
 const readOnly = computed(() => {
@@ -59,16 +62,16 @@ const showClinicSelect = computed(() => {
 
 const handleAddPatient = () => {
   const validator = new Validator();
-  validator.addValidation("name", formData.name, [isRequired]);
+  validator.addValidation("name", formData.value.name, [isRequired]);
   if (validator.validate()) {
     formDataError.name = validator.getError("name") as any;
     return;
   }
   if (!showClinicSelect) {
-    formData.clinic_id = authStore.clinic_id as any;
+    formData.value.clinic_id = authStore.clinic_id as any;
   }
   loadingSubmit.value = true;
-  createPatient({ ...formData, user_id: authStore.id })
+  createPatient({ ...formData.value, user_id: authStore.id })
     .then(() => {
       toPreviousPage();
     })
@@ -79,14 +82,14 @@ const handleAddPatient = () => {
 
 const handleEditPatient = () => {
   const validator = new Validator();
-  validator.addValidation("name", formData.name, [isRequired]);
+  validator.addValidation("name", formData.value.name, [isRequired]);
   if (validator.validate()) {
     formDataError.name = validator.getError("name") as any;
     return;
   }
   loadingSubmit.value = true;
   updatePatient(parseInt(route.params.id as any), {
-    ...formData,
+    ...formData.value,
     user_id: authStore.id,
   })
     .then(() => {
@@ -106,7 +109,7 @@ const handleSubmit = () => {
 };
 
 const onSelectClinic = (clinic: any) => {
-  formData.clinic_id = clinic.id;
+  formData.value.clinic_id = clinic.id;
 };
 
 const toPreviousPage = () => {
@@ -118,18 +121,48 @@ const toPreviousPage = () => {
   }
 };
 
+const setCacheFormData = () => {
+  const cache = {
+    formData: formData.value,
+    selectedClinic: selectedClinic.value,
+  };
+  localStorage.setItem(cacheFormDataKey, JSON.stringify(cache));
+};
+const getCacheFormData = () => {
+  const cacheStr = localStorage.getItem(cacheFormDataKey);
+  if (!cacheStr) return;
+  const cache = JSON.parse(cacheStr);
+
+  formData.value = cache.formData;
+  selectedClinic.value = cache.selectedClinic;
+
+  localStorage.removeItem(cacheFormDataKey);
+};
+
+const handleAddClinicData = () => {
+  setCacheFormData();
+  const ref = {
+    name: route.name,
+    params: route.params,
+    query: { ...route.query, om: "clinic" },
+  };
+  const refStr = encodeURIComponent(JSON.stringify(ref));
+  router.push({ name: "ClinicAdd", query: { ref: refStr } });
+};
+
 onMounted(() => {
+  getCacheFormData();
   if (route.params.id) {
     loadingGetPatient.value = true;
     getPatientById(parseInt(route.params.id as any))
       .then((response) => {
         if (!response) return;
-        formData.name = response.name;
-        formData.gender = response.gender;
-        formData.birthdate = response.birthdate;
-        formData.address = response.address;
-        formData.telp = response.telp;
-        formData.clinic_id = response.register_clinic.id as any;
+        formData.value.name = response.name;
+        formData.value.gender = response.gender;
+        formData.value.birthdate = response.birthdate;
+        formData.value.address = response.address;
+        formData.value.telp = response.telp;
+        formData.value.clinic_id = response.register_clinic.id as any;
         selectedClinic.value = response.register_clinic as any;
         // Detail
         registeringUser.value = response.registered_by
@@ -254,8 +287,10 @@ onMounted(() => {
         <SingleClinicSelect
           label="Klinik"
           v-model="selectedClinic"
+          v-model:modal-show="showModalClinic"
           :disabled="readOnly"
           @update:model-value="onSelectClinic"
+          @add-data="handleAddClinicData"
         />
       </template>
       <div v-if="readOnly">
