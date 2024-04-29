@@ -44,6 +44,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  hideAdd: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emit = defineEmits([
   "update:modelValue",
@@ -233,6 +237,7 @@ onBeforeUnmount(() => {
                   </DialogTitle>
                 </div>
                 <button
+                  v-if="!props.hideAdd"
                   type="button"
                   @click="handleAddPatient"
                   class="flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-lg md:w-max hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 focus:outline-none"

@@ -4,7 +4,6 @@ import PlusIcon from "../../components/icon/PlusIcon.vue";
 import {
   IGetTreatmentQuery,
   ITreatmentResponse,
-  deleteTreatment,
   getAllTreatmentWithPagination,
 } from "../../services/treatment.service";
 import { IPaginationData } from "../../types/pagination.type";
@@ -15,7 +14,6 @@ import TableBody from "../../components/tables/TableBody.vue";
 import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
 import { useRouter } from "vue-router";
-import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../utils/date.util";
@@ -26,29 +24,27 @@ import {
   IPatientArrivalResponse,
   IQueryFilterPatientArrival,
 } from "../../services/patient_arrival.service";
+import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
+import { IPatientResponse } from "../../services/patient.service";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
 const treatments: Ref<ITreatmentResponse[]> = ref([]);
 const patientArrivals: Ref<IPatientArrivalResponse[]> = ref([]);
-const selectedTreatment: Ref<ITreatmentResponse | null> = ref(null);
 const paginationData: Ref<IPaginationData> = ref({
   currentPage: 1,
   limit: 10,
   totalItems: 0,
   totalPage: 1,
 });
-const patientArrivalPaginationData: Ref<IPaginationData> = ref({
-  currentPage: 1,
-  limit: 10,
-  totalItems: 0,
-  totalPage: 1,
-});
+
+const selectedPatient: Ref<IPatientResponse | null> = ref(null);
+
 const loadingGetTreatment = ref(false);
 const loadingGetPatientArrival = ref(false);
-const loadingDeleteTreatment = ref(false);
-const modalDeleteOpen = ref(false);
+
+const showModalPatient = ref(false);
 
 const tableData = computed(() => {
   if (!treatments.value.length) return null;
@@ -91,8 +87,8 @@ const patientArrivalTableData = computed(() => {
 const getTreatmentData = (page = 1, limit = 10) => {
   loadingGetTreatment.value = true;
   const condition: IGetTreatmentQuery = {};
-  if (authStore.role !== Roles.ADMIN) {
-    condition.user_id = authStore.id;
+  if (selectedPatient.value) {
+    condition.patient_id = selectedPatient.value.id;
   }
   getAllTreatmentWithPagination(condition, { page, limit })
     .then((response) => {
@@ -114,11 +110,14 @@ const getPatientArrivalData = (
   getAllPatientArrivalWithPagination({ page, limit }, queryFilter)
     .then((response) => {
       patientArrivals.value = response.items;
-      patientArrivalPaginationData.value = response.paginationData;
     })
     .finally(() => {
       loadingGetPatientArrival.value = false;
     });
+};
+
+const handleOnSelectPatient = () => {
+  getTreatmentData();
 };
 
 const handleOnTreatmentAdd = () => {
@@ -133,42 +132,12 @@ const handleOnTreatmentDetail = (treatmentId: number) => {
   router.push({ name: "TreatmentDetail", params: { id: treatmentId } });
 };
 
-const handleOnTreatmentEdit = (treatmentId: number) => {
-  router.push({ name: "TreatmentEdit", params: { id: treatmentId } });
-};
-
-const handleOnTreatmentDelete = () => {
-  loadingDeleteTreatment.value = true;
-  deleteTreatment(selectedTreatment.value!.id)
-    .then(() => {
-      getTreatmentData(
-        paginationData.value.currentPage,
-        paginationData.value.limit
-      );
-    })
-    .finally(() => {
-      loadingDeleteTreatment.value = false;
-      modalDeleteOpen.value = false;
-    });
-};
-
-const openDeleteModal = (treatmentId: number) => {
-  selectedTreatment.value = treatments.value.find(
-    (treatment) => treatment.id === treatmentId
-  )!;
-  modalDeleteOpen.value = true;
-};
-
 const toPreviousPage = () => {
   router.push({ name: "Home" });
 };
 
 onMounted(() => {
-  getPatientArrivalData(
-    patientArrivalPaginationData.value.currentPage,
-    patientArrivalPaginationData.value.limit,
-    { done: false, user_id: authStore.id }
-  );
+  getPatientArrivalData(1, 10, { done: false, user_id: authStore.id });
   getTreatmentData();
 });
 </script>
@@ -196,9 +165,9 @@ onMounted(() => {
         <span>Tambah Perawatan</span>
       </button>
     </div>
-    <div class="mt-5">
-      <!-- TAMBAHKAN TABEL LIST DARI DATA PERAWATAN YANG PERLU DIISI (YANG SUDAH DITAMBAHKAN DI KEDATANGAN PASIEN) -->
-      <div v-if="patientArrivals.length">
+    <div v-if="patientArrivals.length" class="mt-5">
+      <!-- tabel kedatangan pasien -->
+      <div>
         <p class="mb-3 text-xl font-medium text-gray-700">
           Data perawatan perlu dilengkapi
         </p>
@@ -233,19 +202,24 @@ onMounted(() => {
             </TableRowBody>
           </template>
         </ResponsiveTable>
-        <Pagination
-          :current-page="patientArrivalPaginationData.currentPage"
-          :total-pages="patientArrivalPaginationData.totalPage"
-          :total-items="patientArrivalPaginationData.totalItems"
-          :limit="patientArrivalPaginationData.limit"
-          @page-change="getPatientArrivalData"
-        ></Pagination>
       </div>
-      <!-- table -->
+    </div>
+    <div class="mt-5">
+      <!-- tabel perawatan -->
       <div v-if="treatments.length">
         <p class="mb-3 text-xl font-medium text-gray-700">
           Daftar Pasien yang pernah dirawat
         </p>
+        <!-- patient select -->
+        <div class="mb-3">
+          <SinglePatientSelect
+            label="Filter Pasien"
+            hide-add
+            v-model="selectedPatient"
+            v-model:modal-show="showModalPatient"
+            @update:model-value="handleOnSelectPatient"
+          />
+        </div>
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead
@@ -273,18 +247,6 @@ onMounted(() => {
                 >
                   Detail
                 </button>
-                <button
-                  @click="handleOnTreatmentEdit(treatments[i].id)"
-                  class="flex items-center gap-1 px-4 py-1 text-sm rounded-md text-amber-900 bg-amber-100 hover:bg-amber-200 group"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="openDeleteModal(treatments[i].id)"
-                  class="flex items-center gap-1 px-4 py-1 text-sm text-red-900 bg-red-100 rounded-md hover:bg-red-200 group"
-                >
-                  Hapus
-                </button>
               </TableBody>
             </TableRowBody>
           </template>
@@ -300,13 +262,4 @@ onMounted(() => {
       <EmptyData v-else></EmptyData>
     </div>
   </div>
-  <ConfirmDialog
-    v-model="modalDeleteOpen"
-    title="Hapus Perawatan"
-    button-text="Hapus"
-    :loading-confirm="loadingDeleteTreatment"
-    @confirm="handleOnTreatmentDelete"
-  >
-    konfirmasi untuk menghapus data?
-  </ConfirmDialog>
 </template>
