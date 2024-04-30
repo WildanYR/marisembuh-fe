@@ -32,9 +32,11 @@ import SingleClinicSelect from "../../components/form/custom_data/SingleClinicSe
 import { Roles } from "../../types/role.enum";
 import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
 import { cacheFormDataKey } from "../../configs";
+import { useNotification } from "@kyvg/vue3-notification";
 
 const router = useRouter();
 const route = useRoute();
+const { notify } = useNotification();
 const authStore = useAuthStore();
 
 const editedFormKey = new Map();
@@ -99,6 +101,7 @@ const pulseLocationDifferentiation = ref({
 const bloodPressureData = ref(["", ""]);
 const isHomecareTreatment = ref(false);
 const formDataError = reactive({
+  patient_id: [],
   objective: [],
 });
 
@@ -154,9 +157,21 @@ const patientLock = computed(() => {
 
 const handleAddTreatment = () => {
   const validator = new Validator();
+  validator.addValidation("patient_id", formData.value.patient_id, [
+    isRequired,
+  ]);
   validator.addValidation("objective", formData.value.objective, [isRequired]);
   if (validator.validate()) {
+    formDataError.patient_id = validator.getError("patient_id") as any;
+    if (formDataError.patient_id.length) {
+      notify({
+        text: "Pasien harus diisi",
+        title: "Data Tidak Valid",
+        type: "error",
+      });
+    }
     formDataError.objective = validator.getError("objective") as any;
+    window.scrollTo(0, 0);
     return;
   }
   loadingSubmit.value = true;
@@ -493,6 +508,7 @@ onBeforeUnmount(() => {
           label="Pasien"
           v-model="selectedPatient"
           v-model:modal-show="showModalPatient"
+          :error-message="formDataError.patient_id"
           :disabled="readOnly || patientLock"
           @update:model-value="onSelectPatient"
         />
