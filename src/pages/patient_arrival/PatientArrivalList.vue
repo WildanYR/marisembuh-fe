@@ -37,12 +37,21 @@ const tableData = computed(() => {
       patientArrival.patient.no_rm,
       patientArrival.patient.name,
       patientArrival.patient.address,
+      patientArrival.patient.register_clinic.name,
       patientArrival.user.name,
       patientArrival.done ? "Sudah dirawat" : "Belum dirawat",
     ];
   });
   return {
-    header: ["Tanggal", "No RM", "Nama", "Alamat", "Terapis", "Selesai"],
+    header: [
+      "Tanggal",
+      "No RM",
+      "Nama",
+      "Alamat",
+      "Klinik",
+      "Terapis",
+      "Selesai",
+    ],
     row,
   };
 });

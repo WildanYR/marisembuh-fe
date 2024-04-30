@@ -280,6 +280,9 @@ onBeforeUnmount(() => {
                     ]"
                   >
                     <p class="text-lg font-medium">{{ item.name }}</p>
+                    <p class="text-sm font-medium">
+                      {{ item.register_clinic.name }}
+                    </p>
                     <p class="text-sm">{{ item.address }}</p>
                   </button>
                 </div>

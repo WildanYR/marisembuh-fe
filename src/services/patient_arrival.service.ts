@@ -10,6 +10,12 @@ interface IPatientIncluded {
   birthdate: string;
   address: string;
   telp: string;
+  register_clinic: IPatientClinicIncluded;
+}
+
+interface IPatientClinicIncluded {
+  id: number;
+  name: string;
 }
 
 interface IUserIncluded {
