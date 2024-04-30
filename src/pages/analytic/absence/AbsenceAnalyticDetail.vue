@@ -25,6 +25,7 @@ import {
   isTimeGreaterThan,
 } from "../../../utils/date.util";
 import { useDateFilterStore } from "../../../stores/date_filter.store";
+import LoadingSpinner from "../../../components/icon/LoadingSpinner.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -45,7 +46,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalItems: 0,
   totalPage: 1,
 });
-const loadingAbsenceAnalytic = ref(false);
+const loadingGetAbsenceAnalytic = ref(false);
 const filter = ref({
   date: [],
 });
@@ -92,7 +93,7 @@ const tableData = computed(() => {
 });
 
 const getAbsenceAnalyticData = (userId: number, page = 1, limit = 10) => {
-  loadingAbsenceAnalytic.value = true;
+  loadingGetAbsenceAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
@@ -113,7 +114,7 @@ const getAbsenceAnalyticData = (userId: number, page = 1, limit = 10) => {
       absenceLateHour.value = response.lateHour;
     })
     .finally(() => {
-      loadingAbsenceAnalytic.value = false;
+      loadingGetAbsenceAnalytic.value = false;
     });
 };
 
@@ -200,8 +201,17 @@ onMounted(() => {
           @update:modelValue="handleDateFilter"
         />
       </div>
+      <div
+        v-if="loadingGetAbsenceAnalytic"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="absenceAnalytics.length">
+      <div v-else-if="absenceAnalytics.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

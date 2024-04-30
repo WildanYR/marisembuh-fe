@@ -14,6 +14,7 @@ import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { IPatientArrivalResponse } from "../../services/patient_arrival.service";
 import { getAllPatientArrivalWithPagination } from "../../services/patient_arrival.service";
 import { formatLocaleStringDate } from "../../utils/date.util";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -25,7 +26,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalItems: 0,
   totalPage: 1,
 });
-const loadingPatientArrival = ref(false);
+const loadingGetPatientArrival = ref(false);
 
 const tableData = computed(() => {
   if (!patientArrival.value.length) return null;
@@ -47,7 +48,7 @@ const tableData = computed(() => {
 });
 
 const getPatientArrivalData = (page = 1, limit = 10) => {
-  loadingPatientArrival.value = true;
+  loadingGetPatientArrival.value = true;
   getAllPatientArrivalWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -55,7 +56,7 @@ const getPatientArrivalData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingPatientArrival.value = false;
+      loadingGetPatientArrival.value = false;
     });
 };
 
@@ -105,8 +106,17 @@ onMounted(() => {
       </button>
     </div>
     <div class="mt-5">
+      <div
+        v-if="loadingGetPatientArrival"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="patientArrival.length">
+      <div v-else-if="patientArrival.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

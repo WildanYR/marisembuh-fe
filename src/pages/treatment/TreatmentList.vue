@@ -26,6 +26,7 @@ import {
 } from "../../services/patient_arrival.service";
 import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
 import { IPatientResponse } from "../../services/patient.service";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -171,7 +172,16 @@ onMounted(() => {
         <p class="mb-3 text-xl font-medium text-gray-700">
           Data perawatan perlu dilengkapi
         </p>
-        <ResponsiveTable v-if="patientArrivalTableData">
+        <div
+          v-if="loadingGetPatientArrival"
+          class="flex flex-col items-center justify-center gap-3"
+        >
+          <LoadingSpinner
+            class="w-8 h-8 text-gray-500 animate-spin"
+          ></LoadingSpinner>
+          <p class="text-lg text-gray-500">Memuat Data</p>
+        </div>
+        <ResponsiveTable v-else-if="patientArrivalTableData">
           <template v-slot:header>
             <TableHead
               v-for="(header, i) in patientArrivalTableData.header"
@@ -220,7 +230,16 @@ onMounted(() => {
             @update:model-value="handleOnSelectPatient"
           />
         </div>
-        <ResponsiveTable v-if="tableData">
+        <div
+          v-if="loadingGetTreatment"
+          class="flex flex-col items-center justify-center gap-3"
+        >
+          <LoadingSpinner
+            class="w-8 h-8 text-gray-500 animate-spin"
+          ></LoadingSpinner>
+          <p class="text-lg text-gray-500">Memuat Data</p>
+        </div>
+        <ResponsiveTable v-else-if="tableData">
           <template v-slot:header>
             <TableHead
               v-for="(header, i) in tableData.header"

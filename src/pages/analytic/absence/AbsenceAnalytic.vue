@@ -25,6 +25,7 @@ import {
   getFilterStartEndISODate,
   getStartEndOfMonthDate,
 } from "../../../utils/date.util";
+import LoadingSpinner from "../../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -39,7 +40,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingAbsenceAnalytic = ref(false);
+const loadingGetAbsenceAnalytic = ref(false);
 const filter = ref({
   date: [],
 });
@@ -63,7 +64,7 @@ const resetPaginationData = () => {
 };
 
 const getAbsenceAnalyticData = (page = 1, limit = 10) => {
-  loadingAbsenceAnalytic.value = true;
+  loadingGetAbsenceAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
@@ -81,7 +82,7 @@ const getAbsenceAnalyticData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingAbsenceAnalytic.value = false;
+      loadingGetAbsenceAnalytic.value = false;
     });
 };
 
@@ -91,7 +92,7 @@ const getAbsenceAnalyticDataByQuery = () => {
     getAbsenceAnalyticData();
     return;
   }
-  loadingAbsenceAnalytic.value = true;
+  loadingGetAbsenceAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
@@ -105,7 +106,7 @@ const getAbsenceAnalyticDataByQuery = () => {
       absenceAnalytics.value = response;
     })
     .finally(() => {
-      loadingAbsenceAnalytic.value = false;
+      loadingGetAbsenceAnalytic.value = false;
     });
 };
 
@@ -196,8 +197,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetAbsenceAnalytic"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="absenceAnalytics.length">
+      <div v-else-if="absenceAnalytics.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

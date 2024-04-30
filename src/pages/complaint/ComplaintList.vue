@@ -21,6 +21,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -35,7 +36,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingComplaint = ref(false);
+const loadingGetComplaint = ref(false);
 const loadingDeleteComplaint = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -59,7 +60,7 @@ const resetPaginationData = () => {
 };
 
 const getComplaintData = (page = 1, limit = 10) => {
-  loadingComplaint.value = true;
+  loadingGetComplaint.value = true;
   getAllComplaintWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -67,7 +68,7 @@ const getComplaintData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingComplaint.value = false;
+      loadingGetComplaint.value = false;
     });
 };
 
@@ -77,14 +78,14 @@ const getComplaintDataByQuery = () => {
     getComplaintData();
     return;
   }
-  loadingComplaint.value = true;
+  loadingGetComplaint.value = true;
   getComplaintByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       Complaints.value = response;
     })
     .finally(() => {
-      loadingComplaint.value = false;
+      loadingGetComplaint.value = false;
     });
 };
 
@@ -178,8 +179,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetComplaint"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="Complaints.length">
+      <div v-else-if="Complaints.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

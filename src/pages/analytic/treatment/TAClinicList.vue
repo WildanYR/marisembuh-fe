@@ -18,6 +18,7 @@ import GrayButton from "../../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../../configs/debounce.config";
+import LoadingSpinner from "../../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -31,7 +32,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingClinic = ref(false);
+const loadingGetClinic = ref(false);
 
 const tableData = computed(() => {
   if (!clinics.value.length) return null;
@@ -52,7 +53,7 @@ const resetPaginationData = () => {
 };
 
 const getClinicData = (page = 1, limit = 10) => {
-  loadingClinic.value = true;
+  loadingGetClinic.value = true;
   getAllClinicWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -60,7 +61,7 @@ const getClinicData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingClinic.value = false;
+      loadingGetClinic.value = false;
     });
 };
 
@@ -70,14 +71,14 @@ const getClinicDataByQuery = () => {
     getClinicData();
     return;
   }
-  loadingClinic.value = true;
+  loadingGetClinic.value = true;
   getClinicByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       clinics.value = response;
     })
     .finally(() => {
-      loadingClinic.value = false;
+      loadingGetClinic.value = false;
     });
 };
 
@@ -143,8 +144,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetClinic"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="clinics.length">
+      <div v-else-if="clinics.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead>Aksi</TableHead>

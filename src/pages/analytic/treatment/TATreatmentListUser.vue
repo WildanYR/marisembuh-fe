@@ -18,6 +18,7 @@ import ChevLeftIcon from "../../../components/icon/ChevLeftIcon.vue";
 import { formatLocaleStringDate } from "../../../utils/date.util";
 import { getUserById } from "../../../services/user.service";
 import { useAuthStore } from "../../../stores/auth.store";
+import LoadingSpinner from "../../../components/icon/LoadingSpinner.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -136,8 +137,17 @@ onMounted(() => {
       </div>
     </div>
     <div class="mt-5">
+      <div
+        v-if="loadingGetTreatment"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="treatments.length">
+      <div v-else-if="treatments.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

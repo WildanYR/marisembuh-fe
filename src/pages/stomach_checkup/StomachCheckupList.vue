@@ -21,6 +21,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -35,7 +36,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingStomachCheckup = ref(false);
+const loadingGetStomachCheckup = ref(false);
 const loadingDeleteStomachCheckup = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -58,7 +59,7 @@ const resetPaginationData = () => {
 };
 
 const getStomachCheckupData = (page = 1, limit = 10) => {
-  loadingStomachCheckup.value = true;
+  loadingGetStomachCheckup.value = true;
   getAllStomachCheckupWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -66,7 +67,7 @@ const getStomachCheckupData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingStomachCheckup.value = false;
+      loadingGetStomachCheckup.value = false;
     });
 };
 
@@ -76,14 +77,14 @@ const getStomachCheckupDataByQuery = () => {
     getStomachCheckupData();
     return;
   }
-  loadingStomachCheckup.value = true;
+  loadingGetStomachCheckup.value = true;
   getStomachCheckupByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       StomachCheckups.value = response;
     })
     .finally(() => {
-      loadingStomachCheckup.value = false;
+      loadingGetStomachCheckup.value = false;
     });
 };
 
@@ -180,8 +181,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetStomachCheckup"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="StomachCheckups.length">
+      <div v-else-if="StomachCheckups.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

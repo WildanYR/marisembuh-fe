@@ -21,6 +21,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -35,7 +36,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingDurationAdvice = ref(false);
+const loadingGetDurationAdvice = ref(false);
 const loadingDeleteDurationAdvice = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -58,7 +59,7 @@ const resetPaginationData = () => {
 };
 
 const getDurationAdviceData = (page = 1, limit = 10) => {
-  loadingDurationAdvice.value = true;
+  loadingGetDurationAdvice.value = true;
   getAllDurationAdviceWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -66,7 +67,7 @@ const getDurationAdviceData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingDurationAdvice.value = false;
+      loadingGetDurationAdvice.value = false;
     });
 };
 
@@ -76,14 +77,14 @@ const getDurationAdviceDataByQuery = () => {
     getDurationAdviceData();
     return;
   }
-  loadingDurationAdvice.value = true;
+  loadingGetDurationAdvice.value = true;
   getDurationAdviceByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       DurationAdvices.value = response;
     })
     .finally(() => {
-      loadingDurationAdvice.value = false;
+      loadingGetDurationAdvice.value = false;
     });
 };
 
@@ -180,8 +181,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetDurationAdvice"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="DurationAdvices.length">
+      <div v-else-if="DurationAdvices.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

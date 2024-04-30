@@ -21,6 +21,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -35,7 +36,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingDoctorDiagnosis = ref(false);
+const loadingGetDoctorDiagnosis = ref(false);
 const loadingDeleteDoctorDiagnosis = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -58,7 +59,7 @@ const resetPaginationData = () => {
 };
 
 const getDoctorDiagnosisData = (page = 1, limit = 10) => {
-  loadingDoctorDiagnosis.value = true;
+  loadingGetDoctorDiagnosis.value = true;
   getAllDoctorDiagnosisWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -66,7 +67,7 @@ const getDoctorDiagnosisData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingDoctorDiagnosis.value = false;
+      loadingGetDoctorDiagnosis.value = false;
     });
 };
 
@@ -76,14 +77,14 @@ const getDoctorDiagnosisDataByQuery = () => {
     getDoctorDiagnosisData();
     return;
   }
-  loadingDoctorDiagnosis.value = true;
+  loadingGetDoctorDiagnosis.value = true;
   getDoctorDiagnosisByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       DoctorDiagnosiss.value = response;
     })
     .finally(() => {
-      loadingDoctorDiagnosis.value = false;
+      loadingGetDoctorDiagnosis.value = false;
     });
 };
 
@@ -180,8 +181,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetDoctorDiagnosis"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="DoctorDiagnosiss.length">
+      <div v-else-if="DoctorDiagnosiss.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

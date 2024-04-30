@@ -21,6 +21,7 @@ import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import { Debouncer } from "../../utils/debounce";
 import { DEBOUNCE_TIMEOUT } from "../../configs/debounce.config";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -35,7 +36,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingMeridian = ref(false);
+const loadingGetMeridian = ref(false);
 const loadingDeleteMeridian = ref(false);
 const modalDeleteOpen = ref(false);
 
@@ -58,7 +59,7 @@ const resetPaginationData = () => {
 };
 
 const getMeridianData = (page = 1, limit = 10) => {
-  loadingMeridian.value = true;
+  loadingGetMeridian.value = true;
   getAllMeridianWithPagination({ page, limit })
     .then((response) => {
       if (!response) return;
@@ -66,7 +67,7 @@ const getMeridianData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingMeridian.value = false;
+      loadingGetMeridian.value = false;
     });
 };
 
@@ -76,14 +77,14 @@ const getMeridianDataByQuery = () => {
     getMeridianData();
     return;
   }
-  loadingMeridian.value = true;
+  loadingGetMeridian.value = true;
   getMeridianByName(searchQuery.value)
     .then((response) => {
       if (!response) return;
       Meridians.value = response;
     })
     .finally(() => {
-      loadingMeridian.value = false;
+      loadingGetMeridian.value = false;
     });
 };
 
@@ -177,8 +178,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetMeridian"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="Meridians.length">
+      <div v-else-if="Meridians.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead

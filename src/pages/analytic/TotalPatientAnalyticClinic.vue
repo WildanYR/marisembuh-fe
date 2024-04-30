@@ -25,6 +25,7 @@ import {
   getFilterStartEndISODate,
   getStartEndOfMonthDate,
 } from "../../utils/date.util";
+import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const debouncer = new Debouncer();
 const router = useRouter();
@@ -39,7 +40,7 @@ const paginationData: Ref<IPaginationData> = ref({
   totalPage: 1,
 });
 const searchQuery = ref("");
-const loadingTotalPatientAnalytic = ref(false);
+const loadingGetTotalPatientAnalytic = ref(false);
 const filter = ref({
   date: [],
 });
@@ -63,7 +64,7 @@ const resetPaginationData = () => {
 };
 
 const getTotalPatientAnalyticData = (page = 1, limit = 10) => {
-  loadingTotalPatientAnalytic.value = true;
+  loadingGetTotalPatientAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
@@ -82,7 +83,7 @@ const getTotalPatientAnalyticData = (page = 1, limit = 10) => {
       paginationData.value = response.paginationData;
     })
     .finally(() => {
-      loadingTotalPatientAnalytic.value = false;
+      loadingGetTotalPatientAnalytic.value = false;
     });
 };
 
@@ -92,7 +93,7 @@ const getTotalPatientAnalyticDataByQuery = () => {
     getTotalPatientAnalyticData();
     return;
   }
-  loadingTotalPatientAnalytic.value = true;
+  loadingGetTotalPatientAnalytic.value = true;
   const { startDate, endDate } = getFilterStartEndISODate(
     filter.value.date[0],
     filter.value.date[1]
@@ -106,7 +107,7 @@ const getTotalPatientAnalyticDataByQuery = () => {
       totalPatientAnalytics.value = response;
     })
     .finally(() => {
-      loadingTotalPatientAnalytic.value = false;
+      loadingGetTotalPatientAnalytic.value = false;
     });
 };
 
@@ -195,8 +196,17 @@ onBeforeUnmount(() => {
           class="w-full lg:w-max"
         />
       </div>
+      <div
+        v-if="loadingGetTotalPatientAnalytic"
+        class="flex flex-col items-center justify-center gap-3"
+      >
+        <LoadingSpinner
+          class="w-8 h-8 text-gray-500 animate-spin"
+        ></LoadingSpinner>
+        <p class="text-lg text-gray-500">Memuat Data</p>
+      </div>
       <!-- table -->
-      <div v-if="totalPatientAnalytics.length">
+      <div v-else-if="totalPatientAnalytics.length">
         <ResponsiveTable v-if="tableData">
           <template v-slot:header>
             <TableHead
