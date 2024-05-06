@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { requestErrorHandler } from "../utils/request_error_handler.util";
 import { AbsenceStatus } from "../pages/absence/types/absence_status.type";
+import { DateTime } from "luxon";
 
 interface IAbsenceResponse {
   status: AbsenceStatus;
@@ -27,7 +28,7 @@ export const handleAbsence = async (
   try {
     const response: AxiosResponse<IAbsenceResponse, any> = await axios.post(
       `/absence/${userId}`,
-      { type, data }
+      { type, data, client_date: DateTime.now().toISO() }
     );
     return response.data;
   } catch (error) {
