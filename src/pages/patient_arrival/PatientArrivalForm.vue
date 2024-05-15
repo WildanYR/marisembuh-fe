@@ -15,6 +15,11 @@ import {
 import { useAuthStore } from "../../stores/auth.store";
 import { cacheFormDataKey } from "../../configs";
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
+import { id as dateLocalId } from "date-fns/locale";
+import {
+  formatSQLStringDate,
+  formatISOStringDate,
+} from "../../utils/date.util";
 
 const router = useRouter();
 const route = useRoute();
@@ -25,6 +30,7 @@ const formData = ref({
   user_id: null,
   tag_user_id: null,
   type: "KLINIK",
+  date: "",
 });
 const formDataError = reactive({
   patient: [],
@@ -58,7 +64,8 @@ const handleAddPatientArrival = () => {
   }
   loadingSubmit.value = true;
   formData.value.tag_user_id = authStore.id as any;
-  createPatientArrival({ ...(formData.value as any) })
+  const ISODate = formatISOStringDate(formData.value.date);
+  createPatientArrival({ ...(formData.value as any), date: ISODate })
     .then(() => {
       toPreviousPage();
     })
@@ -70,7 +77,13 @@ const handleAddPatientArrival = () => {
 const handleEditPatientArrival = () => {
   loadingSubmit.value = true;
   const patientArrivalId = parseInt(route.params.id as string);
-  updatePatientArrival(patientArrivalId, { ...(formData.value as any) })
+  const ISODate = formData.value.date
+    ? formatISOStringDate(formData.value.date)
+    : null;
+  updatePatientArrival(patientArrivalId, {
+    ...(formData.value as any),
+    date: ISODate,
+  })
     .then(() => {
       toPreviousPage();
     })
@@ -150,6 +163,8 @@ const onAddPatient = () => {
 onMounted(() => {
   if (!getCacheFormData() && route.params.id) {
     getPatientArrivalData(parseInt(route.params.id as string));
+  } else if (!formData.value.date) {
+    formData.value.date = formatSQLStringDate(new Date());
   }
   if (route.query.om === "patient") {
     showModalPatient.value = true;
@@ -212,6 +227,21 @@ onMounted(() => {
           </RadioGroupOption>
         </div>
       </RadioGroup>
+      <!-- Tanggal Perawatan -->
+      <div>
+        <p class="mb-3 text-gray-700">Tanggal Lahir</p>
+        <VueDatePicker
+          v-model="formData.date"
+          model-type="yyyy-MM-dd"
+          placeholder="Pilih tanggal"
+          locale="id"
+          format="dd MMMM yyyy"
+          :format-locale="dateLocalId"
+          :enable-time-picker="false"
+          :readonly="readOnly"
+          auto-apply
+        />
+      </div>
       <SinglePatientSelect
         label="Pasien"
         v-model="selectedPatient"

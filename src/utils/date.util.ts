@@ -73,6 +73,13 @@ export const formatTimeStringDate = (date: Date | string) => {
   return DateTime.fromJSDate(date).toFormat("HH:mm");
 };
 
+export const formatISOStringDate = (date: Date | string) => {
+  if (typeof date === "string") {
+    date = new Date(date);
+  }
+  return DateTime.fromJSDate(date).toISO();
+};
+
 export const calculateAgeFromBirthdate = (birthdate: Date | string) => {
   if (typeof birthdate === "string") {
     birthdate = new Date(birthdate);

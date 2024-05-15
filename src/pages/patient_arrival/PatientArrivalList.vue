@@ -45,7 +45,9 @@ const showModalDeletePatientArrival = ref(false);
 const tableData = computed(() => {
   if (!patientArrival.value.length) return null;
   const row = patientArrival.value.map((patientArrival) => {
-    const dateString = formatLocaleStringDate(patientArrival.created_at);
+    const dateString = formatLocaleStringDate(
+      patientArrival.date || patientArrival.created_at
+    );
     let clinic = "";
 
     if (patientArrival.type === "HOMECARE") {
