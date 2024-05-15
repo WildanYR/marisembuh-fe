@@ -378,6 +378,9 @@ const openModalOnMounted = () => {
 onMounted(() => {
   getCacheFormData();
   openModalOnMounted();
+  if (route.query.is_homecare === "1") {
+    isHomecareTreatment.value = true;
+  }
   formData.value.user_id = authStore.id as any;
   if (route.params.patientId) {
     loadingGetTreatment.value = true;

@@ -26,6 +26,7 @@ interface IUserIncluded {
 export interface IPatientArrivalResponse {
   id: number;
   done: boolean;
+  type: string;
   patient: IPatientIncluded;
   user: IUserIncluded;
   tag_user: IUserIncluded;
@@ -36,11 +37,13 @@ export interface IPatientArrivalCreate {
   patient_id: number;
   user_id: number;
   tag_user_id: number;
+  type: string;
 }
 
 export interface IPatientArrivalUpdate {
   patient_id?: number;
   user_id?: number;
+  type?: string;
 }
 
 export interface IQueryFilterPatientArrival {
@@ -48,6 +51,7 @@ export interface IQueryFilterPatientArrival {
   patient_id?: number;
   user_id?: number;
   tag_user_id?: number;
+  type?: string;
 }
 
 export const getAllPatientArrivalWithPagination = async (

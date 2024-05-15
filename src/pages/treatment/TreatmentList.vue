@@ -76,11 +76,12 @@ const patientArrivalTableData = computed(() => {
   if (!patientArrivals.value.length) return null;
   const row = patientArrivals.value.map((item) => {
     const dateString = formatLocaleStringDate(item.created_at);
-    return [dateString, item.patient.name, item.user.name];
+    const type = item.type === "HOMECARE" ? "Homecare" : "Klinik";
+    return [dateString, item.patient.name, item.user.name, type];
   });
 
   return {
-    header: ["Tanggal", "Pasien", "Terapis"],
+    header: ["Tanggal", "Pasien", "Terapis", "Jenis Perawatan"],
     row,
   };
 });
@@ -125,8 +126,13 @@ const handleOnTreatmentAdd = () => {
   router.push({ name: "TreatmentAdd" });
 };
 
-const handleOnTreatmentFill = (patientId: number) => {
-  router.push({ name: "TreatmentFill", params: { patientId } });
+const handleOnTreatmentFill = (patientId: number, type?: string) => {
+  const isHomecare = type === "HOMECARE" ? 1 : 0;
+  router.push({
+    name: "TreatmentFill",
+    params: { patientId },
+    query: { is_homecare: isHomecare },
+  });
 };
 
 const handleOnTreatmentDetail = (treatmentId: number) => {
@@ -203,7 +209,12 @@ onMounted(() => {
               </TableBody>
               <TableBody class="flex items-center gap-3">
                 <button
-                  @click="handleOnTreatmentFill(patientArrivals[i].patient.id)"
+                  @click="
+                    handleOnTreatmentFill(
+                      patientArrivals[i].patient.id,
+                      patientArrivals[i].type
+                    )
+                  "
                   class="flex items-center gap-1 px-4 py-1 text-sm text-blue-900 bg-blue-100 rounded-md hover:bg-blue-200 group"
                 >
                   Isi data

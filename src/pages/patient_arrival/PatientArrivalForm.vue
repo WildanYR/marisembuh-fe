@@ -10,6 +10,7 @@ import SingleUserSelect from "../../components/form/custom_data/SingleUserSelect
 import { createPatientArrival } from "../../services/patient_arrival.service";
 import { useAuthStore } from "../../stores/auth.store";
 import { cacheFormDataKey } from "../../configs";
+import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -19,10 +20,12 @@ const formData = ref({
   patient_id: null,
   user_id: null,
   tag_user_id: null,
+  type: "KLINIK",
 });
 const formDataError = reactive({
   patient: [],
   user: [],
+  type: [],
 });
 
 const selectedPatient = ref(null);
@@ -42,6 +45,7 @@ const handleSubmit = () => {
   const validator = new Validator();
   validator.addValidation("patient", formData.value.patient_id, [isRequired]);
   validator.addValidation("user", formData.value.user_id, [isRequired]);
+  validator.addValidation("type", formData.value.type, [isRequired]);
   if (validator.validate()) {
     formDataError.patient = validator.getError("patient") as any;
     formDataError.user = validator.getError("user") as any;
@@ -119,6 +123,50 @@ onMounted(() => {
       <GrayButton @click="toPreviousPage" class="text-sm">Kembali</GrayButton>
     </div>
     <div class="space-y-4">
+      <!-- Jenis Perawatan -->
+      <RadioGroup v-model="formData.type" :disabled="readOnly">
+        <RadioGroupLabel class="font-medium">Jenis Perawatan</RadioGroupLabel>
+        <div class="flex items-center gap-3 mt-3 md:gap-5">
+          <RadioGroupOption
+            as="template"
+            value="KLINIK"
+            v-slot="{ active, checked }"
+          >
+            <div
+              :class="[
+                active
+                  ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                  : '',
+                checked
+                  ? 'bg-sky-500/75 text-white '
+                  : 'bg-white border border-gray-200',
+              ]"
+              class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
+            >
+              <RadioGroupLabel>Klinik</RadioGroupLabel>
+            </div>
+          </RadioGroupOption>
+          <RadioGroupOption
+            as="template"
+            value="HOMECARE"
+            v-slot="{ active, checked }"
+          >
+            <div
+              :class="[
+                active
+                  ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-sky-300'
+                  : '',
+                checked
+                  ? 'bg-sky-500/75 text-white '
+                  : 'bg-white border border-gray-200',
+              ]"
+              class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
+            >
+              <RadioGroupLabel>Homecare</RadioGroupLabel>
+            </div>
+          </RadioGroupOption>
+        </div>
+      </RadioGroup>
       <SinglePatientSelect
         label="Pasien"
         v-model="selectedPatient"

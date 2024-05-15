@@ -32,14 +32,20 @@ const tableData = computed(() => {
   if (!patientArrival.value.length) return null;
   const row = patientArrival.value.map((patientArrival) => {
     const dateString = formatLocaleStringDate(patientArrival.created_at);
+    let clinic = "";
+
+    if (patientArrival.type === "HOMECARE") {
+      clinic = "Homecare";
+    } else if (patientArrival.patient.register_clinic) {
+      clinic = patientArrival.patient.register_clinic.name;
+    }
+
     return [
       dateString,
       patientArrival.patient.no_rm,
       patientArrival.patient.name,
       patientArrival.patient.address,
-      patientArrival.patient.register_clinic
-        ? patientArrival.patient.register_clinic.name
-        : "",
+      clinic,
       patientArrival.user.name,
       patientArrival.done ? "Sudah dirawat" : "Belum dirawat",
     ];
