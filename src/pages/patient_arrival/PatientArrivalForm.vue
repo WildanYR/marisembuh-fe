@@ -7,7 +7,11 @@ import LoadingButton from "../../components/LoadingButton.vue";
 import GrayButton from "../../components/button/GrayButton.vue";
 import SinglePatientSelect from "../../components/form/custom_data/SinglePatientSelect.vue";
 import SingleUserSelect from "../../components/form/custom_data/SingleUserSelect.vue";
-import { createPatientArrival } from "../../services/patient_arrival.service";
+import {
+  createPatientArrival,
+  getPatientArrivalById,
+  updatePatientArrival,
+} from "../../services/patient_arrival.service";
 import { useAuthStore } from "../../stores/auth.store";
 import { cacheFormDataKey } from "../../configs";
 import { RadioGroup, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue";
@@ -35,13 +39,14 @@ const showModalPatient = ref(false);
 const showModalUser = ref(false);
 
 const loadingSubmit = ref(false);
+const loadingGetPatientArrival = ref(false);
 
 const readOnly = computed(() => {
   if (route.meta.readOnly) return true;
   return false;
 });
 
-const handleSubmit = () => {
+const handleAddPatientArrival = () => {
   const validator = new Validator();
   validator.addValidation("patient", formData.value.patient_id, [isRequired]);
   validator.addValidation("user", formData.value.user_id, [isRequired]);
@@ -62,6 +67,26 @@ const handleSubmit = () => {
     });
 };
 
+const handleEditPatientArrival = () => {
+  loadingSubmit.value = true;
+  const patientArrivalId = parseInt(route.params.id as string);
+  updatePatientArrival(patientArrivalId, { ...(formData.value as any) })
+    .then(() => {
+      toPreviousPage();
+    })
+    .finally(() => {
+      loadingSubmit.value = false;
+    });
+};
+
+const handleSubmit = () => {
+  if (route.name === "PatientArrivalAdd") {
+    handleAddPatientArrival();
+  } else {
+    handleEditPatientArrival();
+  }
+};
+
 const toPreviousPage = () => {
   router.push({ name: "PatientArrivalList" });
 };
@@ -71,6 +96,23 @@ const onSelectPatient = (item: any) => {
 };
 const onSelectUser = (item: any) => {
   formData.value.user_id = item.id || null;
+};
+
+const getPatientArrivalData = (patientArrivalId: number) => {
+  loadingGetPatientArrival.value = true;
+  getPatientArrivalById(patientArrivalId)
+    .then((response) => {
+      console.log(response);
+      formData.value.patient_id = response.patient.id as any;
+      formData.value.tag_user_id = response.tag_user.id as any;
+      formData.value.user_id = response.user.id as any;
+      formData.value.type = response.type;
+      selectedPatient.value = response.patient as any;
+      selectedUser.value = response.user as any;
+    })
+    .finally(() => {
+      loadingGetPatientArrival.value = false;
+    });
 };
 
 const setCacheFormData = () => {
@@ -83,7 +125,7 @@ const setCacheFormData = () => {
 };
 const getCacheFormData = () => {
   const cacheStr = localStorage.getItem(cacheFormDataKey);
-  if (!cacheStr) return;
+  if (!cacheStr) return false;
   const cache = JSON.parse(cacheStr);
 
   formData.value = cache.formData;
@@ -91,6 +133,7 @@ const getCacheFormData = () => {
   selectedUser.value = cache.selectedUser;
 
   localStorage.removeItem(cacheFormDataKey);
+  return true;
 };
 
 const onAddPatient = () => {
@@ -105,7 +148,9 @@ const onAddPatient = () => {
 };
 
 onMounted(() => {
-  getCacheFormData();
+  if (!getCacheFormData() && route.params.id) {
+    getPatientArrivalData(parseInt(route.params.id as string));
+  }
   if (route.query.om === "patient") {
     showModalPatient.value = true;
   }
@@ -117,7 +162,7 @@ onMounted(() => {
     class="w-full max-w-xl p-6 mx-auto mb-24 bg-white shadow-lg mt-14 rounded-xl"
   >
     <h1 class="mb-3 text-4xl font-medium text-center">
-      Tambah Kedatangan Pasien
+      {{ route.meta.title }}
     </h1>
     <div class="flex items-center justify-center mb-3">
       <GrayButton @click="toPreviousPage" class="text-sm">Kembali</GrayButton>
@@ -189,7 +234,7 @@ onMounted(() => {
           @click="handleSubmit"
           class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
         >
-          Tambah Kedatangan Pasien
+          {{ route.meta.title }}
         </LoadingButton>
         <GrayButton @click="toPreviousPage" class="w-full">Kembali</GrayButton>
       </div>

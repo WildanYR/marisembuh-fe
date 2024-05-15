@@ -11,10 +11,15 @@ import EmptyData from "../../components/EmptyData.vue";
 import { useRoute, useRouter } from "vue-router";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
-import { IPatientArrivalResponse } from "../../services/patient_arrival.service";
+import {
+  IPatientArrivalResponse,
+  deletePatientArrival,
+} from "../../services/patient_arrival.service";
 import { getAllPatientArrivalWithPagination } from "../../services/patient_arrival.service";
 import { formatLocaleStringDate } from "../../utils/date.util";
 import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
+import ConfirmDialog from "../../components/dialog/ConfirmDialog.vue";
+import { notify } from "@kyvg/vue3-notification";
 
 const router = useRouter();
 const route = useRoute();
@@ -26,7 +31,16 @@ const paginationData: Ref<IPaginationData> = ref({
   totalItems: 0,
   totalPage: 1,
 });
+
+const selectedPatientArrival = ref({
+  id: 0,
+  name: "",
+});
+
 const loadingGetPatientArrival = ref(false);
+const loadingDeletePatientArrival = ref(false);
+
+const showModalDeletePatientArrival = ref(false);
 
 const tableData = computed(() => {
   if (!patientArrival.value.length) return null;
@@ -90,6 +104,29 @@ const handlePaginationChange = (page: number) => {
   getPatientArrivalData(page);
 };
 
+const openDeletePatientArrivalModal = (
+  patientArrivalId: number,
+  patientArrivalName: string
+) => {
+  selectedPatientArrival.value.id = patientArrivalId;
+  selectedPatientArrival.value.name = patientArrivalName;
+  showModalDeletePatientArrival.value = true;
+};
+
+const handleEditPatientArrival = (patientArrivalId: number) => {
+  router.push({ name: "PatientArrivalEdit", params: { id: patientArrivalId } });
+};
+
+const handleDeletePatientArrival = () => {
+  loadingDeletePatientArrival.value = true;
+  deletePatientArrival(selectedPatientArrival.value.id).finally(() => {
+    showModalDeletePatientArrival.value = false;
+    loadingDeletePatientArrival.value = false;
+    notify({ type: "info", title: "Berhasil", text: "Data berhasil dihapus" });
+    getPatientArrivalData();
+  });
+};
+
 onMounted(() => {
   let page = 1;
   if (route.query.page) {
@@ -142,6 +179,7 @@ onMounted(() => {
             >
               {{ header }}
             </TableHead>
+            <TableHead>Aksi</TableHead>
           </template>
           <template v-slot:body>
             <TableRowBody
@@ -150,6 +188,25 @@ onMounted(() => {
             >
               <TableBody v-for="(col, j) in row" :key="'patient-table-col-' + j"
                 >{{ col }}
+              </TableBody>
+              <TableBody class="flex items-center gap-3">
+                <button
+                  @click="handleEditPatientArrival(patientArrival[i].id)"
+                  class="flex items-center gap-1 px-4 py-1 text-sm rounded-md text-amber-900 bg-amber-100 hover:bg-amber-200 group"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="
+                    openDeletePatientArrivalModal(
+                      patientArrival[i].id,
+                      patientArrival[i].patient.name
+                    )
+                  "
+                  class="flex items-center gap-1 px-4 py-1 text-sm text-red-900 bg-red-100 rounded-md hover:bg-red-200 group"
+                >
+                  Hapus
+                </button>
               </TableBody>
             </TableRowBody>
           </template>
@@ -165,4 +222,14 @@ onMounted(() => {
       <EmptyData v-else></EmptyData>
     </div>
   </div>
+  <ConfirmDialog
+    v-model="showModalDeletePatientArrival"
+    title="Hapus Kedatangan Pasien"
+    button-text="Hapus"
+    :loading-confirm="loadingDeletePatientArrival"
+    @confirm="handleDeletePatientArrival"
+  >
+    konfirmasi untuk menghapus,
+    <span class="font-medium">{{ selectedPatientArrival.name }}</span>
+  </ConfirmDialog>
 </template>

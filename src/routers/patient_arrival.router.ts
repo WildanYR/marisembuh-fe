@@ -8,6 +8,17 @@ const routes: RouteRecordRaw[] = [
     name: "PatientArrivalAdd",
     path: "tambah",
     component: PatientArrivalForm,
+    meta: {
+      title: "Tambah Kedatangan Pasien",
+    },
+  },
+  {
+    name: "PatientArrivalEdit",
+    path: "edit/:id",
+    component: PatientArrivalForm,
+    meta: {
+      title: "Edit Kedatangan Pasien",
+    },
   },
 ];
 
