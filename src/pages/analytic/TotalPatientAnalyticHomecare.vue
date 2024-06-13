@@ -7,7 +7,7 @@ import TableRowBody from "../../components/tables/TableRowBody.vue";
 import TableBody from "../../components/tables/TableBody.vue";
 // import Pagination from "../../components/Pagination.vue";
 import EmptyData from "../../components/EmptyData.vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import GrayButton from "../../components/button/GrayButton.vue";
 import ChevLeftIcon from "../../components/icon/ChevLeftIcon.vue";
 import {
@@ -24,7 +24,7 @@ import {
 import LoadingSpinner from "../../components/icon/LoadingSpinner.vue";
 
 const router = useRouter();
-const route = useRoute();
+// const route = useRoute();
 const dateFilterStore = useDateFilterStore();
 
 const totalPatientAnalytics: Ref<ITotalPatientAnalyticResponse[]> = ref([]);
@@ -96,10 +96,10 @@ const handleDateFilter = () => {
 // };
 
 onMounted(() => {
-  let page = 1;
-  if (route.query.page) {
-    page = parseInt(route.query.page as string);
-  }
+  // let page = 1;
+  // if (route.query.page) {
+  //   page = parseInt(route.query.page as string);
+  // }
 
   if (dateFilterStore.start_date && dateFilterStore.end_date) {
     filter.value.date = [
