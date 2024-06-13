@@ -3,6 +3,7 @@ import TotalPatientAnalyticList from "../pages/analytic/TotalPatientAnalyticList
 import TotalPatientAnalyticTherapy from "../pages/analytic/TotalPatientAnalyticTherapy.vue";
 import TotalPatientAnalyticClinic from "../pages/analytic/TotalPatientAnalyticClinic.vue";
 import TotalPatientAnalyticUser from "../pages/analytic/TotalPatientAnalyticUser.vue";
+import TotalPatientAnalyticHomecare from "../pages/analytic/TotalPatientAnalyticHomecare.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -24,6 +25,11 @@ const routes: RouteRecordRaw[] = [
     name: "TotalPatientAnalyticTherapy",
     path: "jenis-terapi",
     component: TotalPatientAnalyticTherapy,
+  },
+  {
+    name: "TotalPatientAnalyticHomecare",
+    path: "homecare",
+    component: TotalPatientAnalyticHomecare,
   },
 ];
 

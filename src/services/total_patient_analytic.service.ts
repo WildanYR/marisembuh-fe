@@ -164,3 +164,24 @@ export const getTotalPatientAnalyticTherapyByName = async (
     throw error;
   }
 };
+
+export const getTotalPatientAnalyticHomecare = async (
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
+    }
+
+    const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
+      await axios.get("analytic/total-patient/homecare", { params });
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
