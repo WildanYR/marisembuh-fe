@@ -4,6 +4,8 @@ import TotalPatientAnalyticTherapy from "../pages/analytic/TotalPatientAnalyticT
 import TotalPatientAnalyticClinic from "../pages/analytic/TotalPatientAnalyticClinic.vue";
 import TotalPatientAnalyticUser from "../pages/analytic/TotalPatientAnalyticUser.vue";
 import TotalPatientAnalyticHomecare from "../pages/analytic/TotalPatientAnalyticHomecare.vue";
+import TotalPatientAnalyticComplaint from "../pages/analytic/TotalPatientAnalyticComplaint.vue";
+import TotalPatientAnalyticDoctorDiagnosis from "../pages/analytic/TotalPatientAnalyticDoctorDiagnosis.vue";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -30,6 +32,16 @@ const routes: RouteRecordRaw[] = [
     name: "TotalPatientAnalyticHomecare",
     path: "homecare",
     component: TotalPatientAnalyticHomecare,
+  },
+  {
+    name: "TotalPatientAnalyticComplaint",
+    path: "keluhan",
+    component: TotalPatientAnalyticComplaint,
+  },
+  {
+    name: "TotalPatientAnalyticDoctorDiagnosis",
+    path: "diagnosa-dokter",
+    component: TotalPatientAnalyticDoctorDiagnosis,
   },
 ];
 

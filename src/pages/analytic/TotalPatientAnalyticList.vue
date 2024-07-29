@@ -10,6 +10,11 @@ const routes = [
   { data: { name: "TotalPatientAnalyticUser" }, name: "Terapis" },
   { data: { name: "TotalPatientAnalyticTherapy" }, name: "Jenis Terapi" },
   { data: { name: "TotalPatientAnalyticHomecare" }, name: "Homecare" },
+  { data: { name: "TotalPatientAnalyticComplaint" }, name: "Keluhan" },
+  {
+    data: { name: "TotalPatientAnalyticDoctorDiagnosis" },
+    name: "Diagnosa Dokter",
+  },
 ];
 
 const toPreviousPage = () => {

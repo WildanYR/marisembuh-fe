@@ -185,3 +185,107 @@ export const getTotalPatientAnalyticHomecare = async (
     throw error;
   }
 };
+
+export const getTotalPatientAnalyticComplaintPagination = async (
+  pagination?: IPagination,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (pagination) {
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
+    }
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
+    }
+
+    const response: AxiosResponse<
+      IPaginationResponse<ITotalPatientAnalyticResponse>,
+      any
+    > = await axios.get("analytic/total-patient/complaint", { params });
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticComplaintByName = async (
+  name: string,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
+    }
+
+    const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
+      await axios.get("analytic/total-patient/complaint", { params });
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticDoctorDiagnosisPagination = async (
+  pagination?: IPagination,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const params = new URLSearchParams();
+    if (pagination) {
+      Object.entries(pagination).forEach((q) => {
+        params.append(q[0], q[1]);
+      });
+    }
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
+    }
+
+    const response: AxiosResponse<
+      IPaginationResponse<ITotalPatientAnalyticResponse>,
+      any
+    > = await axios.get("analytic/total-patient/doctor-diagnosis", { params });
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
+
+export const getTotalPatientAnalyticDoctorDiagnosisByName = async (
+  name: string,
+  dateFilter?: IDateFilterQuery
+) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("s", name);
+    if (dateFilter?.startDate) {
+      params.append("start_date", dateFilter.startDate);
+    }
+    if (dateFilter?.endDate) {
+      params.append("end_date", dateFilter.endDate);
+    }
+
+    const response: AxiosResponse<ITotalPatientAnalyticResponse[], any> =
+      await axios.get("analytic/total-patient/doctor-diagnosis", { params });
+    return response.data;
+  } catch (error) {
+    requestErrorHandler(error);
+    throw error;
+  }
+};
