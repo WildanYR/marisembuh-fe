@@ -15,6 +15,10 @@ const routes = [
     data: { name: "TotalPatientAnalyticDoctorDiagnosis" },
     name: "Diagnosa Dokter",
   },
+  {
+    data: { name: "TotalPatientAnalyticTreatmentPacket" },
+    name: "Paket Perawatan",
+  },
 ];
 
 const toPreviousPage = () => {
