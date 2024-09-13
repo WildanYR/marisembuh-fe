@@ -76,7 +76,7 @@ const handleAddUser = () => {
     return;
   }
   loadingSubmit.value = true;
-  createUser({ ...(formData as any) })
+  createUser({ ...(formData.value as any) })
     .then(() => {
       toPreviousPage();
     })
@@ -168,9 +168,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    class="w-full max-w-xl p-6 mx-auto mb-24 bg-white shadow-lg mt-14 rounded-xl"
-  >
+  <div class="w-full max-w-xl p-6 mx-auto mb-24 bg-white shadow-lg mt-14 rounded-xl">
     <h1 class="mb-3 text-4xl font-medium text-center">
       {{ route.meta.title }}
     </h1>
@@ -178,68 +176,38 @@ onMounted(() => {
       <GrayButton @click="toPreviousPage" class="text-sm">Kembali</GrayButton>
     </div>
     <div class="space-y-4">
-      <TextInput
-        v-model="formData.email"
-        label="Email"
-        :disabled="readOnly"
-        :error-message="formDataError.email"
-      ></TextInput>
-      <TextInput
-        v-model="formData.password"
-        label="Password"
-        type="password"
-        :disabled="readOnly"
-        :error-message="formDataError.password"
-      ></TextInput>
-      <TextInput
-        v-model="formData.name"
-        label="Nama"
-        :disabled="readOnly"
-        :error-message="formDataError.name"
-      ></TextInput>
+      <TextInput v-model="formData.email" label="Email" :disabled="readOnly" :error-message="formDataError.email">
+      </TextInput>
+      <TextInput v-model="formData.password" label="Password" type="password" :disabled="readOnly"
+        :error-message="formDataError.password"></TextInput>
+      <TextInput v-model="formData.name" label="Nama" :disabled="readOnly" :error-message="formDataError.name">
+      </TextInput>
       <RadioGroup v-model="formData.role" :disabled="readOnly">
         <RadioGroupLabel class="text-gray-700">Role</RadioGroupLabel>
         <div class="grid grid-cols-2 gap-3 mt-3">
-          <RadioGroupOption
-            v-for="(role, i) in Object.values(Roles)"
-            :key="'role-' + i"
-            as="template"
-            :value="role"
-            v-slot="{ active, checked }"
-          >
-            <div
-              :class="[
-                active
-                  ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-blue-300'
-                  : '',
-                checked
-                  ? 'bg-blue-700/75 text-white '
-                  : 'bg-white border border-gray-200',
-              ]"
-              class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none"
-            >
+          <RadioGroupOption v-for="(role, i) in Object.values(Roles)" :key="'role-' + i" as="template" :value="role"
+            v-slot="{ active, checked }">
+            <div :class="[
+              active
+                ? 'ring-2 ring-white/60 ring-offset-2 ring-offset-blue-300'
+                : '',
+              checked
+                ? 'bg-blue-700/75 text-white '
+                : 'bg-white border border-gray-200',
+            ]"
+              class="relative flex items-center justify-center w-full px-5 py-3 rounded-lg cursor-pointer focus:outline-none">
               <RadioGroupLabel class="text-sm">{{ role }}</RadioGroupLabel>
             </div>
           </RadioGroupOption>
         </div>
       </RadioGroup>
       <template v-if="showClinicSelect">
-        <SingleClinicSelect
-          label="Klinik"
-          v-model="selectedClinic"
-          v-model:modal-show="showModalClinic"
-          :disabled="readOnly"
-          @update:model-value="onSelectClinic"
-          @add-data="handleAddClinicData"
-        />
+        <SingleClinicSelect label="Klinik" v-model="selectedClinic" v-model:modal-show="showModalClinic"
+          :disabled="readOnly" @update:model-value="onSelectClinic" @add-data="handleAddClinicData" />
       </template>
       <div class="pt-3 space-y-4">
-        <LoadingButton
-          v-show="!readOnly"
-          :loading="loadingSubmit"
-          @click="handleSubmit"
-          class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600"
-        >
+        <LoadingButton v-show="!readOnly" :loading="loadingSubmit" @click="handleSubmit"
+          class="w-full px-4 py-2 text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-blue-200 disabled:text-blue-600">
           {{ route.meta.title }}
         </LoadingButton>
         <GrayButton @click="toPreviousPage" class="w-full">Kembali</GrayButton>
