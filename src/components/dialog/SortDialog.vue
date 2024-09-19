@@ -9,7 +9,12 @@ import {
   RadioGroupLabel,
   RadioGroupOption,
 } from "@headlessui/vue";
-import { ref } from "vue";
+import { PropType, ref } from "vue";
+
+interface ISortList {
+  key: string;
+  name: string;
+}
 
 const props = defineProps({
   title: {
@@ -21,7 +26,7 @@ const props = defineProps({
     default: false,
   },
   sortList: {
-    type: Array,
+    type: Array as PropType<ISortList[]>,
     required: true
   }
 });
