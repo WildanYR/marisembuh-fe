@@ -89,3 +89,35 @@ export const calculateAgeFromBirthdate = (birthdate: Date | string) => {
   const interval = Interval.fromDateTimes(birthday, today);
   return Math.floor(interval.length("years"));
 };
+
+export const getRelativeTimeStatus = (date: Date) => {
+  // Mendapatkan timestamp saat ini dan tanggal input
+  const sekarang = Date.now();
+  const waktuInput = date.getTime();
+
+  // Menghitung selisih waktu dalam milidetik
+  const selisih = sekarang - waktuInput;
+
+  // Konversi ke berbagai satuan waktu
+  const detik = Math.floor(selisih / 1000);
+  const menit = Math.floor(detik / 60);
+  const jam = Math.floor(menit / 60);
+  const hari = Math.floor(jam / 24);
+  const bulan = Math.floor(hari / 30);
+  const tahun = Math.floor(bulan / 12);
+
+  // Menentukan status waktu relatif
+  if (detik < 60) {
+    return "baru saja";
+  } else if (menit < 60) {
+    return `${menit} menit yang lalu`;
+  } else if (jam < 24) {
+    return `${jam} jam yang lalu`;
+  } else if (hari < 30) {
+    return `${hari} hari yang lalu`;
+  } else if (bulan < 12) {
+    return `${bulan} bulan yang lalu`;
+  } else {
+    return `${tahun} tahun yang lalu`;
+  }
+};

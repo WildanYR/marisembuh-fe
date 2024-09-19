@@ -32,6 +32,7 @@ export interface IPatientResponse {
     id: number;
     name: string;
   };
+  total_treatment?: number;
 }
 
 interface IPatientCountCondition {

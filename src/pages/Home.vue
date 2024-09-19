@@ -140,6 +140,11 @@ const routes: IRoutes[] = [
         data: { name: "TreatmentAnalyticList" },
         name: "Analisis Perawatan",
       },
+      {
+        type: "route",
+        data: { name: "PatientAnalytic" },
+        name: "Analisis Pasien",
+      },
     ],
   },
   {
@@ -234,10 +239,7 @@ const routes: IRoutes[] = [
           }}</span>
           <span v-else class="font-medium">Marisembuh</span>
         </h2>
-        <div
-          v-if="authStore.role !== Roles.ADMIN"
-          class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2"
-        >
+        <div v-if="authStore.role !== Roles.ADMIN" class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
           <div class="w-full px-6 py-2 border border-gray-300 rounded-md">
             <p class="text-sm text-gray-600">Pasien Klinik Hari ini</p>
             <p class="text-3xl font-medium">{{ patientCount.clinic_today }}</p>
@@ -266,20 +268,12 @@ const routes: IRoutes[] = [
           <div class="grid grid-cols-1 gap-5 lg:grid-cols-4 md:grid-cols-2">
             <template v-for="(list, j) in group.list">
               <template v-if="checkRoles(list.roles)">
-                <RouterLink
-                  v-if="list.type === 'route'"
-                  :key="'menu-route-' + j"
-                  :to="(list.data as any)"
-                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-                >
+                <RouterLink v-if="list.type === 'route'" :key="'menu-route-' + j" :to="(list.data as any)"
+                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white">
                   {{ list.name }}
                 </RouterLink>
-                <button
-                  v-else
-                  :key="'menu-action-' + j"
-                  @click="list.data"
-                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white"
-                >
+                <button v-else :key="'menu-action-' + j" @click="list.data"
+                  class="w-full px-6 py-5 text-lg font-medium text-center border border-gray-300 rounded-md hover:bg-blue-500 hover:text-white">
                   {{ list.name }}
                 </button>
               </template>
